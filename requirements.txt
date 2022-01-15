@@ -1,0 +1,4 @@
+PasteDeploy>=1.5.2
+WebOb>=1.8.6
+Routes>=2.4.1
+eventlet>=0.25.2

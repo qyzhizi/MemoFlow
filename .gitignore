@@ -1,0 +1,10 @@
+*.pyc
+*__pycache__/
+*.log
+web_dl.egg-info/
+build/
+.spyproject/
+.eggs
+.spyproject
+ChangeLog
+.idea/
