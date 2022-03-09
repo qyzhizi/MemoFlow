@@ -8,8 +8,7 @@ from web_dl.wsgi import Server
 
 # import pdb; pdb.set_trace()
 LOG = logging.getLogger(__name__)
-cp = ConfigParse("/home/qy/Documents/git_rep/web_dl"
-                 "/etc/web_dl/web_dl.conf")
+cp = ConfigParse("/root/git_rep/2022-1-16-web-dl/web_dl/etc/web_dl/web-dl.conf")
 cf_defaults = cp.read_file().get("default")
 
 log_util.setup(level=logging.DEBUG,
@@ -27,7 +26,7 @@ def main():
     try:
         LOG.info("cf_defaults:%s", cf_defaults)
         api_paste = cf_defaults.get("api_paste_path")
-        app = deploy.loadapp("config:%s" % api_paste, name="web_dl")
+        app = deploy.loadapp("config:%s" % api_paste)
         LOG.info("app: %s", app)
         server = Server(cf_defaults)
         server.start(app)

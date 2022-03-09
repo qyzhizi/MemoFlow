@@ -29,7 +29,7 @@ class DemoController(object):
     def hello(self, req):
         #import pdb; pdb.set_trace()
         # 初始化数据库连接:
-        engine = create_engine('mysql+mysqlconnector://root:peng@localhost:3306/web_test_1')
+        engine = create_engine('mysql+mysqlconnector://root:peng1234@localhost:3306/web_test_1')
         # 创建DBSession类型:
         DBSession = sessionmaker(bind=engine)
         # 创建Session:
