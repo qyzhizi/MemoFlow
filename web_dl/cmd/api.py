@@ -8,12 +8,12 @@ from web_dl.wsgi import Server
 
 # import pdb; pdb.set_trace()
 LOG = logging.getLogger(__name__)
-cp = ConfigParse("/root/git_rep/2022-1-16-web-dl/web_dl/etc/web_dl/web-dl.conf")
+cp = ConfigParse("/root/git_rep/dl/web_dl/etc/web_dl/web-dl.conf")
 cf_defaults = cp.read_file().get("default")
 
-log_util.setup(level=logging.DEBUG,
+log_util.setup(level=logging.INFO,
                outs=[log_util.RotatingFile(filename=cf_defaults.get("log_file"),
-                                           level=logging.DEBUG,
+                                           level=logging.INFO,
                                            max_size_bytes=1000000,
                                            backup_count=10)],
                program_name="web_dl",
@@ -25,8 +25,10 @@ def main():
     LOG.info("******************start**************************")
     try:
         LOG.info("cf_defaults:%s", cf_defaults)
+        import pdb; pdb.set_trace()
         api_paste = cf_defaults.get("api_paste_path")
         app = deploy.loadapp("config:%s" % api_paste)
+
         LOG.info("app: %s", app)
         server = Server(cf_defaults)
         server.start(app)

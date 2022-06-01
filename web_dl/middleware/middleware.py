@@ -20,6 +20,7 @@ class Middleware(object):
         """ 过滤器，process_request在controller前处理，process_response
          controller响应后处理。若process_request有响应返回，则返回，否则继续执行
         """
+        import pdb; pdb.set_trace()
         response = self.process_request(req)
         if response:
             return response
