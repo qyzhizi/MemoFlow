@@ -22,9 +22,12 @@ class VersionFilter(Middleware):
         LOG.info(msg)
 
         if req.path_info_peek() in ("version", ""):
+            LOG.info("req.path_info_peek()")
+            LOG.info(req.path_info_peek())
             return self.version
         match = self.match_version_string(req.path_info_peek(), req)
         if match:
+            LOG.info("matched")
             major_version = req.environ['api.major_version']
             minor_version = req.environ['api.minor_version']
             if (major_version == 1 and minor_version == 0):
@@ -63,6 +66,7 @@ class VersionFilter(Middleware):
 
 def version_filter(local_conf, **global_conf):
     def filter(app):
+        import pdb; pdb.set_trace()
         return VersionFilter(app)
 
     return filter
