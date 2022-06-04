@@ -25,7 +25,6 @@ class Router(object):
                                     conditions={"method": methods_str})
 
         demo = create_handler()
-        #import pdb;pdb.set_trace()
         connect(controller=demo,
                 routes=[
                     {
@@ -49,7 +48,6 @@ class Router(object):
 
     @wsgify
     def __call__(self, *args, **kwargs):
-        #import pdb; pdb.set_trace()
         return self.router
 
     @staticmethod

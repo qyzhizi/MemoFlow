@@ -67,7 +67,6 @@ class Server(object):
     """Server class to manage multiple WSGI sockets and applications."""
 
     def __init__(self, conf, threads=1000):
-        #import pdb; pdb.set_trace()
         os.umask(0o27)  # ensure files are created with the correct privileges
         self._logger = logging.getLogger("eventlet.wsgi.server")
         self.threads = threads

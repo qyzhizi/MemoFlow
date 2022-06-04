@@ -36,7 +36,6 @@ class DemoController(object):
                         % name)
 
     def hello(self, req):
-        import pdb; pdb.set_trace()
 
         # 初始化数据库连接:
         engine = create_engine('mysql+mysqlconnector://root:peng1234@localhost:3306/blog?charset=utf8')

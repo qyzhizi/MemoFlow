@@ -6,7 +6,6 @@ from web_dl.ConfigParse import ConfigParse
 from web_dl import log_util
 from web_dl.wsgi import Server
 
-# import pdb; pdb.set_trace()
 LOG = logging.getLogger(__name__)
 cp = ConfigParse("/root/git_rep/dl/web_dl/etc/web_dl/web-dl.conf")
 cf_defaults = cp.read_file().get("default")
@@ -21,11 +20,9 @@ log_util.setup(level=logging.INFO,
 
 
 def main():
-    # test
     LOG.info("******************start**************************")
     try:
         LOG.info("cf_defaults:%s", cf_defaults)
-        import pdb; pdb.set_trace()
         api_paste = cf_defaults.get("api_paste_path")
         app = deploy.loadapp("config:%s" % api_paste)
 
