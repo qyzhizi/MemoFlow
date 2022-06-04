@@ -15,7 +15,6 @@ class VersionFilter(Middleware):
         super(VersionFilter, self).__init__(app)
 
     def process_request(self, req):
-        #import pdb; pdb.set_trace()
         msg = ("Processing request: %(method)s %(path)s Accept: "
                "%(accept)s" % {'method': req.method,
                                'path': req.path, 'accept': req.accept})
@@ -66,7 +65,6 @@ class VersionFilter(Middleware):
 
 def version_filter(local_conf, **global_conf):
     def filter(app):
-        import pdb; pdb.set_trace()
         return VersionFilter(app)
 
     return filter

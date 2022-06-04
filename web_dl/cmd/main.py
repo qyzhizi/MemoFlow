@@ -5,5 +5,4 @@ from web_dl.cmd.api import main
 
 
 if __name__ == "__main__":
-    import pdb; pdb.set_trace()
     sys.exit(main())
