@@ -5,6 +5,8 @@ import logging
 from web_dl.ConfigParse import ConfigParse
 from web_dl import log_util
 from web_dl.wsgi import Server
+from web_dl.common import dependency
+from web_dl.common import backends
 
 LOG = logging.getLogger(__name__)
 cp = ConfigParse("/root/git_rep/dl/web_dl/etc/web_dl/web-dl.conf")
@@ -22,6 +24,8 @@ log_util.setup(level=logging.INFO,
 def main():
     LOG.info("******************start**************************")
     try:
+        drivers = backends.load_backends()
+        drivers.update(dependency.resolve_future_dependencies())
         LOG.info("cf_defaults:%s", cf_defaults)
         api_paste = cf_defaults.get("api_paste_path")
         app = deploy.loadapp("config:%s" % api_paste)

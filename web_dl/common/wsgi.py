@@ -108,8 +108,8 @@ class ComposableRouter(Router):
     def __init__(self, mapper=None):
         if mapper is None:
             mapper = routes.Mapper()
-            self.add_routes(mapper)
-            super(ComposableRouter, self).__init__(mapper)
+        self.add_routes(mapper)
+        super(ComposableRouter, self).__init__(mapper)
 
     def add_routes(self, mapper):
         """Add routes to given mapper."""""
