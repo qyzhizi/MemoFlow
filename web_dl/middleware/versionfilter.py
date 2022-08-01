@@ -1,9 +1,37 @@
-from .middleware import Middleware
-from web_dl.controller.version import VersionController
-import re
 import logging
+import json
+import re
+from six.moves import http_client
+import webob.dec
+import webob
+
+from .middleware import Middleware
+#from web_dl.controller.version import VersionController
 
 LOG = logging.getLogger(__name__)
+
+
+class VersionController(object):
+
+    @webob.dec.wsgify
+    def __call__(self, req):
+        version_obj = {
+            "version": "v1",
+            "author": "qyzhizi",
+            "url": self.get_href(req)
+        }
+        body_str = json.dumps(dict(version_obj))
+        # application/json
+        response = webob.response.Response(request=req,
+                                           status=http_client.MULTIPLE_CHOICES,
+                                           content_type="text/plain") #text/plain
+        #response.body = body_str
+        
+        response.text = body_str  # python3
+        return response
+
+    def get_href(self, req):
+        return "%s/v1/" % req.host_url
 
 
 class VersionFilter(Middleware):
@@ -63,8 +91,9 @@ class VersionFilter(Middleware):
         return match is not None
 
 
-def version_filter(local_conf, **global_conf):
-    def filter(app):
-        return VersionFilter(app)
+#def version_filter(local_conf, **global_conf):
+#    def filter(app):
+#        return VersionFilter(app)
+#
+#    return filter
 
-    return filter

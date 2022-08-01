@@ -85,6 +85,7 @@ def setup(level=logging.WARNING, outs=[], program_name=None,
     """Setup Python logging.
     This will setup basic handlers for Python logging.
     """
+    # 传入None, get the root_logger
     root_logger = logging.getLogger(None)
 
     # Remove all handlers
@@ -108,3 +109,4 @@ def setup(level=logging.WARNING, outs=[], program_name=None,
 
     if capture_warnings:
         logging.captureWarnings(True)
+

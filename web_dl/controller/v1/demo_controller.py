@@ -74,3 +74,4 @@ class DemoController(object):
 
 def create_handler():
     return Handler(DemoController())
+
