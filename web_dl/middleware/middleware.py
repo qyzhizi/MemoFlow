@@ -26,4 +26,12 @@ class Middleware(object):
         response = req.get_response(self.application)
         return self.process_response(response)
 
+    # 工厂方法，用在api-paste.ini
+    @classmethod
+    def factory(cls, local_conf, **global_conf):
+        def _factory(app):
+            return cls(app)
+    
+        return _factory
+    
 
