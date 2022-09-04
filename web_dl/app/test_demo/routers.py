@@ -11,3 +11,14 @@ class Router(wsgi.ComposableRouter):
                        action='test',
                        conditions=dict(method=['GET']))
 
+        mapper.connect('/hello2/{name}',
+                       controller=test_controller,
+                       action='test2',
+                       conditions=dict(method=['GET']))
+
+        mapper.connect('/lzw/{name}',
+                       controller=test_controller,
+                       action='test_lzw',
+                       conditions=dict(method=['GET']))
+
+

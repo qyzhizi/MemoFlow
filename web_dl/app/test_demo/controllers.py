@@ -12,3 +12,12 @@ class Test(wsgi.Application):
         test = self.test_api.test
         return Response("hello world %s, %s" % (name, test))
 
+    def test2(self, req, name):
+        test = self.test_api.test
+        return Response("hello world2 %s, %s" % (name, test))
+
+    def test_lzw(self, req, name):
+        test = self.test_api.test
+        #return Response("hello world lzw  %s, %s" % (name, test))
+        return "hello world lzw, %s" % name
+
