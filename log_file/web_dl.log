@@ -20,3 +20,203 @@
     with open(filename) as f:
 FileNotFoundError: [Errno 2] No such file or directory: '/root/git_rep/dl/web_dl/etc/web_dl/api-paste.ini'
 
+2023-02-15 00:13:23,547 [21454] INFO     web_dl.cmd.api: ******************start**************************
+2023-02-15 00:13:23,548 [21454] INFO     web_dl.cmd.api: cf_defaults:{'workers': '2', 'port': '9000', 'api_paste_path': '/root/git_rep/dl/web_dl/etc/web_dl/api-paste.ini', 'log_file': '../../log_file/web_dl.log', 'max_header_line': '4096'}
+2023-02-15 00:13:23,649 [21454] INFO     web_dl.cmd.api: app: <paste.urlmap.URLMap object at 0x7f9362189ba8>
+2023-02-15 00:13:23,650 [21454] INFO     web_dl.wsgi: Starting 2 workers
+2023-02-15 00:13:23,652 [21454] INFO     web_dl.wsgi: Started child 21460
+2023-02-15 00:13:23,654 [21460] INFO     eventlet.wsgi.server: (21460) wsgi starting up on http://0.0.0.0:9000
+2023-02-15 00:13:23,654 [21454] INFO     web_dl.wsgi: Started child 21461
+2023-02-15 00:13:23,656 [21461] INFO     eventlet.wsgi.server: (21461) wsgi starting up on http://0.0.0.0:9000
+2023-02-15 00:17:14,487 [21460] INFO     web_dl.middleware.versionfilter: Processing request: GET /v1/hello/lzw Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/avif, image/webp, image/apng, */*;q=0.8, application/signed-exchange;v=b3;q=0.9
+2023-02-15 00:17:14,487 [21460] INFO     web_dl.middleware.versionfilter: major_version, minor_version:1.0
+2023-02-15 00:17:14,487 [21460] INFO     web_dl.middleware.versionfilter: matched
+2023-02-15 00:17:14,487 [21460] INFO     web_dl.middleware.versionfilter: Matched versioned URI. Version: 1.0
+2023-02-15 00:17:14,489 [21460] INFO     web_dl.common.wsgi: GET http://81.71.155.217:9000/v1/hello/lzw
+2023-02-15 00:17:14,489 [21460] INFO     eventlet.wsgi.server: 117.165.238.164 - - [15/Feb/2023 00:17:14] "GET /v1/hello/lzw HTTP/1.1" 200 161 0.002829
+2023-02-15 00:17:14,565 [21460] INFO     web_dl.middleware.versionfilter: Processing request: GET /favicon.ico Accept: image/avif, image/webp, image/apng, image/svg+xml, image/*, */*;q=0.8
+2023-02-15 00:17:14,565 [21460] INFO     web_dl.middleware.versionfilter: the version is not allow
+2023-02-15 00:17:14,565 [21460] INFO     eventlet.wsgi.server: 117.165.238.164 - - [15/Feb/2023 00:17:14] "GET /favicon.ico HTTP/1.1" 300 233 0.000898
+2023-02-15 00:25:19,828 [21461] INFO     web_dl.middleware.versionfilter: Processing request: GET /v1/hello/lzw Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/avif, image/webp, image/apng, */*;q=0.8, application/signed-exchange;v=b3;q=0.9
+2023-02-15 00:25:19,828 [21461] INFO     web_dl.middleware.versionfilter: major_version, minor_version:1.0
+2023-02-15 00:25:19,830 [21461] INFO     web_dl.middleware.versionfilter: matched
+2023-02-15 00:25:19,830 [21461] INFO     web_dl.middleware.versionfilter: Matched versioned URI. Version: 1.0
+2023-02-15 00:25:19,831 [21461] INFO     web_dl.common.wsgi: GET http://81.71.155.217:9000/v1/hello/lzw
+2023-02-15 00:25:19,832 [21461] INFO     eventlet.wsgi.server: 220.196.160.154 - - [15/Feb/2023 00:25:19] "GET /v1/hello/lzw HTTP/1.1" 200 161 0.004876
+2023-02-15 00:32:02,416 [21461] INFO     web_dl.middleware.versionfilter: Processing request: GET /v1/lzw/x Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/avif, image/webp, image/apng, */*;q=0.8, application/signed-exchange;v=b3;q=0.9
+2023-02-15 00:32:02,416 [21461] INFO     web_dl.middleware.versionfilter: major_version, minor_version:1.0
+2023-02-15 00:32:02,416 [21461] INFO     web_dl.middleware.versionfilter: matched
+2023-02-15 00:32:02,416 [21461] INFO     web_dl.middleware.versionfilter: Matched versioned URI. Version: 1.0
+2023-02-15 00:32:02,417 [21461] INFO     web_dl.common.wsgi: GET http://81.71.155.217:9000/v1/lzw/x
+2023-02-15 00:32:02,417 [21461] INFO     eventlet.wsgi.server: 117.165.238.164 - - [15/Feb/2023 00:32:02] "GET /v1/lzw/x HTTP/1.1" 200 158 0.001976
+2023-02-15 00:40:14,428 [21461] INFO     web_dl.middleware.versionfilter: Processing request: GET /v1/lzw/x Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/avif, image/webp, image/apng, */*;q=0.8, application/signed-exchange;v=b3;q=0.9
+2023-02-15 00:40:14,428 [21461] INFO     web_dl.middleware.versionfilter: major_version, minor_version:1.0
+2023-02-15 00:40:14,428 [21461] INFO     web_dl.middleware.versionfilter: matched
+2023-02-15 00:40:14,428 [21461] INFO     web_dl.middleware.versionfilter: Matched versioned URI. Version: 1.0
+2023-02-15 00:40:14,428 [21461] INFO     web_dl.common.wsgi: GET http://81.71.155.217:9000/v1/lzw/x
+2023-02-15 00:40:14,429 [21461] INFO     eventlet.wsgi.server: 220.196.160.51 - - [15/Feb/2023 00:40:14] "GET /v1/lzw/x HTTP/1.1" 200 158 0.001131
+2023-02-15 00:46:42,348 [21454] ERROR    web_dl.wsgi: SIGTERM received
+2023-02-15 00:46:42,350 [21454] INFO     web_dl.wsgi: Removed dead child 21460
+2023-02-15 00:46:45,399 [27222] INFO     web_dl.cmd.api: ******************start**************************
+2023-02-15 00:46:45,399 [27222] INFO     web_dl.cmd.api: cf_defaults:{'workers': '2', 'port': '9000', 'api_paste_path': '/root/git_rep/dl/web_dl/etc/web_dl/api-paste.ini', 'log_file': '../../log_file/web_dl.log', 'max_header_line': '4096'}
+2023-02-15 00:46:45,569 [27222] INFO     web_dl.cmd.api: app: <paste.urlmap.URLMap object at 0x7f67b7845978>
+2023-02-15 00:46:45,570 [27222] INFO     web_dl.wsgi: Starting 2 workers
+2023-02-15 00:46:45,572 [27222] INFO     web_dl.wsgi: Started child 27236
+2023-02-15 00:46:45,574 [27236] INFO     eventlet.wsgi.server: (27236) wsgi starting up on http://0.0.0.0:9000
+2023-02-15 00:46:45,574 [27222] INFO     web_dl.wsgi: Started child 27237
+2023-02-15 00:46:45,576 [27237] INFO     eventlet.wsgi.server: (27237) wsgi starting up on http://0.0.0.0:9000
+2023-02-15 00:47:31,961 [27236] INFO     web_dl.middleware.versionfilter: Processing request: GET /v1/chatgpt/hello Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/avif, image/webp, image/apng, */*;q=0.8, application/signed-exchange;v=b3;q=0.9
+2023-02-15 00:47:31,961 [27236] INFO     web_dl.middleware.versionfilter: major_version, minor_version:1.0
+2023-02-15 00:47:31,961 [27236] INFO     web_dl.middleware.versionfilter: matched
+2023-02-15 00:47:31,961 [27236] INFO     web_dl.middleware.versionfilter: Matched versioned URI. Version: 1.0
+2023-02-15 00:47:31,963 [27236] INFO     web_dl.common.wsgi: GET http://81.71.155.217:9000/v1/chatgpt/hello
+2023-02-15 00:47:31,965 [27236] INFO     openai: message='Request to OpenAI API' method=post path=https://api.openai.com/v1/completions
+2023-02-15 00:47:34,287 [27236] INFO     openai: message='OpenAI API response' path=https://api.openai.com/v1/completions processing_ms=1587 response_code=200
+2023-02-15 00:47:34,289 [27236] INFO     eventlet.wsgi.server: 117.165.238.164 - - [15/Feb/2023 00:47:34] "GET /v1/chatgpt/hello HTTP/1.1" 200 139 2.328446
+2023-02-15 00:48:16,057 [27222] ERROR    web_dl.wsgi: SIGTERM received
+2023-02-15 00:48:16,059 [27222] INFO     web_dl.wsgi: Removed dead child 27237
+2023-02-15 00:48:18,276 [27563] INFO     web_dl.cmd.api: ******************start**************************
+2023-02-15 00:48:18,277 [27563] INFO     web_dl.cmd.api: cf_defaults:{'workers': '2', 'port': '9000', 'api_paste_path': '/root/git_rep/dl/web_dl/etc/web_dl/api-paste.ini', 'log_file': '../../log_file/web_dl.log', 'max_header_line': '4096'}
+2023-02-15 00:48:18,372 [27563] INFO     web_dl.cmd.api: app: <paste.urlmap.URLMap object at 0x7fa4c06c2550>
+2023-02-15 00:48:18,373 [27563] INFO     web_dl.wsgi: Starting 2 workers
+2023-02-15 00:48:18,375 [27563] INFO     web_dl.wsgi: Started child 27571
+2023-02-15 00:48:18,377 [27563] INFO     web_dl.wsgi: Started child 27572
+2023-02-15 00:48:18,378 [27571] INFO     eventlet.wsgi.server: (27571) wsgi starting up on http://0.0.0.0:9000
+2023-02-15 00:48:18,381 [27572] INFO     eventlet.wsgi.server: (27572) wsgi starting up on http://0.0.0.0:9000
+2023-02-15 00:48:21,042 [27571] INFO     web_dl.middleware.versionfilter: Processing request: GET /v1/chatgpt/hello Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/avif, image/webp, image/apng, */*;q=0.8, application/signed-exchange;v=b3;q=0.9
+2023-02-15 00:48:21,042 [27571] INFO     web_dl.middleware.versionfilter: major_version, minor_version:1.0
+2023-02-15 00:48:21,042 [27571] INFO     web_dl.middleware.versionfilter: matched
+2023-02-15 00:48:21,042 [27571] INFO     web_dl.middleware.versionfilter: Matched versioned URI. Version: 1.0
+2023-02-15 00:48:21,044 [27571] INFO     web_dl.common.wsgi: GET http://81.71.155.217:9000/v1/chatgpt/hello
+2023-02-15 00:48:21,045 [27571] INFO     openai: message='Request to OpenAI API' method=post path=https://api.openai.com/v1/completions
+2023-02-15 00:48:23,001 [27571] INFO     openai: message='OpenAI API response' path=https://api.openai.com/v1/completions processing_ms=1238 response_code=200
+2023-02-15 00:48:23,003 [27571] INFO     eventlet.wsgi.server: 117.165.238.164 - - [15/Feb/2023 00:48:23] "GET /v1/chatgpt/hello HTTP/1.1" 200 139 1.961640
+2023-02-15 00:49:47,741 [27563] ERROR    web_dl.wsgi: SIGTERM received
+2023-02-15 00:49:47,743 [27563] INFO     web_dl.wsgi: Removed dead child 27572
+2023-02-15 00:49:50,157 [27904] INFO     web_dl.cmd.api: ******************start**************************
+2023-02-15 00:49:50,158 [27904] INFO     web_dl.cmd.api: cf_defaults:{'workers': '2', 'port': '9000', 'api_paste_path': '/root/git_rep/dl/web_dl/etc/web_dl/api-paste.ini', 'log_file': '../../log_file/web_dl.log', 'max_header_line': '4096'}
+2023-02-15 00:49:50,251 [27904] INFO     web_dl.cmd.api: app: <paste.urlmap.URLMap object at 0x7f62cf37aa90>
+2023-02-15 00:49:50,251 [27904] INFO     web_dl.wsgi: Starting 2 workers
+2023-02-15 00:49:50,253 [27904] INFO     web_dl.wsgi: Started child 27908
+2023-02-15 00:49:50,255 [27908] INFO     eventlet.wsgi.server: (27908) wsgi starting up on http://0.0.0.0:9000
+2023-02-15 00:49:50,256 [27904] INFO     web_dl.wsgi: Started child 27909
+2023-02-15 00:49:50,258 [27909] INFO     eventlet.wsgi.server: (27909) wsgi starting up on http://0.0.0.0:9000
+2023-02-15 00:49:53,919 [27909] INFO     web_dl.middleware.versionfilter: Processing request: GET /v1/chatgpt/hello Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/avif, image/webp, image/apng, */*;q=0.8, application/signed-exchange;v=b3;q=0.9
+2023-02-15 00:49:53,920 [27909] INFO     web_dl.middleware.versionfilter: major_version, minor_version:1.0
+2023-02-15 00:49:53,920 [27909] INFO     web_dl.middleware.versionfilter: matched
+2023-02-15 00:49:53,920 [27909] INFO     web_dl.middleware.versionfilter: Matched versioned URI. Version: 1.0
+2023-02-15 00:49:53,921 [27909] INFO     web_dl.common.wsgi: GET http://81.71.155.217:9000/v1/chatgpt/hello
+2023-02-15 00:49:53,924 [27909] INFO     openai: message='Request to OpenAI API' method=post path=https://api.openai.com/v1/completions
+2023-02-15 00:49:56,739 [27909] INFO     openai: message='OpenAI API response' path=https://api.openai.com/v1/completions processing_ms=2125 response_code=200
+2023-02-15 00:49:56,741 [27909] INFO     eventlet.wsgi.server: 117.165.238.164 - - [15/Feb/2023 00:49:56] "GET /v1/chatgpt/hello HTTP/1.1" 200 176 2.822764
+2023-02-15 00:52:43,822 [27904] ERROR    web_dl.wsgi: SIGTERM received
+2023-02-15 00:52:43,827 [27904] INFO     web_dl.wsgi: Removed dead child 27908
+2023-02-15 00:52:46,087 [28537] INFO     web_dl.cmd.api: ******************start**************************
+2023-02-15 00:52:46,088 [28537] INFO     web_dl.cmd.api: cf_defaults:{'workers': '2', 'port': '9000', 'api_paste_path': '/root/git_rep/dl/web_dl/etc/web_dl/api-paste.ini', 'log_file': '../../log_file/web_dl.log', 'max_header_line': '4096'}
+2023-02-15 00:52:46,183 [28537] INFO     web_dl.cmd.api: app: <paste.urlmap.URLMap object at 0x7f6c17be2b00>
+2023-02-15 00:52:46,184 [28537] INFO     web_dl.wsgi: Starting 2 workers
+2023-02-15 00:52:46,186 [28537] INFO     web_dl.wsgi: Started child 28544
+2023-02-15 00:52:46,188 [28544] INFO     eventlet.wsgi.server: (28544) wsgi starting up on http://0.0.0.0:9000
+2023-02-15 00:52:46,189 [28537] INFO     web_dl.wsgi: Started child 28545
+2023-02-15 00:52:46,191 [28545] INFO     eventlet.wsgi.server: (28545) wsgi starting up on http://0.0.0.0:9000
+2023-02-15 00:55:10,317 [28545] INFO     web_dl.middleware.versionfilter: Processing request: GET /v1/chatgpt/hello Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/avif, image/webp, image/apng, */*;q=0.8, application/signed-exchange;v=b3;q=0.9
+2023-02-15 00:55:10,317 [28545] INFO     web_dl.middleware.versionfilter: major_version, minor_version:1.0
+2023-02-15 00:55:10,317 [28545] INFO     web_dl.middleware.versionfilter: matched
+2023-02-15 00:55:10,317 [28545] INFO     web_dl.middleware.versionfilter: Matched versioned URI. Version: 1.0
+2023-02-15 00:55:10,319 [28545] INFO     web_dl.common.wsgi: GET http://81.71.155.217:9000/v1/chatgpt/hello
+2023-02-15 00:55:10,321 [28545] INFO     openai: message='Request to OpenAI API' method=post path=https://api.openai.com/v1/completions
+2023-02-15 00:55:13,506 [28545] INFO     openai: message='OpenAI API response' path=https://api.openai.com/v1/completions processing_ms=1441 response_code=200
+2023-02-15 00:55:13,507 [28545] INFO     web_dl.app.test_demo.controllers: 
+Hi! How can I help you?
+2023-02-15 00:55:13,507 [28545] INFO     eventlet.wsgi.server: 220.196.160.76 - - [15/Feb/2023 00:55:13] "GET /v1/chatgpt/hello HTTP/1.1" 200 164 3.192482
+2023-02-15 00:56:02,268 [28545] INFO     web_dl.middleware.versionfilter: Processing request: GET /v1/chatgpt/%E4%BD%A0%E5%A5%BD Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/avif, image/webp, image/apng, */*;q=0.8, application/signed-exchange;v=b3;q=0.9
+2023-02-15 00:56:02,268 [28545] INFO     web_dl.middleware.versionfilter: major_version, minor_version:1.0
+2023-02-15 00:56:02,268 [28545] INFO     web_dl.middleware.versionfilter: matched
+2023-02-15 00:56:02,268 [28545] INFO     web_dl.middleware.versionfilter: Matched versioned URI. Version: 1.0
+2023-02-15 00:56:02,269 [28545] INFO     web_dl.common.wsgi: GET http://81.71.155.217:9000/v1/chatgpt/%E4%BD%A0%E5%A5%BD
+2023-02-15 00:56:02,269 [28545] INFO     openai: message='Request to OpenAI API' method=post path=https://api.openai.com/v1/completions
+2023-02-15 00:56:11,259 [28545] INFO     openai: message='OpenAI API response' path=https://api.openai.com/v1/completions processing_ms=8055 response_code=200
+2023-02-15 00:56:11,259 [28545] INFO     web_dl.app.test_demo.controllers: 
+å¤©ä¸Šå¥½ã€‚èŠ‚æ—¶å¥½å�¡ï¼Œè¯¸å¸®ä½ æœ‰ä»€ä¹ˆå¥½çš„äº‹å‘˜å‘ˆï¼Ÿ
+2023-02-15 00:56:11,260 [28545] INFO     eventlet.wsgi.server: 117.165.238.164 - - [15/Feb/2023 00:56:11] "GET /v1/chatgpt/%E4%BD%A0%E5%A5%BD HTTP/1.1" 200 278 8.991758
+2023-02-15 00:56:57,456 [28545] INFO     web_dl.middleware.versionfilter: Processing request: GET /v1/chatgpt/can%20you%20help%20me Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/avif, image/webp, image/apng, */*;q=0.8, application/signed-exchange;v=b3;q=0.9
+2023-02-15 00:56:57,457 [28545] INFO     web_dl.middleware.versionfilter: major_version, minor_version:1.0
+2023-02-15 00:56:57,457 [28545] INFO     web_dl.middleware.versionfilter: matched
+2023-02-15 00:56:57,457 [28545] INFO     web_dl.middleware.versionfilter: Matched versioned URI. Version: 1.0
+2023-02-15 00:56:57,457 [28545] INFO     web_dl.common.wsgi: GET http://81.71.155.217:9000/v1/chatgpt/can%20you%20help%20me
+2023-02-15 00:56:57,457 [28545] INFO     openai: message='Request to OpenAI API' method=post path=https://api.openai.com/v1/completions
+2023-02-15 00:56:59,198 [28545] INFO     openai: message='OpenAI API response' path=https://api.openai.com/v1/completions processing_ms=1493 response_code=200
+2023-02-15 00:56:59,198 [28545] INFO     web_dl.app.test_demo.controllers: 
+Yes, what do you need help with?
+2023-02-15 00:56:59,199 [28545] INFO     eventlet.wsgi.server: 117.165.238.164 - - [15/Feb/2023 00:56:59] "GET /v1/chatgpt/can%20you%20help%20me HTTP/1.1" 200 173 1.742304
+2023-02-15 00:57:50,059 [28544] INFO     web_dl.middleware.versionfilter: Processing request: GET /v1/chatgpt/ Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/webp, image/apng, */*;q=0.8, application/signed-exchange;v=b3;q=0.7
+2023-02-15 00:57:50,059 [28544] INFO     web_dl.middleware.versionfilter: major_version, minor_version:1.0
+2023-02-15 00:57:50,059 [28544] INFO     web_dl.middleware.versionfilter: matched
+2023-02-15 00:57:50,059 [28544] INFO     web_dl.middleware.versionfilter: Matched versioned URI. Version: 1.0
+2023-02-15 00:57:50,062 [28544] INFO     eventlet.wsgi.server: 103.197.69.164 - - [15/Feb/2023 00:57:50] "GET /v1/chatgpt/ HTTP/1.1" 404 297 0.004442
+2023-02-15 00:57:51,379 [28545] INFO     web_dl.middleware.versionfilter: Processing request: GET /favicon.ico Accept: image/webp, image/apng, image/svg+xml, image/*, */*;q=0.8
+2023-02-15 00:57:51,379 [28545] INFO     web_dl.middleware.versionfilter: the version is not allow
+2023-02-15 00:57:51,380 [28545] INFO     eventlet.wsgi.server: 103.197.69.164 - - [15/Feb/2023 00:57:51] "GET /favicon.ico HTTP/1.1" 300 228 0.000740
+2023-02-15 00:57:56,455 [28544] INFO     web_dl.middleware.versionfilter: Processing request: GET /v1/chatgpt/Can%20Ukraine%20defeat%20Russia%20and%20quell%20the%20war Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/webp, image/apng, */*;q=0.8, application/signed-exchange;v=b3;q=0.7
+2023-02-15 00:57:56,455 [28544] INFO     web_dl.middleware.versionfilter: major_version, minor_version:1.0
+2023-02-15 00:57:56,455 [28544] INFO     web_dl.middleware.versionfilter: matched
+2023-02-15 00:57:56,455 [28544] INFO     web_dl.middleware.versionfilter: Matched versioned URI. Version: 1.0
+2023-02-15 00:57:56,456 [28544] INFO     web_dl.common.wsgi: GET http://81.71.155.217:9000/v1/chatgpt/Can%20Ukraine%20defeat%20Russia%20and%20quell%20the%20war
+2023-02-15 00:57:56,458 [28544] INFO     openai: message='Request to OpenAI API' method=post path=https://api.openai.com/v1/completions
+2023-02-15 00:58:04,411 [28544] INFO     openai: message='OpenAI API response' path=https://api.openai.com/v1/completions processing_ms=7294 response_code=200
+2023-02-15 00:58:04,412 [28544] INFO     web_dl.app.test_demo.controllers: 
+No, Ukraine cannot defeat Russia in a war. Russia is a much larger and more powerful country, with a much larger military. The conflict in Ukraine is a complex one, and requires a diplomatic solution that involves Russia, Ukraine, and other countries in the region.
+2023-02-15 00:58:04,412 [28544] INFO     eventlet.wsgi.server: 103.197.69.164 - - [15/Feb/2023 00:58:04] "GET /v1/chatgpt/Can%20Ukraine%20defeat%20Russia%20and%20quell%20the%20war? HTTP/1.1" 200 402 7.957726
+2023-02-15 01:00:02,309 [28545] INFO     web_dl.middleware.versionfilter: Processing request: GET /v1/chatgpt/What%20is%20the%20war%20between%20Ukraine%20and%20Russia%20for Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/webp, image/apng, */*;q=0.8, application/signed-exchange;v=b3;q=0.7
+2023-02-15 01:00:02,309 [28545] INFO     web_dl.middleware.versionfilter: major_version, minor_version:1.0
+2023-02-15 01:00:02,309 [28545] INFO     web_dl.middleware.versionfilter: matched
+2023-02-15 01:00:02,309 [28545] INFO     web_dl.middleware.versionfilter: Matched versioned URI. Version: 1.0
+2023-02-15 01:00:02,310 [28545] INFO     web_dl.common.wsgi: GET http://81.71.155.217:9000/v1/chatgpt/What%20is%20the%20war%20between%20Ukraine%20and%20Russia%20for
+2023-02-15 01:00:02,310 [28545] INFO     openai: message='Request to OpenAI API' method=post path=https://api.openai.com/v1/completions
+2023-02-15 01:00:07,873 [28545] INFO     openai: message='OpenAI API response' path=https://api.openai.com/v1/completions processing_ms=4921 response_code=200
+2023-02-15 01:00:07,873 [28545] INFO     web_dl.app.test_demo.controllers: 
+The war between Ukraine and Russia is a conflict over the sovereignty of Ukraine and the status of the Crimean peninsula. It began in 2014 when Russian forces annexed Crimea from Ukraine, followed by a separatist conflict in the Donbas region of Ukraine.
+2023-02-15 01:00:07,873 [28545] INFO     eventlet.wsgi.server: 103.197.69.164 - - [15/Feb/2023 01:00:07] "GET /v1/chatgpt/What%20is%20the%20war%20between%20Ukraine%20and%20Russia%20for? HTTP/1.1" 200 391 5.564677
+2023-02-15 01:00:59,099 [28545] INFO     web_dl.middleware.versionfilter: Processing request: GET /v1/chatgpt/%E4%BD%A0%E5%A5%BD Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/avif, image/webp, image/apng, */*;q=0.8, application/signed-exchange;v=b3;q=0.9
+2023-02-15 01:00:59,099 [28545] INFO     web_dl.middleware.versionfilter: major_version, minor_version:1.0
+2023-02-15 01:00:59,099 [28545] INFO     web_dl.middleware.versionfilter: matched
+2023-02-15 01:00:59,099 [28545] INFO     web_dl.middleware.versionfilter: Matched versioned URI. Version: 1.0
+2023-02-15 01:00:59,100 [28545] INFO     web_dl.common.wsgi: GET http://81.71.155.217:9000/v1/chatgpt/%E4%BD%A0%E5%A5%BD
+2023-02-15 01:00:59,100 [28545] INFO     openai: message='Request to OpenAI API' method=post path=https://api.openai.com/v1/completions
+2023-02-15 01:01:06,040 [28537] ERROR    web_dl.wsgi: SIGTERM received
+2023-02-15 01:01:06,043 [28537] INFO     web_dl.wsgi: Removed dead child 28544
+2023-02-15 01:01:08,646 [29961] INFO     web_dl.cmd.api: ******************start**************************
+2023-02-15 01:01:08,646 [29961] INFO     web_dl.cmd.api: cf_defaults:{'workers': '2', 'port': '9000', 'api_paste_path': '/root/git_rep/dl/web_dl/etc/web_dl/api-paste.ini', 'log_file': '../../log_file/web_dl.log', 'max_header_line': '4096'}
+2023-02-15 01:01:08,747 [29961] INFO     web_dl.cmd.api: app: <paste.urlmap.URLMap object at 0x7f628c948550>
+2023-02-15 01:01:08,748 [29961] INFO     web_dl.wsgi: Starting 2 workers
+2023-02-15 01:01:08,750 [29961] INFO     web_dl.wsgi: Started child 29967
+2023-02-15 01:01:08,753 [29967] INFO     eventlet.wsgi.server: (29967) wsgi starting up on http://0.0.0.0:9000
+2023-02-15 01:01:08,753 [29961] INFO     web_dl.wsgi: Started child 29968
+2023-02-15 01:01:08,756 [29968] INFO     eventlet.wsgi.server: (29968) wsgi starting up on http://0.0.0.0:9000
+2023-02-15 01:01:23,412 [29968] INFO     web_dl.middleware.versionfilter: Processing request: GET /v1/chatgpt/can%20you%20help%20me Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/avif, image/webp, image/apng, */*;q=0.8, application/signed-exchange;v=b3;q=0.9
+2023-02-15 01:01:23,413 [29968] INFO     web_dl.middleware.versionfilter: major_version, minor_version:1.0
+2023-02-15 01:01:23,413 [29968] INFO     web_dl.middleware.versionfilter: matched
+2023-02-15 01:01:23,413 [29968] INFO     web_dl.middleware.versionfilter: Matched versioned URI. Version: 1.0
+2023-02-15 01:01:23,414 [29968] INFO     web_dl.common.wsgi: GET http://81.71.155.217:9000/v1/chatgpt/can%20you%20help%20me
+2023-02-15 01:01:23,416 [29968] INFO     openai: message='Request to OpenAI API' method=post path=https://api.openai.com/v1/completions
+2023-02-15 01:01:26,038 [29968] INFO     openai: message='OpenAI API response' path=https://api.openai.com/v1/completions processing_ms=1302 response_code=200
+2023-02-15 01:01:26,039 [29968] INFO     web_dl.app.test_demo.controllers: 
+What kind of help do you need?
+2023-02-15 01:01:26,040 [29968] INFO     eventlet.wsgi.server: 117.165.238.164 - - [15/Feb/2023 01:01:26] "GET /v1/chatgpt/can%20you%20help%20me HTTP/1.1" 200 171 2.628495
+2023-02-15 01:01:57,286 [29967] INFO     web_dl.middleware.versionfilter: Processing request: GET /v1/chatgpt/ Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/avif, image/webp, image/apng, */*;q=0.8, application/signed-exchange;v=b3;q=0.9
+2023-02-15 01:01:57,286 [29967] INFO     web_dl.middleware.versionfilter: major_version, minor_version:1.0
+2023-02-15 01:01:57,286 [29967] INFO     web_dl.middleware.versionfilter: matched
+2023-02-15 01:01:57,287 [29967] INFO     web_dl.middleware.versionfilter: Matched versioned URI. Version: 1.0
+2023-02-15 01:01:57,289 [29967] INFO     eventlet.wsgi.server: 59.83.208.104 - - [15/Feb/2023 01:01:57] "GET /v1/chatgpt/ HTTP/1.1" 404 302 0.003236
+2023-02-15 01:02:41,988 [29968] INFO     web_dl.middleware.versionfilter: Processing request: GET /v1/chatgpt/How%20many%20soldiers%20and%20civilians%20died%20in%20the%20war%20between%20Ukraine%20and%20Russia. Accept: text/html, application/xhtml+xml, application/xml;q=0.9, image/webp, image/apng, */*;q=0.8, application/signed-exchange;v=b3;q=0.7
+2023-02-15 01:02:41,988 [29968] INFO     web_dl.middleware.versionfilter: major_version, minor_version:1.0
+2023-02-15 01:02:41,988 [29968] INFO     web_dl.middleware.versionfilter: matched
+2023-02-15 01:02:41,988 [29968] INFO     web_dl.middleware.versionfilter: Matched versioned URI. Version: 1.0
+2023-02-15 01:02:41,989 [29968] INFO     web_dl.common.wsgi: GET http://81.71.155.217:9000/v1/chatgpt/How%20many%20soldiers%20and%20civilians%20died%20in%20the%20war%20between%20Ukraine%20and%20Russia.
+2023-02-15 01:02:41,989 [29968] INFO     openai: message='Request to OpenAI API' method=post path=https://api.openai.com/v1/completions
+2023-02-15 01:02:52,122 [29968] INFO     openai: message='OpenAI API response' path=https://api.openai.com/v1/completions processing_ms=9490 response_code=200
+2023-02-15 01:02:52,122 [29968] INFO     web_dl.app.test_demo.controllers: 
+The exact number of casualties and fatalities in the ongoing war between Ukraine and Russia is unknown. According to the United Nations Office for the Coordination of Humanitarian Affairs, at least 13,000 people have been killed and 30,000 injured since the conflict began in April 2014. Of those killed, approximately 10,000 are believed to be civilians.
+2023-02-15 01:02:52,123 [29968] INFO     eventlet.wsgi.server: 103.197.69.164 - - [15/Feb/2023 01:02:52] "GET /v1/chatgpt/How%20many%20soldiers%20and%20civilians%20died%20in%20the%20war%20between%20Ukraine%20and%20Russia. HTTP/1.1" 200 492 10.135088
+2023-02-15 01:04:41,157 [29961] ERROR    web_dl.wsgi: SIGTERM received
+2023-02-15 01:04:41,160 [29961] INFO     web_dl.wsgi: Removed dead child 29967
