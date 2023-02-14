@@ -1,0 +1,22 @@
+2023-02-15 00:01:56,052 [18514] INFO     web_dl.cmd.api: ******************start**************************
+2023-02-15 00:01:56,052 [18514] INFO     web_dl.cmd.api: cf_defaults:{'workers': '2', 'port': '9000', 'api_paste_path': '/root/git_rep/dl/web_dl/etc/web_dl/api-paste.ini', 'log_file': '../../log_file/web_dl.log', 'max_header_line': '4096'}
+2023-02-15 00:01:56,053 [18514] INFO     web_dl.cmd.api: caught an exception :[Errno 2] No such file or directory: '/root/git_rep/dl/web_dl/etc/web_dl/api-paste.ini'
+2023-02-15 00:01:56,053 [18514] CRITICAL web_dl: Traceback (most recent call last):
+  File "main.py", line 8, in <module>
+    sys.exit(main())
+  File "../../web_dl/cmd/api.py", line 39, in main
+    raise e
+  File "../../web_dl/cmd/api.py", line 31, in main
+    app = deploy.loadapp("config:%s" % api_paste)
+  File "/usr/local/lib/python3.6/site-packages/paste/deploy/loadwsgi.py", line 253, in loadapp
+    return loadobj(APP, uri, name=name, **kw)
+  File "/usr/local/lib/python3.6/site-packages/paste/deploy/loadwsgi.py", line 277, in loadobj
+    global_conf=global_conf)
+  File "/usr/local/lib/python3.6/site-packages/paste/deploy/loadwsgi.py", line 302, in loadcontext
+    global_conf=global_conf)
+  File "/usr/local/lib/python3.6/site-packages/paste/deploy/loadwsgi.py", line 323, in _loadconfig
+    loader = ConfigLoader(path)
+  File "/usr/local/lib/python3.6/site-packages/paste/deploy/loadwsgi.py", line 399, in __init__
+    with open(filename) as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/root/git_rep/dl/web_dl/etc/web_dl/api-paste.ini'
+
