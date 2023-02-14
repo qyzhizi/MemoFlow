@@ -27,7 +27,7 @@ class Test(wsgi.Application):
         return "hello world lzw, %s" % name
 
     def test_chatgpt(self, req, question):
-        openai.api_key = "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"
+        openai.api_key = "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"
         response = openai.Completion.create(
             model="text-davinci-003",
             prompt=question+"\n",
