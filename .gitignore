@@ -1,7 +1,7 @@
 *.swp
 *.pyc
 *__pycache__/
-*.log
+
 dist/
 web_dl.egg-info/
 build/
