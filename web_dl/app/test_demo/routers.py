@@ -26,5 +26,15 @@ class Router(wsgi.ComposableRouter):
                        action='test_chatgpt',
                        conditions=dict(method=['GET']))
 
+        mapper.connect('/lzw-hello',
+                       controller=test_controller,
+                       action='test_hello',
+                       conditions=dict(method=['GET']))
+        
+        mapper.connect('/lzw-hello/{kkk}',
+                       controller=test_controller,
+                       action='test_kkk',
+                       conditions=dict(method=['GET']))
+
 
 
