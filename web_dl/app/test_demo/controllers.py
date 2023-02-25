@@ -42,4 +42,12 @@ class Test(wsgi.Application):
 
         return response["choices"][0]["text"]
 
+    def test_hello(self, req):
+        LOG.info("hello lzw")
+        return "hello lzw"
+
+    def test_kkk(self, req, kkk):
+        LOG.info("hello kkk, %s" % kkk)
+        #return "hello lzw"
+        return "hello kkk, %s" % kkk
 
