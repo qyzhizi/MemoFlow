@@ -2,6 +2,7 @@ import logging
 from logging.handlers import WatchedFileHandler
 from logging import StreamHandler
 from logging import Formatter
+import pathlib
 import sys
 import traceback
 import os
@@ -30,6 +31,25 @@ def get_log_file_path(logfile=None, logdir=None,
     if not logfile:
         raise ValueError("not found log file")
     return logpath
+
+
+def check_and_creat_dir(file_url):
+    '''
+    判断文件是否存在，文件路径不存在则创建文件夹
+    :param file_url: 文件路径，包含文件名
+    :return:
+    '''
+    file_gang_list = file_url.split('/')
+    if len(file_gang_list)>1:
+        [path,filename] = os.path.split(file_url)
+        if not os.path.exists(path):
+            os.makedirs(path)
+        else:
+            return None
+        #还可以直接创建空文件
+        
+    else:
+        return None
 
 
 class Outs(object):
@@ -71,6 +91,10 @@ class RotatingFile(Outs):
         """Rotating log file output."""
         logpath = get_log_file_path(filename, directory,
                                     program_name, suffix)
+
+        # 2023-2-27 add, if file not exit, then create it
+        check_and_creat_dir(logpath)
+
         handler = logging.handlers.RotatingFileHandler(
             logpath, maxBytes=max_size_bytes, backupCount=backup_count)
         super(RotatingFile, self).__init__(handler, level, formatter)
