@@ -35,6 +35,11 @@ class Router(wsgi.ComposableRouter):
                        controller=test_controller,
                        action='test_kkk',
                        conditions=dict(method=['GET']))
+        
+        mapper.connect('/get-html',
+                        controller=test_controller,
+                        action='get_html',
+                        conditions=dict(method=['GET']))
 
 
 

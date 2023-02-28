@@ -27,7 +27,7 @@ class Test(wsgi.Application):
         return "hello world lzw, %s" % name
 
     def test_chatgpt(self, req, question):
-        openai.api_key = "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"
+        openai.api_key = "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"
         response = openai.Completion.create(
             model="text-davinci-003",
             prompt=question+"\n",
@@ -50,4 +50,7 @@ class Test(wsgi.Application):
         LOG.info("hello kkk, %s" % kkk)
         #return "hello lzw"
         return "hello kkk, %s" % kkk
+    
+    def get_html(self, req):
+        return self.test_api.get_html()
 
