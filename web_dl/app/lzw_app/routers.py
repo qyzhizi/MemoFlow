@@ -8,7 +8,7 @@ class Router(wsgi.ComposableRouter):
         lzw_app_controller = controllers.LzwApp()
         mapper.connect('/lzw_app/index.html',
                        controller=lzw_app_controller,
-                       action='lzw_app_hello',
+                       action='lzw_app_get_html',
                        conditions=dict(method=['GET']))
         mapper.connect('/lzw_app/style.css',
                        controller=lzw_app_controller,
