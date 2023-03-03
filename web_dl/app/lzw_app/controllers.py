@@ -13,8 +13,8 @@ LOG = logging.getLogger(__name__)
 
 
 class LzwApp(wsgi.Application):
-    def lzw_app_hello(self, req):
-        LOG.info("lzw_app, hello")
+    def lzw_app_get_html(self, req):
+        LOG.info("lzw_app, get_html")
         with open("/root/git_rep/dl/web_dl/web_dl/app/lzw_app/data/index.html", "r", encoding='UTF-8')as f:
             res = f.read()
             # LOG.info(res)
