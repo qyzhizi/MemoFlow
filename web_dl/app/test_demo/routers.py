@@ -41,5 +41,9 @@ class Router(wsgi.ComposableRouter):
                         action='get_html',
                         conditions=dict(method=['GET']))
 
+        mapper.connect('/add_diary',
+                        controller=test_controller,
+                        action='add_diary',
+                        conditions=dict(method=['POST']))
 
 
