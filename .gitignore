@@ -2,6 +2,7 @@
 *.pyc
 *__pycache__/
 *.log
+web_dl.log.*
 dist/
 web_dl.egg-info/
 build/

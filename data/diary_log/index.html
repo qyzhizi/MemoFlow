@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>日志页面</title>
+    <meta charset="UTF-8">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* 样式 */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 10px;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 0.5em;
+        }
+        form {
+			display:block;
+			flex-direction: column;
+			/* align-items: stretch; */
+			margin-bottom: 20px;
+		}
+        input[type="text"], textarea {
+            display: block;
+            text-align: left;
+            width: 50%;
+            width: 200px;
+            height: 100px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button[type="submit"] { 
+			background-color: #008CBA;
+			border: none;
+			color: white;
+			padding: 10px 20px;
+			text-align: left;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 20px;
+			border-radius: 5px;
+			cursor: pointer;
+			margin: 10px;
+			align-self: flex-start;
+			transform: scale(1);    
+            position: fixed;
+            left: 0;         
+        }
+        hr {
+            margin: 1em 0;
+            border: none;
+            border-top: 1px solid #ccc;
+        }
+        h3 {
+            font-size: 1.5em;
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+        }
+        p {
+            margin-bottom: 1em;
+        }
+        div{
+            margin:10px 0;
+        }
+		li {
+			margin-bottom: 10px;
+			padding: 10px;
+			border-radius: 5px;
+			background-color: #f2f2f2;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+		}
+		li:last-child {
+			margin-bottom: 0;
+		}    
+ 
+    </style>
+</head>
+<body>
+    <h1>日记页面</h1>
+    <form>
+        <label for="log" style="font-size: 20px;">输入您的日志：</label>
+        <textarea id="log" name="log"></textarea>
+        <button id="submit" style="font-size: 20px;">提交</button>
+    </form>
+    <hr>
+    <h3>所有日记页面</h3>
+    <button id="delete_all" style="font-size: 20px;">删除所有</button>
+    <div id="logList"; style="white-space: pre-line";></div>
+    <script src="log.js"></script>
+</body>
+</html>

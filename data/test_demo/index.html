@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Diary</title>
+</head>
+<body>
+  <h1>My Diary</h1>
+  <form id="diary-form">
+    <label for="diary-entry">New Entry:</label>
+    <textarea id="diary-entry"></textarea>
+    <button type="submit">Save</button>
+  </form>
+  <div id="diary-entries">
+    <h2>Entries</h2>
+    <ul id="diary-list"></ul>
+  </div>
+  <script>
+    // Get the form and the list element
+    const diaryForm = document.querySelector('#diary-form');
+    const diaryList = document.querySelector('#diary-list');
+
+    // Add an event listener for the form submission
+    diaryForm.addEventListener('submit', (e) => {
+      // Prevent the default form submission
+      e.preventDefault();
+      
+      // Get the diary entry from the form
+      const diaryEntry = document.querySelector('#diary-entry').value;
+      
+      // Send the diary entry to the server
+      fetch('/v1/add_diary', {
+        method: 'POST',
+        body: JSON.stringify({entry: diaryEntry}),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Add the new diary entry to the list
+        const newEntry = document.createElement('li');
+        newEntry.textContent = data.entry;
+        diaryList.appendChild(newEntry);
+        // Clear the form
+        diaryForm.reset();
+      });
+    });
+
+    // Load the diary entries when the page loads
+    fetch('/get_diaries')
+      .then(response => response.json())
+      .then(data => {
+        // Add each diary entry to the list
+        for (const entry of data.entries) {
+          const newEntry = document.createElement('li');
+          newEntry.textContent = entry;
+          diaryList.appendChild(newEntry);
+        }
+      });
+  </script>
+</body>
+</html>

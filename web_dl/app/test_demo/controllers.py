@@ -3,6 +3,7 @@
 import os
 import openai
 import logging
+import json
 
 from webob.response import Response
 
@@ -53,4 +54,13 @@ class Test(wsgi.Application):
     
     def get_html(self, req):
         return self.test_api.get_html()
+    
+    def add_diary(self, req):
+        # 从请求中获取POST数据
+        data = req.body
+        
+        # 将POST数据转换为JSON格式
+        json_data = json.loads(data)
+        LOG.info("data:, %s" % json_data)
+        return Response(json.dumps(json_data))
 
