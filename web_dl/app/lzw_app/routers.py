@@ -14,6 +14,11 @@ class Router(wsgi.ComposableRouter):
                        controller=lzw_app_controller,
                        action='lzw_app_get_css',
                        conditions=dict(method=['GET']))
+        
+        mapper.connect('/lzw_app/chatgpt.html',
+                       controller=lzw_app_controller,
+                       action='lzw_app_chatgpt',
+                       conditions=dict(method=['GET']))
 
 
 

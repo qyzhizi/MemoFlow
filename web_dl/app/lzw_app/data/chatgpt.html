@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>ChatGPT API Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <h1>ChatGPT API Demo</h1>
+    <label for="question">Enter your question:</label>
+    <input type="text" id="question" name="question"><br><br>
+    <button onclick="getAnswer()">Get Answer</button><br><br>
+    <div id="answer"></div>
+
+    <script>
+      function getAnswer() {
+        const question = document.getElementById("question").value;
+        const url = "https://api.openai.com/v1/engines/davinci-codex/completions";
+        const prompt = `Q: ${question}\nA:`;
+        const data = {
+          prompt: prompt,
+          max_tokens: 150,
+          temperature: 0.7
+        };
+        const headers = {
+          "Content-Type": "application/json",
+          "Authorization": "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"
+        };
+
+        axios.post(url, data, { headers })
+          .then(response => {
+            const answer = response.data.choices[0].text;
+            document.getElementById("answer").innerHTML = answer;
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      }
+    </script>
+  </body>
+</html>
