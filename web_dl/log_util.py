@@ -8,8 +8,10 @@ import traceback
 import os
 import inspect
 
+from web_dl.conf import CONF
+
 DEFAULT_FORMAT_STYPE = (
-    "%(asctime)s [%(process)d] %(levelname)-8.8s %(name)s: %(message)s"
+    "%(asctime)s [%(process)d] %(levelname)-8.8s %(filename)s %(funcName)s %(lineno)s: %(message)s"
 )
 
 DEFAULT_FORMAT = Formatter(fmt=DEFAULT_FORMAT_STYPE)
@@ -134,3 +136,14 @@ def setup(level=logging.WARNING, outs=[], program_name=None,
     if capture_warnings:
         logging.captureWarnings(True)
 
+def server_setup(filename, program_name):
+
+    setup(
+        level=logging.INFO,
+        outs=[RotatingFile(
+            filename,
+            level=logging.INFO,
+            max_size_bytes=1000000,
+            backup_count=10)],
+        program_name=program_name,
+        capture_warnings=True)                
