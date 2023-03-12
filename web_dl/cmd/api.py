@@ -1,28 +1,27 @@
-
-from paste import deploy
 import logging
-
 from web_dl.ConfigParse import ConfigParse
 from web_dl import log_util
+from web_dl.conf import CONF
+from paste import deploy
 from web_dl.wsgi import Server
 from web_dl.common import dependency
 from web_dl.common import backends
+from web_dl.db import init_db
+
+cp = ConfigParse(CONF.server['server_conf_path'])
+cf_defaults = cp.read_file().get("default")
+log_util.server_setup(cf_defaults.get("log_file"),'web_dl')
 
 LOG = logging.getLogger(__name__)
-cp = ConfigParse("/root/git_rep/dl/web_dl/etc/web_dl/web-dl.conf")
-cf_defaults = cp.read_file().get("default")
-
-log_util.setup(level=logging.INFO,
-               outs=[log_util.RotatingFile(filename=cf_defaults.get("log_file"),
-                                           level=logging.INFO,
-                                           max_size_bytes=1000000,
-                                           backup_count=10)],
-               program_name="web_dl",
-               capture_warnings=True)
 
 
 def main():
     LOG.info("******************start**************************")
+
+    # 初始化app使用的数据库
+    LOG.info("初始化app使用的数据库")
+    init_db()
+
     try:
         drivers = backends.load_backends()
         drivers.update(dependency.resolve_future_dependencies())
