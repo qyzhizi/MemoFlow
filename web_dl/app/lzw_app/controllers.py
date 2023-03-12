@@ -26,3 +26,10 @@ class LzwApp(wsgi.Application):
             res = f.read()
             # LOG.info(res)
         return res
+    
+    def lzw_app_chatgpt(self, req):
+        
+        with open("/root/git_rep/dl/web_dl/web_dl/app/lzw_app/data/chatgpt.html", "r", encoding='UTF-8')as f:
+            res = f.read()
+            # LOG.info(res)
+        return res
