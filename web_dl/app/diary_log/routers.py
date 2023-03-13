@@ -26,3 +26,7 @@ class Router(wsgi.ComposableRouter):
                        controller=diary_log_controller,
                        action='delete_all_log',
                        conditions=dict(method=['GET']))        
+        mapper.connect('/diary-log/test_flomo',
+                       controller=diary_log_controller,
+                       action='test_flomo',
+                       conditions=dict(method=['GET']))                           
