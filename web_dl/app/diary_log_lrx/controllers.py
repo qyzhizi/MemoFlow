@@ -3,22 +3,19 @@
 import logging
 import json
 
-
-from webob.response import Response
-
 from web_dl.common import wsgi
 from web_dl.common import dependency
 
 LOG = logging.getLogger(__name__)
 
 
-@dependency.requires('diary_log_api')
+@dependency.requires('diary_log_lrx_api')
 class DiaryLog(wsgi.Application):
     def get_html(self, req):
-        return self.diary_log_api.get_html()
+        return self.diary_log_lrx_api.get_html()
 
     def get_js(self, req):
-        return self.diary_log_api.get_js()
+        return self.diary_log_lrx_api.get_js()
 
     def add_log(self, req):
         # 从请求中获取POST数据
@@ -26,25 +23,23 @@ class DiaryLog(wsgi.Application):
         
         # 将POST数据转换为JSON格式
         diary_log = json.loads(data)
-        LOG.info("diary_log json_data:, %s" % diary_log)
+        LOG.info("diary_log_lrx json_data:, %s" % diary_log)
 
         # 保存到本地数据库
-        self.diary_log_api.save_log(diary_log)
+        self.diary_log_lrx_api.save_log(diary_log)
         # 发送到浮墨笔记
-        self.diary_log_api.send_log_flomo(diary_log)
+        # self.diary_log_lrx_api.send_log_flomo(diary_log)
 
+        # 将json转换json字符串返回
         return json.dumps(diary_log)
         # return Response(json_data)
     
     def get_logs(self, req):
-        return self.diary_log_api.get_logs()
+        return self.diary_log_lrx_api.get_logs()
 
     def delete_all_log(self, req):
-        return self.diary_log_api.delete_all_log()
-
-    def delete_all_log(self, req):
-        return self.diary_log_api.delete_all_log()
+        return self.diary_log_lrx_api.delete_all_log()
     
     def test_flomo(self, req):
-        self.diary_log_api.test_post_flomo()
+        self.diary_log_lrx_api.test_post_flomo()
         return "sucess"
