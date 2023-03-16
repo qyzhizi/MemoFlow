@@ -59,7 +59,7 @@ class Manager(object):
 
     """
     flomo 笔记的api(不能泄露) ,可以向它发送内容
-    POST https://flomoapp.com/iwh/MzA4ODk/bf5338002eb49cbd323c672e03eb5b1b/
+    POST https://flomoapp.com/iwh/MzA4ODk/bf5338***********3eb5b1b/
     Content-type: application/json
     {
         "content": "Hello, #flomo https://flomoapp.com"

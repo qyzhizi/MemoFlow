@@ -12,6 +12,7 @@ CONF_OPTS = [
                 default="/root/git_rep/dl/web_dl/data/diary_log/log.js",
                 help='主页的js文件路径'),
     cfg.StrOpt('flomo_api_url',
+            #@todo os.environ
             default="https://flomoapp.com/iwh/MzA4ODk/bf5338002eb49cbd323c672e03eb5b1b/",
             help='flomo api url')
 ]
