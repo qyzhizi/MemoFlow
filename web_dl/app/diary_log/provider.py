@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # coding=utf-8
-import os
 import logging
 import json
 import requests
@@ -9,6 +8,7 @@ import sqlite3
 from web_dl.common import dependency
 from web_dl.common import manager
 from web_dl.conf import CONF
+from web_dl.app.diary_log.driver import notion_api
 
 LOG = logging.getLogger(__name__)
 
@@ -74,3 +74,9 @@ class Manager(object):
         flomo_api_url = CONF.diary_log['flomo_api_url']
         post_data = diary_log
         requests.post(flomo_api_url, json=post_data)
+
+    # 向notion发送信息
+    def send_log_notion(self, diary_log):
+        notion_api.create_database_page(CONF.diary_log['notion_api_key'],
+                                        CONF.diary_log['database_id'],
+                                        diary_log['content'])
