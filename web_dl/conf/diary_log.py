@@ -13,8 +13,14 @@ CONF_OPTS = [
                 help='主页的js文件路径'),
     cfg.StrOpt('flomo_api_url',
             #@todo os.environ
-            default="https://flomoapp.com/iwh/MzA4ODk/bf5338002eb49cbd323c672e03eb5b1b/",
-            help='flomo api url')
+            default="https://flomoapp.com/iwh/MzA4ODk/bf53380*******3eb5b1b/",
+            help='flomo api url'),
+    cfg.StrOpt('database_id',
+                default='0597e5e0241c46ef8cc2f5885246dc22',
+                help='notion db id'),
+    cfg.StrOpt('notion_api_key',
+                default='',
+                help='temp')
 ]
 
 def register_opts(conf):

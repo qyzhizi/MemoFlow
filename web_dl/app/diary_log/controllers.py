@@ -3,9 +3,6 @@
 import logging
 import json
 
-
-from webob.response import Response
-
 from web_dl.common import wsgi
 from web_dl.common import dependency
 
@@ -32,6 +29,9 @@ class DiaryLog(wsgi.Application):
         self.diary_log_api.save_log(diary_log)
         # 发送到浮墨笔记
         self.diary_log_api.send_log_flomo(diary_log)
+
+        # 发送到notion 数据库
+        self.diary_log_api.send_log_notion(diary_log)
 
         return json.dumps(diary_log)
         # return Response(json_data)
