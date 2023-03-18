@@ -1,0 +1,8 @@
+#!/usr/bin/python3
+import sys
+sys.path.insert(0,"/root/git_rep/dl/web_dl/")
+
+from web_dl.app.diary_log.driver import celery_task
+
+app = celery_task.celery
+app.worker_main(argv=['worker', '-l', 'info'])

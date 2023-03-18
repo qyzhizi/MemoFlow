@@ -10,6 +10,7 @@ from web_dl.common import dependency
 from web_dl.common import manager
 from web_dl.conf import CONF
 from web_dl.app.diary_log.driver import notion_api
+from web_dl.app.diary_log.driver import celery_task
 
 LOG = logging.getLogger(__name__)
 
@@ -81,6 +82,9 @@ class Manager(object):
         return notion_api.create_database_page(CONF.diary_log['notion_api_key'],
                                                 CONF.diary_log['database_id'],
                                                 diary_log['content'])
+
+    def celery_send_log_notion(self, diary_log):
+        return celery_task.celery_send_log_notion.delay(diary_log)
     
     # 定义一个异步任务
     async def async_send_log_flomo(self, diary_log):

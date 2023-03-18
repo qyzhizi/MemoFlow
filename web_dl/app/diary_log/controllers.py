@@ -39,7 +39,8 @@ class DiaryLog(wsgi.Application):
         # LOG.info(f'Function took {(end_time - start_time):.5f} seconds to run.')
 
         start_time = time.time()
-        asyncio.run(self.diary_log_api.run_tasks(diary_log))
+        self.diary_log_api.celery_send_log_notion(diary_log)
+        # asyncio.run(self.diary_log_api.run_tasks(diary_log))
         end_time = time.time()
         LOG.info(f'Function took {(end_time - start_time):.5f} seconds to run.')
 

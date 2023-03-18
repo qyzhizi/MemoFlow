@@ -9,5 +9,6 @@ torch <=1.13.1
 Pillow >= 8.4.0
 torchvision >= 0.11.2
 openai <=0.26.5
-
-
+Celery
+oslo_config
+redis
