@@ -1,8 +1,7 @@
-import aiohttp
 import logging
 import re
 import requests
-from pprint import pprint
+# from pprint import pprint
 import traceback
 import time
 
@@ -23,8 +22,6 @@ def create_database_page(notion_api_key, database_id, content=None):
     "Content-Type": "application/json",
     }
 
-    
-    
     # 正则匹配，以一个#开头空格结尾的字符串，找到标签
     pattern = r"(?<!#)#\w+(?<!#)\s"
     matches = re.findall(pattern, content)
@@ -37,7 +34,7 @@ def create_database_page(notion_api_key, database_id, content=None):
     LOG.info(f"title_content: {title_content}")
     LOG.info(f"txt_content: {txt_content}")
     LOG.info(f"payload: {payload}")
-    pprint(payload)
+    # pprint(payload)
     try:
         """
         如果要实现异步http 请求，需要参考下面的代码，同时要修改调用方的代码
