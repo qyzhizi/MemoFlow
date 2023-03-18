@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding=utf-8
+import asyncio
 import logging
 import json
 import requests
@@ -77,6 +78,34 @@ class Manager(object):
 
     # 向notion发送信息
     def send_log_notion(self, diary_log):
-        notion_api.create_database_page(CONF.diary_log['notion_api_key'],
-                                        CONF.diary_log['database_id'],
-                                        diary_log['content'])
+        return notion_api.create_database_page(CONF.diary_log['notion_api_key'],
+                                                CONF.diary_log['database_id'],
+                                                diary_log['content'])
+    
+    # 定义一个异步任务
+    async def async_send_log_flomo(self, diary_log):
+        LOG.info("*****start task async_send_log_flomo")
+        # await asyncio.sleep(5)
+        self.send_log_flomo(diary_log)
+        LOG.info("*****end task async_send_log_flomo")
+    
+    # # 定义一个异步任务
+    async def async_send_log_notion(self, diary_log):
+        LOG.info("******start task async_send_log_notion")
+        # await asyncio.sleep(5)
+        self.send_log_notion(diary_log)
+        LOG.info("******end task async_send_log_notion")
+
+    # 定义一个协程， 用于并发执行多个任务 ,异步额外消耗时间太长了（3秒到8秒），放弃
+    async def run_tasks(self, diary_log):
+        # 创建一个任务列表
+        tasks = []
+        task = asyncio.create_task(self.async_send_log_flomo(diary_log))
+        tasks.append(task)
+
+        task = asyncio.create_task(self.async_send_log_notion(diary_log))
+        tasks.append(task)
+
+        # 并发执行任务
+        await asyncio.gather(*tasks)
+        
