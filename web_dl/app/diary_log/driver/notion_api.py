@@ -1,8 +1,11 @@
+import aiohttp
 import logging
 import re
 import requests
 from pprint import pprint
 import traceback
+import time
+
 from web_dl.app.diary_log.driver import db_page_payload
 
 LOG = logging.getLogger(__name__)
@@ -36,7 +39,18 @@ def create_database_page(notion_api_key, database_id, content=None):
     LOG.info(f"payload: {payload}")
     pprint(payload)
     try:
+        """
+        如果要实现异步http 请求，需要参考下面的代码，同时要修改调用方的代码
+        不过太慢了，所以这里只是记录一下，就不真的写完了
+        async def main():
+            async with aiohttp.ClientSession() as session:
+                async with session.get('http://www.example.com') as response:
+                print(await response.text())
+        """
+        start_time = time.time()
         res = requests.post(url, headers=headers, json=payload)
+        end_time = time.time()
+        LOG.info(f'create_database_page took {(end_time - start_time):.5f} seconds to run.')
         LOG.info(f"notion response: {res}")
     except Exception as e:
         LOG.error(f"requests create_database_page error: {e}")
