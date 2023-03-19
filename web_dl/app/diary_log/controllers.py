@@ -29,14 +29,12 @@ class DiaryLog(wsgi.Application):
 
         # 保存到本地数据库
         self.diary_log_api.save_log(diary_log)
-        # start_time = time.time()
-        # # 发送到浮墨笔记
-        # self.diary_log_api.send_log_flomo(diary_log)
+
+        # 发送到浮墨笔记
+        self.diary_log_api.send_log_flomo(diary_log)
 
         # # 发送到notion 数据库
         # self.diary_log_api.send_log_notion(diary_log)
-        # end_time = time.time()
-        # LOG.info(f'Function took {(end_time - start_time):.5f} seconds to run.')
 
         start_time = time.time()
         self.diary_log_api.celery_send_log_notion(diary_log)
