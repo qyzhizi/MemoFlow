@@ -2,7 +2,15 @@
 import sys
 sys.path.insert(0,"/root/git_rep/dl/web_dl/")
 
+from web_dl.conf import CONF
+from web_dl import log_util
+from web_dl.ConfigParse import ConfigParse
 from web_dl.app.diary_log.driver import celery_task
+
+# 配置日志，但好像work进程的日志还是没有打印在指定的文件中
+cp = ConfigParse(CONF.server['server_conf_path'])
+cf_defaults = cp.read_file().get("default")
+log_util.server_setup(cf_defaults.get("celery_log_file"),'celery')
 
 app = celery_task.celery
 app.worker_main(argv=['worker', '-l', 'info'])

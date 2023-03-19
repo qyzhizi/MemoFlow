@@ -12,3 +12,4 @@ openai <=0.26.5
 Celery
 oslo_config
 redis
+python-dotenv

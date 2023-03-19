@@ -26,7 +26,11 @@ def create_database_page(notion_api_key, database_id, content=None):
     pattern = r"(?<!#)#\w+(?<!#)\s"
     matches = re.findall(pattern, content)
     LOG.info([match for match in matches])
-    tags = [match.strip("# ") for match in matches]
+    # 这一要注意除了空格，还有'\n'要去除
+    tags = [match.strip('#\n').replace(' ', '') for match in matches]
+    # 可以根据不同的tag 选择不同的标签颜色 : "red" "gray" "yellow"
+    # 不用传颜色参数，会随机选择一个颜色
+    # tag_color = 'green'
     txt_content = content
     title_content = content[:TITLE_NUM].replace('\r', '').replace('\n', ' ')
 
@@ -45,10 +49,18 @@ def create_database_page(notion_api_key, database_id, content=None):
                 print(await response.text())
         """
         start_time = time.time()
-        res = requests.post(url, headers=headers, json=payload)
+        response = requests.post(url, headers=headers, json=payload)
         end_time = time.time()
         LOG.info(f'create_database_page took {(end_time - start_time):.5f} seconds to run.')
-        LOG.info(f"notion response: {res}")
+        # LOG.info(f"notion response: {response.text}")
+        
+        # 可以查看返回来的错误
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            LOG.info(f"err response: {response.text}")
+            LOG.info(f'{err}')
+        
     except Exception as e:
         LOG.error(f"requests create_database_page error: {e}")
         LOG.info(f'{traceback.format_exc()}')
