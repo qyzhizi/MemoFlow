@@ -1,4 +1,11 @@
 from oslo_config import cfg
+from dotenv import load_dotenv
+load_dotenv()
+import os
+
+flomo_api_url = os.getenv("FLOMO_API_URL")
+database_id = os.getenv("DATABASE_ID")
+notion_api_key = os.getenv("NOTION_API_KEY")
 
 # 声明配置项
 CONF_OPTS = [     
@@ -13,13 +20,13 @@ CONF_OPTS = [
                 help='主页的js文件路径'),
     cfg.StrOpt('flomo_api_url',
             #@todo os.environ
-            default="https://flomoapp.com/iwh/MzA4ODk/xxxxx/",
+            default=flomo_api_url,
             help='flomo api url'),
     cfg.StrOpt('database_id',
-                default='0597e5e0241c46ef8cc2f5885246dc22',
+                default=database_id,
                 help='notion db id'),
     cfg.StrOpt('notion_api_key',
-                default='xxxxx',
+                default=notion_api_key,
                 help='temp')
 ]
 
