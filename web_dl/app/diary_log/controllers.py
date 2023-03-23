@@ -36,16 +36,25 @@ class DiaryLog(wsgi.Application):
         # # 发送到notion 数据库
         # self.diary_log_api.send_log_notion(diary_log)
 
-        start_time = time.time()
-        self.diary_log_api.celery_send_log_notion(diary_log)
-        # asyncio.run(self.diary_log_api.run_tasks(diary_log))
-        end_time = time.time()
-        LOG.info(f'Function took {(end_time - start_time):.5f} seconds to run.')
-
-        # file_path = "README.md"
-        # logseq 笔记软件
-        file_path = "pages/github_cards.md"
+        """
+        added_list 的一个例子
+        ['## 2023/3/24 03:15:14:', '#test #webdl', '#que 是否可行？', '#ans 还行', '']
+        """
         added_content = diary_log['content']
+        added_list = added_content.split('\n')
+        # 作为子块
+        added_list[1] = " - " + added_list[1]
+        # 作为子块
+        added_list[3] = " - " + added_list[3]
+        # 重新组成串
+        added_content = "\n".join(added_list)
+
+        # 向notion 发送数据
+        self.diary_log_api.celery_send_log_notion(diary_log=added_content)
+        # asyncio.run(self.diary_log_api.run_tasks(diary_log))
+
+        # 向github仓库（logseq 笔记软件）发送数据
+        file_path = "pages/github_cards.md"
         commit_message = "commit by web_dl"
         branch_name = "main"
         self.diary_log_api.celery_update_file_to_github(file_path,

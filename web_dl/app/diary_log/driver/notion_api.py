@@ -25,9 +25,11 @@ def create_database_page(notion_api_key, database_id, content=None):
     # 正则匹配，以一个#开头空格结尾的字符串，找到标签
     pattern = r"(?<!#)#\w+(?<!#)\s"
     matches = re.findall(pattern, content)
-    LOG.info([match for match in matches])
+    
     # 这一要注意除了空格，还有'\n'要去除
     tags = [match.strip('#\n').replace(' ', '') for match in matches]
+    LOG.info(tags)
+
     # 可以根据不同的tag 选择不同的标签颜色 : "red" "gray" "yellow"
     # 不用传颜色参数，会随机选择一个颜色
     # tag_color = 'green'
