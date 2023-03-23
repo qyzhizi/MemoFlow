@@ -7,7 +7,9 @@ flomo_api_url = os.getenv("FLOMO_API_URL")
 database_id = os.getenv("DATABASE_ID")
 notion_api_key = os.getenv("NOTION_API_KEY")
 github_token = os.getenv("GITHUB_TOKEN")
-github_repo = "qyzhizi/github_api_test"
+# github_repo = "qyzhizi/github_api_test"
+github_repo = "qyzhizi/logseqnote"
+
 
 # 声明配置项
 CONF_OPTS = [     

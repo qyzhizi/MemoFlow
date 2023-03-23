@@ -14,7 +14,7 @@ from web_dl.app.diary_log.driver import celery_task
 
 LOG = logging.getLogger(__name__)
 
-driver_name = CONF.diary_log['driver']
+# driver_name = CONF.diary_log['driver']
 
 
 @dependency.provider('diary_log_api')

@@ -42,7 +42,9 @@ class DiaryLog(wsgi.Application):
         end_time = time.time()
         LOG.info(f'Function took {(end_time - start_time):.5f} seconds to run.')
 
-        file_path = "README.md"
+        # file_path = "README.md"
+        # logseq 笔记软件
+        file_path = "pages/github_cards.md"
         added_content = diary_log['content']
         commit_message = "commit by web_dl"
         branch_name = "main"
