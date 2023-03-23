@@ -13,3 +13,4 @@ Celery
 oslo_config
 redis
 python-dotenv
+PyGithub
