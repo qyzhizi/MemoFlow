@@ -86,7 +86,7 @@ class Manager(object):
     def send_log_notion(self, diary_log):
         return notion_api.create_database_page(CONF.diary_log['notion_api_key'],
                                                 CONF.diary_log['database_id'],
-                                                diary_log['content'])
+                                                diary_log)
     
     # 向celery 发送异步任务
     def celery_send_log_notion(self, diary_log):

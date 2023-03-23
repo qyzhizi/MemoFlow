@@ -15,7 +15,7 @@ celery = Celery(__name__,
 def celery_send_log_notion(diary_log):
     return notion_api.create_database_page(CONF.diary_log['notion_api_key'],
                                            CONF.diary_log['database_id'],
-                                           diary_log['content'])
+                                           diary_log)
 
 
 token = CONF.diary_log['github_token']
