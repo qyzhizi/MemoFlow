@@ -14,10 +14,15 @@ from web_dl.app.diary_log.driver import celery_task
 
 LOG = logging.getLogger(__name__)
 
+driver_name = CONF.diary_log['driver']
+
 
 @dependency.provider('diary_log_api')
 class Manager(object):
     driver_namespace = "diary_log_api"
+
+    # def __init__(self):
+    #     super().__init__(driver_name)
 
     def get_html(self):
         index_html_path = CONF.diary_log['index_html_path']
@@ -82,7 +87,8 @@ class Manager(object):
         return notion_api.create_database_page(CONF.diary_log['notion_api_key'],
                                                 CONF.diary_log['database_id'],
                                                 diary_log['content'])
-
+    
+    # 向celery 发送异步任务
     def celery_send_log_notion(self, diary_log):
         return celery_task.celery_send_log_notion.delay(diary_log)
     
@@ -112,4 +118,11 @@ class Manager(object):
 
         # 并发执行任务
         await asyncio.gather(*tasks)
+    
+    # 向celery 发送异步任务
+    def celery_update_file_to_github(self, file_path, added_content, commit_message, branch_name):
+        return celery_task.celery_update_file_to_github.delay(file_path,
+                                                              added_content,
+                                                              commit_message,
+                                                              branch_name)
         

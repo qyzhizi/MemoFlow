@@ -6,6 +6,8 @@ import os
 flomo_api_url = os.getenv("FLOMO_API_URL")
 database_id = os.getenv("DATABASE_ID")
 notion_api_key = os.getenv("NOTION_API_KEY")
+github_token = os.getenv("GITHUB_TOKEN")
+github_repo = "qyzhizi/github_api_test"
 
 # 声明配置项
 CONF_OPTS = [     
@@ -27,7 +29,14 @@ CONF_OPTS = [
                 help='notion db id'),
     cfg.StrOpt('notion_api_key',
                 default=notion_api_key,
-                help='temp')
+                help='notion api key'),
+    cfg.StrOpt('github_token',
+               default=github_token,
+               help='github access token'),
+    cfg.StrOpt("github_repo",
+               default=github_repo,
+               help='github repo')
+
 ]
 
 def register_opts(conf):

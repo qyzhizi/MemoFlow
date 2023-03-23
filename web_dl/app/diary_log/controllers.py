@@ -42,6 +42,15 @@ class DiaryLog(wsgi.Application):
         end_time = time.time()
         LOG.info(f'Function took {(end_time - start_time):.5f} seconds to run.')
 
+        file_path = "README.md"
+        added_content = diary_log['content']
+        commit_message = "commit by web_dl"
+        branch_name = "main"
+        self.diary_log_api.celery_update_file_to_github(file_path,
+                                                        added_content,
+                                                        commit_message,
+                                                        branch_name)
+
         return json.dumps(diary_log)
         # return Response(json_data)
     
