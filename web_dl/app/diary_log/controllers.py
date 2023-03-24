@@ -42,10 +42,12 @@ class DiaryLog(wsgi.Application):
         """
         added_content = diary_log['content']
         added_list = added_content.split('\n')
-        # 作为子块
-        added_list[1] = " - " + added_list[1]
-        # 作为子块
-        added_list[3] = " - " + added_list[3]
+        if len(added_list) > 1:
+            # 作为子块
+            added_list[1] = " - " + added_list[1]
+        if len(added_list) > 3:
+            # 作为子块
+            added_list[3] = " - " + added_list[3]
         # 重新组成串
         added_content = "\n".join(added_list)
 
