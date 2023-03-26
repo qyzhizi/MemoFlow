@@ -120,8 +120,8 @@ class Manager(object):
         await asyncio.gather(*tasks)
     
     # 向celery 发送异步任务
-    def celery_update_file_to_github(self, file_path, added_content, commit_message, branch_name):
-        return celery_task.celery_update_file_to_github.delay(file_path,
+    def celery_update_file_to_github(self, token, repo, file_path, added_content, commit_message, branch_name):
+        return celery_task.celery_update_file_to_github.delay(token, repo, file_path,
                                                               added_content,
                                                               commit_message,
                                                               branch_name)
