@@ -32,19 +32,33 @@ class DiaryLog(wsgi.Application):
         # self.diary_log_lrx_api.send_log_flomo(diary_log)
 
         # 保存到github
-        added_content = diary_log['content']
-        file_path = "pages/github_cards.md"
-        commit_message = "commit by web_dl"
-        branch_name = "main"
-        token = CONF.diary_log['github_token']
-        repo = CONF.diary_log['github_repo']
+        # added_content = diary_log['content']
+        # file_path = "pages/github_cards.md"
+        # commit_message = "commit by web_dl"
+        # branch_name = "main"
+        # token = CONF.diary_log['github_token']
+        # repo = CONF.diary_log['github_repo']
 
-        self.diary_log_api.celery_update_file_to_github(token,
-                                                        repo,
-                                                        file_path,
-                                                        added_content,
-                                                        commit_message,
-                                                        branch_name)
+        # self.diary_log_api.celery_update_file_to_github(token,
+        #                                                 repo,
+        #                                                 file_path,
+        #                                                 added_content,
+        #                                                 commit_message,
+        #                                                 branch_name)
+        
+        # 向坚果云发送异步任务，更新文件
+        # lzp 的坚果云账号
+        lzp_jianguoyun_count = CONF.api_conf.lzp_jianguoyun_count
+        lzp_jianguoyun_token = CONF.api_conf.lzp_jianguoyun_token
+        base_url = CONF.api_conf.base_url
+        to_path = CONF.api_conf.lzp_jianguoyun_to_path
+        content = added_content
+        self.diary_log_api.celery_update_file_to_jianguoyun(base_url,
+                                                            lzp_jianguoyun_count,
+                                                            lzp_jianguoyun_token,
+                                                            to_path,
+                                                            content,
+                                                            overwrite = True)
 
         # 将json转换json字符串返回
         return json.dumps(diary_log)
