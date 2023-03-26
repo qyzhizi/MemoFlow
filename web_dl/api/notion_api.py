@@ -1,11 +1,10 @@
 import logging
 import re
 import requests
-# from pprint import pprint
 import traceback
 import time
 
-from web_dl.app.diary_log.driver import db_page_payload
+from web_dl.api import db_page_payload
 
 LOG = logging.getLogger(__name__)
 

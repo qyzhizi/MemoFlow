@@ -9,8 +9,8 @@ import sqlite3
 from web_dl.common import dependency
 from web_dl.common import manager
 from web_dl.conf import CONF
-from web_dl.app.diary_log.driver import notion_api
-from web_dl.app.diary_log.driver import celery_task
+from web_dl.api import notion_api
+from web_dl.tasks import celery_task
 
 LOG = logging.getLogger(__name__)
 
