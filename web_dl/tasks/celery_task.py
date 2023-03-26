@@ -1,7 +1,7 @@
 from celery import Celery
 
 from web_dl.conf import CONF
-from web_dl.app.diary_log.driver import notion_api
+from web_dl.api import notion_api
 from web_dl.api import github_api
 
 CELERY_BROKER_URL='redis://localhost:6379'
