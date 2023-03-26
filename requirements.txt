@@ -14,3 +14,4 @@ oslo_config
 redis
 python-dotenv
 PyGithub
+webdav4

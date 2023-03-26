@@ -32,7 +32,7 @@ class JianGuoYunClient(object):
                     encoding='utf-8'):
         with self.client.open(path=file_path, mode=mode, encoding=encoding) as file:
             content = file.read()
-            updated_content = content + "\n" + added_content
+            updated_content = added_content + "\n" + content
         updated_file_obj = io.BytesIO(updated_content.encode(encoding))
         self.client.upload_fileobj(updated_file_obj, file_path, overwrite=True)
     
