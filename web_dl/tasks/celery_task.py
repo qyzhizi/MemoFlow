@@ -22,8 +22,7 @@ github_api_instance ={}
 def celery_update_file_to_github(token, repo, file_path, added_content, commit_message, branch_name):
     if not github_api_instance.get(repo,''):
         github_api_instance[repo] = github_api.GitHupApi(token=token, repo=repo)
-    else:
-        my_api_instance = github_api_instance[repo]
+    my_api_instance = github_api_instance[repo]
     return my_api_instance.update_file(file_path=file_path,
                                        added_content=added_content,
                                        commit_message=commit_message,
