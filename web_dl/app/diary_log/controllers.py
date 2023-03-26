@@ -69,6 +69,20 @@ class DiaryLog(wsgi.Application):
                                                         commit_message,
                                                         branch_name)
 
+        # 向坚果云发送异步任务，更新文件
+        # lzp 的坚果云账号
+        lzp_jianguoyun_count = CONF.api_conf.lzp_jianguoyun_count
+        lzp_jianguoyun_token = CONF.api_conf.lzp_jianguoyun_token
+        base_url = CONF.api_conf.base_url
+        to_path = CONF.api_conf.lzp_jianguoyun_to_path
+        content = added_content
+        self.diary_log_api.celery_update_file_to_jianguoyun(base_url,
+                                                            lzp_jianguoyun_count,
+                                                            lzp_jianguoyun_token,
+                                                            to_path,
+                                                            content,
+                                                            overwrite = True)
+
         return json.dumps(diary_log)
         # return Response(json_data)
     

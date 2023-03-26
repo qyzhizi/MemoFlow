@@ -126,3 +126,9 @@ class Manager(object):
                                                               commit_message,
                                                               branch_name)
         
+    # 向坚果云发送异步任务，更新文件
+    def celery_update_file_to_jianguoyun(self, base_url: str, acount: str,
+                                         token: str, to_path: str, content: str,
+                                         overwrite: bool = True) -> None:
+        celery_task.update_file_to_janguoyun.delay(base_url, acount, token,
+                                                   to_path, content, overwrite)
