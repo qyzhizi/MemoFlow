@@ -5,6 +5,7 @@ import logging
 import json
 import time
 
+from web_dl.conf import CONF
 from web_dl.common import wsgi
 from web_dl.common import dependency
 
@@ -59,7 +60,11 @@ class DiaryLog(wsgi.Application):
         file_path = "pages/github_cards.md"
         commit_message = "commit by web_dl"
         branch_name = "main"
-        self.diary_log_api.celery_update_file_to_github(file_path,
+        token = CONF.diary_log['github_token']
+        repo = CONF.diary_log['github_repo']
+        self.diary_log_api.celery_update_file_to_github(token,
+                                                        repo,
+                                                        file_path,
                                                         added_content,
                                                         commit_message,
                                                         branch_name)
