@@ -32,8 +32,7 @@ class Manager(object):
         data_base_path = CONF.diary_log_lrx['data_base_path']
         conn = sqlite3.connect(data_base_path)
         c = conn.cursor()
-        LOG.info(diary_log_lrx['content'])
-        c.execute('INSERT INTO diary_log_lrx  (content) VALUES (?)', (diary_log_lrx['content'],))
+        c.execute('INSERT INTO diary_log_lrx  (content) VALUES (?)', (diary_log_lrx,))
         conn.commit()
         # 关闭数据库连接
         conn.close()

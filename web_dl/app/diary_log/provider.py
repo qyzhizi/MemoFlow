@@ -36,12 +36,11 @@ class Manager(object):
             res = f.read()
         return res        
     
-    def save_log(self, diary_log):
+    def save_log(self, content):
         data_base_path = CONF.diary_log['data_base_path']
         conn = sqlite3.connect(data_base_path)
         c = conn.cursor()
-        LOG.info(diary_log['content'])
-        c.execute('INSERT INTO diary_log  (content) VALUES (?)', (diary_log['content'],))
+        c.execute('INSERT INTO diary_log  (content) VALUES (?)', (content,))
         conn.commit()
         # 关闭数据库连接
         conn.close()
@@ -63,6 +62,37 @@ class Manager(object):
         # 提交更改并关闭连接
         conn.commit()
         conn.close()
+    
+    def process_content(self, content):
+        """
+        用于生成卡片笔记
+
+        content_list 的一个例子
+        ['## 2023/3/24 03:15:14:', '#git #github #commit',
+        '#que 如何展示在本地而不在远程的提交？', '#ans',
+        'git log --oneline origin/main..HEAD']
+
+        生成的效果：
+        ## 2023/3/24 03:15:14:
+        - #git #github #commit
+        #que 如何展示在本地而不在远程的提交？  
+        - #ans 
+        git log --oneline origin/main..HEAD
+
+        """
+        content_list = content.split('\n')
+        for i, content in enumerate(content_list):
+            # 这一行将视为特殊标签，并作为子块
+            if content and (content[:4] == "#que" or content[:4] == "#ans"):
+                new_content = " - " + content
+                content_list[i] = new_content
+                LOG.info("new_content: %s" % new_content)
+            
+        # 重新组成串
+        processed_content = "\n".join(content_list)
+        LOG.info("processed_content: %s" % processed_content)
+
+        return processed_content
 
     """
     flomo 笔记的api(不能泄露) ,可以向它发送内容
@@ -77,10 +107,9 @@ class Manager(object):
         post_data = { "content": "Hello, #flomo https://flomoapp.com" }
         requests.post(flomo_api_url, json=post_data)
 
-    def send_log_flomo(self, diary_log):
+    def send_log_flomo(self, flomo_post_data):
         flomo_api_url = CONF.diary_log['flomo_api_url']
-        post_data = diary_log
-        requests.post(flomo_api_url, json=post_data)
+        requests.post(flomo_api_url, json=flomo_post_data)
 
     # 向notion发送信息
     def send_log_notion(self, diary_log):
