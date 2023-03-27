@@ -36,7 +36,6 @@ CONF_OPTS = [
     cfg.StrOpt('lrx_jianguoyun_to_path',
                default=lrx_jianguoyun_to_path,
                help='lrx 的坚果云笔记更新文件的路径'),
-
 ]
 
 def register_opts(conf):
