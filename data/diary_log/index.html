@@ -33,21 +33,20 @@
             box-sizing: border-box;
         }
         button[type="submit"] { 
-			background-color: #008CBA;
-			border: none;
-			color: rgb(22, 79, 177);
-			padding: 10px 10px;
-			text-align: left;
-			text-decoration: none;
-			display: inline-block;
-			font-size: 20px;
-			border-radius: 5px;
-			cursor: pointer;
-			margin: 10px;
-			align-self: flex-start;
-			transform: scale(1);    
-            position: fixed;
-            left: 0;         
+            background-color: #008CBA;
+            border: none;
+            color: rgb(172, 24, 116);
+            padding: 10px 10px;
+            text-align: left;
+            text-decoration: none;
+            display: block;
+            font-size: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: auto;
+            align-self: flex-start;
+            transform: scale(1);    
+            position: relative;
         }
         hr {
             margin: 1em 0;
@@ -89,8 +88,8 @@
         <button id="submit" style="font-size: 20px;">提交</button>
     </form>
     <hr>
-    <h3>所有日记页面</h3>
-    <button id="delete_all" style="font-size: 10px;">删除所有</button>
+    <h3>所有日记</h3>
+    <button id="delete_all" style="font-size: 20px;">删除所有</button>
     <div id="logList"; style="white-space: pre-line";></div>
     <script src="log.js"></script>
 </body>
