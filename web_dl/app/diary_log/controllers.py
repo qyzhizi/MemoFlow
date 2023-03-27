@@ -26,34 +26,20 @@ class DiaryLog(wsgi.Application):
         
         # 将POST数据转换为JSON格式
         diary_log = json.loads(data)
-        LOG.info("diary_log json_data:, %s" % diary_log)
+        LOG.info("diary_log json_data:, %s" % diary_log["content"][:70])
+
+        # 处理卡片笔记
+        processed_content = self.diary_log_api.process_content(diary_log['content'])
 
         # 保存到本地数据库
-        self.diary_log_api.save_log(diary_log)
+        self.diary_log_api.save_log(processed_content)
 
         # 发送到浮墨笔记
-        self.diary_log_api.send_log_flomo(diary_log)
-
-        # # 发送到notion 数据库
-        # self.diary_log_api.send_log_notion(diary_log)
-
-        """
-        added_list 的一个例子
-        ['## 2023/3/24 03:15:14:', '#test #webdl', '#que 是否可行？', '#ans 还行', '']
-        """
-        added_content = diary_log['content']
-        added_list = added_content.split('\n')
-        if len(added_list) > 1:
-            # 作为子块
-            added_list[1] = " - " + added_list[1]
-        if len(added_list) > 3:
-            # 作为子块
-            added_list[3] = " - " + added_list[3]
-        # 重新组成串
-        added_content = "\n".join(added_list)
+        flomo_post_data = {"content": processed_content}
+        self.diary_log_api.send_log_flomo(flomo_post_data)
 
         # 向notion 发送数据
-        self.diary_log_api.celery_send_log_notion(diary_log=added_content)
+        self.diary_log_api.celery_send_log_notion(diary_log=processed_content)
         # asyncio.run(self.diary_log_api.run_tasks(diary_log))
 
         # 向github仓库（logseq 笔记软件）发送数据
@@ -62,6 +48,7 @@ class DiaryLog(wsgi.Application):
         branch_name = "main"
         token = CONF.diary_log['github_token']
         repo = CONF.diary_log['github_repo']
+        added_content = processed_content
         self.diary_log_api.celery_update_file_to_github(token,
                                                         repo,
                                                         file_path,
@@ -75,12 +62,12 @@ class DiaryLog(wsgi.Application):
         lzp_jianguoyun_token = CONF.api_conf.lzp_jianguoyun_token
         base_url = CONF.api_conf.base_url
         to_path = CONF.api_conf.lzp_jianguoyun_to_path
-        content = added_content
+        added_content = processed_content
         self.diary_log_api.celery_update_file_to_jianguoyun(base_url,
                                                             lzp_jianguoyun_count,
                                                             lzp_jianguoyun_token,
                                                             to_path,
-                                                            content,
+                                                            added_content,
                                                             overwrite = True)
 
         return json.dumps(diary_log)

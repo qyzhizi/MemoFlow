@@ -26,8 +26,11 @@ class DiaryLog(wsgi.Application):
         diary_log = json.loads(data)
         LOG.info("diary_log_lrx json_data:, %s" % diary_log)
 
+        # 处理卡片笔记
+        processed_content = self.diary_log_api.process_content(diary_log['content'])
+
         # 保存到本地数据库
-        self.diary_log_lrx_api.save_log(diary_log)
+        self.diary_log_lrx_api.save_log(processed_content)
         # 发送到浮墨笔记
         # self.diary_log_lrx_api.send_log_flomo(diary_log)
 
@@ -46,33 +49,18 @@ class DiaryLog(wsgi.Application):
         #                                                 commit_message,
         #                                                 branch_name)
         
-        """
-        added_list 的一个例子
-        ['## 2023/3/24 03:15:14:', '#test #webdl', '#que 是否可行？', '#ans 还行', '']
-        """
-        added_content = diary_log['content']
-        added_list = added_content.split('\n')
-        if len(added_list) > 1:
-            # 作为子块
-            added_list[1] = " - " + added_list[1]
-        if len(added_list) > 3:
-            # 作为子块
-            added_list[3] = " - " + added_list[3]
-        # 重新组成串
-        added_content = "\n".join(added_list)
-                
         # 向坚果云发送异步任务，更新文件
         # lrx 的坚果云账号
         lrx_jianguoyun_count = CONF.api_conf.lrx_jianguoyun_count
         lrx_jianguoyun_token = CONF.api_conf.lrx_jianguoyun_token
         base_url = CONF.api_conf.base_url
         to_path = CONF.api_conf.lrx_jianguoyun_to_path
-        content = added_content
+        added_content = processed_content
         self.diary_log_api.celery_update_file_to_jianguoyun(base_url,
                                                             lrx_jianguoyun_count,
                                                             lrx_jianguoyun_token,
                                                             to_path,
-                                                            content,
+                                                            added_content,
                                                             overwrite = True)
 
         # 将json转换json字符串返回
