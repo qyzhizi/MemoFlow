@@ -90,7 +90,7 @@ class Manager(object):
             
         # 重新组成串
         processed_content = "\n".join(content_list)
-        LOG.info("processed_content: %s" % processed_content)
+        # LOG.info("processed_content: %s" % processed_content)
 
         return processed_content
 
