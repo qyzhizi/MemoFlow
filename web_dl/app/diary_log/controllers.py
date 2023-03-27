@@ -32,7 +32,7 @@ class DiaryLog(wsgi.Application):
         processed_content = self.diary_log_api.process_content(diary_log['content'])
 
         # 保存到本地数据库
-        self.diary_log_api.save_log(processed_content)
+        self.diary_log_api.save_log(diary_log['content'])
 
         # 发送到浮墨笔记
         flomo_post_data = {"content": processed_content}
