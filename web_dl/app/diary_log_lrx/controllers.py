@@ -45,18 +45,32 @@ class DiaryLog(wsgi.Application):
         #                                                 added_content,
         #                                                 commit_message,
         #                                                 branch_name)
-
         
+        """
+        added_list 的一个例子
+        ['## 2023/3/24 03:15:14:', '#test #webdl', '#que 是否可行？', '#ans 还行', '']
+        """
+        added_content = diary_log['content']
+        added_list = added_content.split('\n')
+        if len(added_list) > 1:
+            # 作为子块
+            added_list[1] = " - " + added_list[1]
+        if len(added_list) > 3:
+            # 作为子块
+            added_list[3] = " - " + added_list[3]
+        # 重新组成串
+        added_content = "\n".join(added_list)
+                
         # 向坚果云发送异步任务，更新文件
-        # lzp 的坚果云账号
-        lzp_jianguoyun_count = CONF.api_conf.lzp_jianguoyun_count
-        lzp_jianguoyun_token = CONF.api_conf.lzp_jianguoyun_token
+        # lrx 的坚果云账号
+        lrx_jianguoyun_count = CONF.api_conf.lrx_jianguoyun_count
+        lrx_jianguoyun_token = CONF.api_conf.lrx_jianguoyun_token
         base_url = CONF.api_conf.base_url
-        to_path = CONF.api_conf.lzp_jianguoyun_to_path
+        to_path = CONF.api_conf.lrx_jianguoyun_to_path
         content = added_content
         self.diary_log_api.celery_update_file_to_jianguoyun(base_url,
-                                                            lzp_jianguoyun_count,
-                                                            lzp_jianguoyun_token,
+                                                            lrx_jianguoyun_count,
+                                                            lrx_jianguoyun_token,
                                                             to_path,
                                                             content,
                                                             overwrite = True)
