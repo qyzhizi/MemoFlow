@@ -82,8 +82,16 @@ class Manager(object):
         """
         content_list = content.split('\n')
         for i, content in enumerate(content_list):
+            if content and (content.strip()[:4] == "#que"):
+                up_line = i-1
+                # 排除第0行，将上一行（带标签）当做子块
+                if up_line != 0 and content_list[up_line].strip()[0] == "#":
+                    content_list[up_line] = " - " + content_list[up_line]
+                else:
+                    content_list[i] = " - " + content_list[i]
+
             # 这一行将视为特殊标签，并作为子块
-            if content and (content[:4] == "#que" or content[:4] == "#ans"):
+            if content and (content.strip()[:4] == "#ans"):
                 new_content = " - " + content
                 content_list[i] = new_content
                 LOG.info("new_content: %s" % new_content)
