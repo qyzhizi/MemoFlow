@@ -34,13 +34,13 @@ class DiaryLog(wsgi.Application):
         # 保存到本地数据库
         self.diary_log_api.save_log(processed_content)
 
-        # 发送到浮墨笔记
-        flomo_post_data = {"content": processed_content}
-        self.diary_log_api.send_log_flomo(flomo_post_data)
+        # # 发送到浮墨笔记
+        # flomo_post_data = {"content": processed_content}
+        # self.diary_log_api.send_log_flomo(flomo_post_data)
 
-        # 向notion 发送数据
-        self.diary_log_api.celery_send_log_notion(diary_log=processed_content)
-        # asyncio.run(self.diary_log_api.run_tasks(diary_log))
+        # # 向notion 发送数据
+        # self.diary_log_api.celery_send_log_notion(diary_log=processed_content)
+        # # asyncio.run(self.diary_log_api.run_tasks(diary_log))
 
         # 向github仓库（logseq 笔记软件）发送数据
         file_path = "pages/github_cards.md"
