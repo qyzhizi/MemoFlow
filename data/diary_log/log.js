@@ -16,7 +16,7 @@ $(function() {
 
                 var logList= $('#logList');
                 response = JSON.parse(response)
-                logList.prepend('<p>'+response.content +'</p>');
+                logList.prepend('<pre>'+response.content +'</pre>');
                 
                 $('#log').val('');
                 // console.log(response);
@@ -34,9 +34,9 @@ $(function() {
             response = JSON.parse(response)
             for (var i = 0; i < response.logs.length; i++) {
                 var log = response.logs[i];
-                var p = $('<p></p>');
-                p.text(log);
-                $('#logList').prepend(p);
+                var pre = $('<pre></pre>');
+                pre.text(log);
+                $('#logList').prepend(pre);
             }
         },
         error: function(error) {
