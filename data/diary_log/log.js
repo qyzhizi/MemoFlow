@@ -16,8 +16,11 @@ $(function() {
 
                 var logList= $('#logList');
                 response = JSON.parse(response)
-                logList.prepend('<pre>'+response.content +'</pre>');
+                var pre = $('<pre></pre>');
+                pre.text(response.content);
+                logList.prepend(pre);
                 
+                // 清空 输入框
                 $('#log').val('');
                 // console.log(response);
             },
