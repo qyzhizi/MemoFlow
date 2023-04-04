@@ -65,12 +65,24 @@ $(function() {
 
     var txtInput = document.getElementById('log');
     txtInput.addEventListener('keydown', function(e) {
-        if (e.keyCode === 9) { // 按下Tab键或Shift+Tab键
+        if (e.key === "Tab") { // 按下Tab键或Shift+Tab键
             var start = this.selectionStart;
             var end = this.selectionEnd;
             var value = this.value;
             var selectedText = value.substring(start, end);
+
             if (e.shiftKey) { // 按下Shift键 需要反缩进
+
+                // 获取选中文本所在行的起始位置和结束位置
+                var lineStart = value.lastIndexOf('\n', start - 1) + 1;
+                var lineEnd = value.indexOf('\n', end);
+                // 如果选中文本所在行是最后一行，需要特殊处理
+                if (lineEnd === -1) {
+                lineEnd = value.length;
+                }
+                // 获取选中文本所在行的所有字符串
+                selectedText = value.substring(lineStart, lineEnd);
+
                 var unindentedText = selectedText.split('\n').map(function(line) {
                     var leadingTabs = line.match(/^\t+/); // 匹配行首的制表符
                     if (leadingTabs) { // 存在制表符
@@ -87,9 +99,11 @@ $(function() {
                         return line;
                     }
                 }).join('\n');
-                this.value = value.substring(0, start) + unindentedText + value.substring(end);
-                this.selectionStart = start;
-                this.selectionEnd = end - (selectedText.length - unindentedText.length);
+                this.value = value.substring(0, lineStart) + unindentedText + value.substring(lineEnd);
+                var length_d = selectedText.length - unindentedText.length;
+                if ((start - length_d) < lineStart){this.selectionStart = lineStart}
+                else {this.selectionStart = start - length_d;}
+                this.selectionEnd = end - length_d;
             } else { // 没有按下Shift键
                 var indentedText = selectedText.split('\n').map(function(line) {
                     let i = 0;
@@ -109,5 +123,5 @@ $(function() {
             }
             e.preventDefault();
         }
-    });     
+    });    
 });
