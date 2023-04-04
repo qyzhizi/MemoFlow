@@ -85,7 +85,8 @@ class Manager(object):
             if content and (content.strip()[:4] == "#que"):
                 up_line = i-1
                 # 排除第0行，将上一行（带标签）当做子块
-                if up_line != 0 and content_list[up_line].strip()[0] == "#":
+                up_line_list = content_list[up_line].strip()
+                if up_line != 0 and up_line_list and up_line_list[0] == "#":
                     content_list[up_line] = " - " + content_list[up_line]
                 else:
                     content_list[i] = " - " + content_list[i]
@@ -169,3 +170,4 @@ class Manager(object):
                                          overwrite: bool = True) -> None:
         celery_task.update_file_to_janguoyun.delay(base_url, acount, token,
                                                    to_path, content, overwrite)
+
