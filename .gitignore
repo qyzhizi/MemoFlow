@@ -14,3 +14,5 @@ ChangeLog
 venv/
 .env
 *.db
+*.sql
+*.back
