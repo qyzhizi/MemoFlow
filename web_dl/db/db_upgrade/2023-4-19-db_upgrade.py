@@ -23,6 +23,7 @@ formatted_date = now.strftime("%Y%m%d%H%M%S%f")[:-5]
 
 # 表名
 table_name = "diary_log"
+table_col = 'content'
 new_table_name = "new_diary_log"
 
 # 导出数据
@@ -51,31 +52,34 @@ print(create_table_sql)
 # 执行CREATE TABLE
 c.execute(create_table_sql)
 
-# 获取所有行
-rows = c.execute(f'SELECT * FROM {table_name} ORDER BY rowid ASC').fetchall()
+# 复制content列到新表
+c.execute(f'INSERT INTO {new_table_name} ({table_col}) SELECT {table_col} FROM {table_name}')
 
-# 将每一行数据转换为字典的形式, 去除了主键
-result = []
-for row in rows:
-    row_dict = {}
-    for i, col in enumerate(c.description):
-        # 去除主键
-        if col[0] == pk_key:
-            continue
-        row_dict[col[0]] = row[i]
-    result.append(row_dict)
-
-# 创建插入语句
-my_dict_one = result[0]
-columns = ', '.join(my_dict_one.keys())
-placeholders = ', '.join('?' * len(my_dict_one))
-# 插入到diary_log_new 表中
-insert_sql = f'INSERT INTO {new_table_name} ({columns}) VALUES ({placeholders})'
-
-for my_dict in result:
-    # 将字典的内容插入到数据库的一行中
-    values = tuple(my_dict.values())
-    c.execute(insert_sql, values)
+## 获取所有行
+#rows = c.execute(f'SELECT * FROM {table_name} ORDER BY rowid ASC').fetchall()
+#
+## 将每一行数据转换为字典的形式, 去除了主键
+#result = []
+#for row in rows:
+#    row_dict = {}
+#    for i, col in enumerate(c.description):
+#        # 去除主键
+#        if col[0] == pk_key:
+#            continue
+#        row_dict[col[0]] = row[i]
+#    result.append(row_dict)
+#
+## 创建插入语句
+#my_dict_one = result[0]
+#columns = ', '.join(my_dict_one.keys())
+#placeholders = ', '.join('?' * len(my_dict_one))
+## 插入到diary_log_new 表中
+#insert_sql = f'INSERT INTO {new_table_name} ({columns}) VALUES ({placeholders})'
+#
+#for my_dict in result:
+#    # 将字典的内容插入到数据库的一行中
+#    values = tuple(my_dict.values())
+#    c.execute(insert_sql, values)
 
 # 删除旧表，重命名新表
 c.execute(f'DROP TABLE {table_name}')
