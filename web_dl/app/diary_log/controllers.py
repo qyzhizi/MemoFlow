@@ -17,6 +17,7 @@ REVIEW_DIARY_LOG = CONF.diary_log['review_diary_log_table']
 INDEX_HTML_PATH = CONF.diary_log['index_html_path']
 REVIEW_INDEX_HTML_PATH = CONF.diary_log['review_index_html_path']
 LOG_JS_PATH = CONF.diary_log['log_js_path']
+REVIEW_JS_PATH = CONF.diary_log['review_js_path']
 
 
 @dependency.requires('diary_log_api')
@@ -98,6 +99,9 @@ class DiaryLog(wsgi.Application):
     def get_review_html(self, req):
         return self.diary_log_api.get_review_html(
             review_index_html_path=REVIEW_INDEX_HTML_PATH)
+
+    def get_review_js(self, req):
+        return self.diary_log_api.get_review_js(review_js_path=REVIEW_JS_PATH)
 
     def get_review_logs(self, req):
         return self.diary_log_api.get_review_logs(table=REVIEW_DIARY_LOG,

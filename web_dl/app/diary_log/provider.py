@@ -105,6 +105,11 @@ class Manager(object):
             res = f.read()
         return res
 
+    def get_review_js(self, review_js_path):
+        with open(review_js_path, "r", encoding='UTF-8')as f:
+            res = f.read()
+        return res        
+    
     def get_review_logs(self, table, columns, data_base_path):
         """get all diary logs
 

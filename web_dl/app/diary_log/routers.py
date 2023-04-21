@@ -34,6 +34,10 @@ class Router(wsgi.ComposableRouter):
                        controller=diary_log_controller,
                        action='get_review_html',
                        conditions=dict(method=['GET']))
+        mapper.connect('/diary-log/review.js',
+                       controller=diary_log_controller,
+                       action='get_review_js',
+                       conditions=dict(method=['GET']))                                             
         mapper.connect('/diary-log/get_review_logs',
                        controller=diary_log_controller,
                        action='get_review_logs',
