@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import sys
+from multiprocessing import Process
 sys.path.insert(0,"/root/git_rep/dl/web_dl/")
 
 from web_dl.conf import CONF
@@ -13,4 +14,20 @@ cf_defaults = cp.read_file().get("default")
 log_util.server_setup(cf_defaults.get("celery_log_file"),'celery')
 
 app = celery_task.celery
-app.worker_main(argv=['worker', '-l', 'info'])
+
+# 异步任务
+def start_worker():
+    app.worker_main(argv=['worker', '-l', 'info'])
+
+# 定时任务
+def start_beat():
+    beat = app.Beat(loglevel='info')
+    beat.run()
+
+if __name__ == "__main__":
+    worker_process = Process(target=start_worker)
+    beat_process = Process(target=start_beat)
+    worker_process.start()
+    beat_process.start()
+    worker_process.join()
+    beat_process.join()

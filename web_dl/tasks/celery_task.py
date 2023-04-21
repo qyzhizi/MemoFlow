@@ -1,13 +1,23 @@
 from celery import Celery
+import logging
+import random
 
 from web_dl.conf import CONF
 from web_dl.api import notion_api
 from web_dl.api import github_api
 from web_dl.api.jianguoyun_api import JianGuoYunClient
 from web_dl.api.jianguoyun_api import jianguoyun_clients
+from web_dl.db import diary_log as diary_log_db
+
+DIARY_LOG_TABLE = CONF.diary_log['diary_log_table']
+REVIEW_DIARY_LOG = CONF.diary_log['review_diary_log']
+TAGS = ["que", "ans", "dl"]
+DATA_BASE_PATH = CONF.diary_log['data_base_path']
 
 CELERY_BROKER_URL='redis://localhost:6379'
 CELERY_RESULT_BACKEND='redis://localhost:6379'
+
+LOG = logging.getLogger(__name__)
 
 celery = Celery(__name__,
                 broker=CELERY_BROKER_URL,
@@ -42,3 +52,32 @@ def update_file_to_janguoyun(base_url: str, acount: str, token: str,
         my_client.add_content_to_file(added_content=content, file_path=to_path)
     else:
         my_client.upload_content_to_new_file(content, to_path, overwrite)
+
+@celery.task
+def time_task():
+    print("Running time task ...")
+
+@celery.task
+def time_get_diary_log_task():
+    LOG.info("Running time_get_diary_log_task ...")
+    rows=diary_log_db.get_rows_by_tags(table_name=DIARY_LOG_TABLE,
+                                        tags=TAGS,
+                                        data_base_path=DATA_BASE_PATH)
+    random_row = random.choice(rows)
+    LOG.info(f"random_row: {random_row}")
+    # diary_log_db.inser_diary_to_table(table_name=REVIEW_DIARY_LOG,
+    #                                   content=random_row[0],
+    #                                   tags=random_row[1],
+    #                                   data_base_path=DATA_BASE_PATH)
+    
+
+celery.conf.beat_schedule = {
+    'run-every-12*60*60-seconds': {
+        'task': 'web_dl.tasks.celery_task.time_task',
+        'schedule': 12*60*60
+    },
+    'time_get_diary_log_task': {
+    'task': 'web_dl.tasks.celery_task.time_get_diary_log_task',
+    'schedule': 5
+    }
+}

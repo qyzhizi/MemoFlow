@@ -4,18 +4,22 @@ import asyncio
 import logging
 import json
 import requests
-import sqlite3
+import re
 
 from web_dl.common import dependency
 from web_dl.common import manager
 from web_dl.conf import CONF
 from web_dl.api import notion_api
 from web_dl.tasks import celery_task
+from web_dl.db import diary_log as diary_log_db
 
 LOG = logging.getLogger(__name__)
 
 # driver_name = CONF.diary_log['driver']
-
+DATA_BASE_PATH = CONF.diary_log['data_base_path']
+DIARY_LOG_TABLE = CONF.diary_log['diary_log_table']
+INDEX_HTML_PATH = CONF.diary_log['index_html_path']
+LOG_JS_PATH = CONF.diary_log['log_js_path']
 
 @dependency.provider('diary_log_api')
 class Manager(object):
@@ -24,44 +28,77 @@ class Manager(object):
     # def __init__(self):
     #     super().__init__(driver_name)
 
-    def get_html(self):
-        index_html_path = CONF.diary_log['index_html_path']
+    def get_html(self, index_html_path=INDEX_HTML_PATH):
         with open(index_html_path, "r", encoding='UTF-8')as f:
             res = f.read()
         return res
     
-    def get_js(self):
-        log_js_path = CONF.diary_log['log_js_path']
+    def get_js(self, log_js_path=LOG_JS_PATH):
         with open(log_js_path, "r", encoding='UTF-8')as f:
             res = f.read()
         return res        
     
-    def save_log(self, content):
-        data_base_path = CONF.diary_log['data_base_path']
-        conn = sqlite3.connect(data_base_path)
-        c = conn.cursor()
-        c.execute('INSERT INTO diary_log  (content) VALUES (?)', (content,))
-        conn.commit()
-        # 关闭数据库连接
-        conn.close()
+    def save_log(self, content, tags, table_name=DIARY_LOG_TABLE,
+                 data_base_path=DATA_BASE_PATH):
+        """save diary(content, tags) to table
+
+        Args:
+            content (string): 笔记内容
+            tags (list): 笔记的标签，例如：[a,b,c]
+            table_name (string, optional): 表名. Defaults to DIARY_LOG_TABLE.
+        """
+        # data_base_path = CONF.diary_log['data_base_path']
+        # conn = sqlite3.connect(data_base_path)
+        # c = conn.cursor()
+        # tags_string = ','.join(tags)
+        # c.execute('INSERT INTO diary_log  (content, tags) VALUES (?,?)', (content,tags_string))
+        # conn.commit()
+        # # 关闭数据库连接
+        # conn.close()
+        tags_string = ','.join(tags)
+        diary_log_db.inser_diary_to_table(table_name=table_name,
+                                          content=content,
+                                          tags=tags_string,
+                                          data_base_path=data_base_path)
     
-    def get_logs(self):
-        data_base_path = CONF.diary_log['data_base_path']
-        conn = sqlite3.connect(data_base_path)
-        c = conn.cursor()
-        c.execute('SELECT content FROM diary_log')
-        contents = [row[0] for row in c.fetchall()]
+    def get_logs(self, table=DIARY_LOG_TABLE, columns=['contents'],
+                 data_base_path=DATA_BASE_PATH):
+        """get all diary logs
+
+        Args:
+            table (string, optional): _description_. Defaults to DIARY_LOG_TABLE.
+            columns (list, optional): _description_. Defaults to ['contents'].
+            data_base_path (string, optional): _description_. Defaults to DATA_BASE_PATH.
+
+        Returns:
+            string: json string
+        """
+        # conn = sqlite3.connect(data_base_path)
+        # c = conn.cursor()
+        # c.execute(f'SELECT content FROM {table}')
+        # contents = [row[0] for row in c.fetchall()]
+        # return json.dumps({'logs': contents})
+        rows = diary_log_db.get_all_logs(table_name=table,
+                                         columns=columns,
+                                         data_base_path=data_base_path)
+        contents = [row[0] for row in rows]
         return json.dumps({'logs': contents})
     
-    def delete_all_log(self):
-        data_base_path = CONF.diary_log['data_base_path']
-        conn = sqlite3.connect(data_base_path)
-        c = conn.cursor()
-        # 执行DELETE语句，删除表中的所有数据
-        c.execute('DELETE FROM diary_log')
-        # 提交更改并关闭连接
-        conn.commit()
-        conn.close()
+    def delete_all_log(self, data_base_path=DATA_BASE_PATH, table=DIARY_LOG_TABLE):
+        """delete all diary logs of one table
+
+        Args:
+            data_base_path (string, optional): 数据库地址. Defaults to DATA_BASE_PATH.
+            table (string, optional): 表名. Defaults to DIARY_LOG_TABLE.
+        """
+        # conn = sqlite3.connect(data_base_path)
+        # c = conn.cursor()
+        # # 执行DELETE语句，删除表中的所有数据
+        # c.execute(f'DELETE FROM {table}')
+        # # 提交更改并关闭连接
+        # conn.commit()
+        # conn.close()
+        diary_log_db.delete_all_log(table_name=table, data_base_path=data_base_path)
     
     def process_content(self, content):
         """
@@ -102,16 +139,30 @@ class Manager(object):
         # LOG.info("processed_content: %s" % processed_content)
 
         return processed_content
+    
+    def get_tags_from_content(content):
+        """get tags
 
-    """
-    flomo 笔记的api(不能泄露) ,可以向它发送内容
-    POST https://flomoapp.com/iwh/MzA4ODk/bf5338***********3eb5b1b/
-    Content-type: application/json
-    {
-        "content": "Hello, #flomo https://flomoapp.com"
-    }
-    """
+        Args:
+            content (string): diary content
+
+        Returns:
+            list: tag list
+        """
+        # 匹配标签，找到所有的标签
+        matches = re.findall(r"(?<!#)#\w+(?<!#)\s", content)
+        tags = [match.strip('# \n') for match in matches]
+        return tags
+        
     def test_post_flomo(self):
+        """
+        flomo 笔记的api(不能泄露) ,可以向它发送内容
+        POST https://flomoapp.com/iwh/MzA4ODk/bf5338***********3eb5b1b/
+        Content-type: application/json
+        {
+            "content": "Hello, #flomo https://flomoapp.com"
+        }
+        """
         flomo_api_url = CONF.diary_log['flomo_api_url']
         post_data = { "content": "Hello, #flomo https://flomoapp.com" }
         requests.post(flomo_api_url, json=post_data)
