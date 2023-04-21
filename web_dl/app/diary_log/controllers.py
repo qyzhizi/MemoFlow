@@ -11,6 +11,12 @@ from web_dl.common import dependency
 
 LOG = logging.getLogger(__name__)
 
+DATA_BASE_PATH = CONF.diary_log['data_base_path']
+DIARY_LOG_TABLE = CONF.diary_log['diary_log_table']
+REVIEW_DIARY_LOG = CONF.diary_log['review_diary_log_table']
+INDEX_HTML_PATH = CONF.diary_log['index_html_path']
+LOG_JS_PATH = CONF.diary_log['log_js_path']
+
 
 @dependency.requires('diary_log_api')
 class DiaryLog(wsgi.Application):
@@ -87,3 +93,12 @@ class DiaryLog(wsgi.Application):
     def test_flomo(self, req):
         self.diary_log_api.test_post_flomo()
         return "sucess"
+
+    def get_review_logs(self, req):
+        return self.diary_log_api.get_review_logs(table=REVIEW_DIARY_LOG,
+                                                  columns=['content'],
+                                                  data_base_path=DATA_BASE_PATH)
+
+    def delete_all_review_log(self, req):
+        return self.diary_log_api.delete_all_review_log(data_base_path=DATA_BASE_PATH,
+                                                        table=REVIEW_DIARY_LOG)
