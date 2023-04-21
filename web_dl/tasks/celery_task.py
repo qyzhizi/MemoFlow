@@ -11,7 +11,7 @@ from web_dl.db import diary_log as diary_log_db
 
 DIARY_LOG_TABLE = CONF.diary_log['diary_log_table']
 REVIEW_DIARY_LOG = CONF.diary_log['review_diary_log_table']
-TAGS = ["que", "ans", "dl"]
+REVIEW_TAGS = CONF.diary_log['review_tags'].split(',')
 DATA_BASE_PATH = CONF.diary_log['data_base_path']
 
 CELERY_BROKER_URL='redis://localhost:6379'
@@ -61,7 +61,7 @@ def time_task():
 def time_get_diary_log_task():
     LOG.info("Running time_get_diary_log_task ...")
     rows=diary_log_db.get_rows_by_tags(table_name=DIARY_LOG_TABLE,
-                                        tags=TAGS,
+                                        tags=REVIEW_TAGS,
                                         data_base_path=DATA_BASE_PATH)
     if not rows:
         return 
