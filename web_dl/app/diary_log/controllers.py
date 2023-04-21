@@ -28,11 +28,13 @@ class DiaryLog(wsgi.Application):
         diary_log = json.loads(data)
         LOG.info("diary_log json_data:, %s" % diary_log["content"][:70])
 
+        # get tags
+        tags = self.diary_log_api.get_tags_from_content(diary_log['content'])
         # 处理卡片笔记
         processed_content = self.diary_log_api.process_content(diary_log['content'])
 
         # 保存到本地数据库
-        self.diary_log_api.save_log(processed_content)
+        self.diary_log_api.save_log(processed_content, tags)
 
         # # 发送到浮墨笔记
         # flomo_post_data = {"content": processed_content}
