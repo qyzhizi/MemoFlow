@@ -10,7 +10,7 @@ from web_dl.api.jianguoyun_api import jianguoyun_clients
 from web_dl.db import diary_log as diary_log_db
 
 DIARY_LOG_TABLE = CONF.diary_log['diary_log_table']
-REVIEW_DIARY_LOG = CONF.diary_log['review_diary_log']
+REVIEW_DIARY_LOG = CONF.diary_log['review_diary_log_table']
 TAGS = ["que", "ans", "dl"]
 DATA_BASE_PATH = CONF.diary_log['data_base_path']
 
