@@ -30,3 +30,11 @@ class Router(wsgi.ComposableRouter):
                        controller=diary_log_controller,
                        action='test_flomo',
                        conditions=dict(method=['GET']))                           
+        mapper.connect('/diary-log/get_review_logs',
+                       controller=diary_log_controller,
+                       action='get_review_logs',
+                       conditions=dict(method=['GET']))
+        mapper.connect('/diary-log/delete_all_review_log',
+                       controller=diary_log_controller,
+                       action='delete_all_review_log',
+                       conditions=dict(method=['GET']))        

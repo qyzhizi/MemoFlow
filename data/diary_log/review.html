@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>日志页面</title>
+    <title>review</title>
     <meta charset="UTF-8">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
@@ -10,18 +10,18 @@
             font-family: Arial, sans-serif;
             padding: 10px;
         }
-        h1 {
+        /* h1 {
             font-size: 1em;
             margin-bottom: 0.5em;
-        }
-        form {
+        } */
+        /* form {
 			display:block;
 			flex-direction: column;
-			/* align-items: stretch; */
+			align-items: stretch;
 			margin-bottom: 5px;
             font-size: 15px;
-		}
-        input[type="text"], textarea {
+		} */
+        /* input[type="text"], textarea {
             display: block;
             text-align: left;
             width: 100%;
@@ -31,8 +31,8 @@
             border: 1px solid #ccc;
             border-radius: 2px;
             box-sizing: border-box;
-        }
-        button[type="submit"] { 
+        } */
+        /* button[type="submit"] { 
             background-color: #008CBA;
             border: none;
             color: rgb(172, 24, 116);
@@ -47,7 +47,7 @@
             align-self: flex-start;
             transform: scale(1);    
             position: relative;
-        }
+        } */
         hr {
             margin: 1em 0;
             border: none;
@@ -58,9 +58,9 @@
             margin-top: 1em;
             margin-bottom: 0.5em;
         }
-        p {
+        /* p {
             margin-bottom: 1em;
-        }
+        } */
         div{
             margin:10px 0;
         }
@@ -74,9 +74,9 @@
 		li:last-child {
 			margin-bottom: 0;
 		}     */
-        #log{
+        /* #log{
             font-size: 20px;
-        }
+        } */
         pre {
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -98,17 +98,18 @@
 </head>
 <body>
     <!-- <h1>日记页面</h1> -->
-    <form>
+    <!-- <form>
         <label for="log" style="font-size: 10px;">输入您的日志：</label>
         <textarea id="log" name="log"></textarea>
         <button id="submit" style="font-size: 20px;">提交</button>
-    </form>
+    </form> -->
     <hr>
-    <a href="https://abc.qyzhizi.cn:5050" style="font-size: 30px;" >picture</a>
-    <a href="https://abc.qyzhizi.cn:5050/review" style="font-size: 30px;" >review_diary_log</a>
-    <h3>所有日记</h3>
+    <!-- <a href="https://abc.qyzhizi.cn:5050" style="font-size: 30px;" >picture</a> -->
+    <a href="/" style="font-size: 30px;" >主页</a>
+    <h3>review</h3>
     <button id="delete_all" style="font-size: 20px;">删除所有</button>
+    <hr>
     <div id="logList"; style="white-space: pre-line";></div>
-    <script src="log.js"></script>
+    <script src="review.js"></script>
 </body>
 </html>

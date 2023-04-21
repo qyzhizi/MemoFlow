@@ -100,6 +100,32 @@ class Manager(object):
         # conn.close()
         diary_log_db.delete_all_log(table_name=table, data_base_path=data_base_path)
     
+    def get_review_logs(self, table, columns, data_base_path):
+        """get all diary logs
+
+        Args:
+            table (string, optional): _description_. Defaults to DIARY_LOG_TABLE.
+            columns (list, optional): _description_. Defaults to ['contents'].
+            data_base_path (string, optional): _description_. Defaults to DATA_BASE_PATH.
+
+        Returns:
+            string: json string
+        """
+        rows = diary_log_db.get_all_logs(table_name=table,
+                                         columns=columns,
+                                         data_base_path=data_base_path)
+        contents = [row[0] for row in rows]
+        return json.dumps({'logs': contents})
+
+    def delete_all_review_log(self, data_base_path, table):
+        """delete all diary logs of one table
+
+        Args:
+            data_base_path (string, optional): 数据库地址. Defaults to DATA_BASE_PATH.
+            table (string, optional): 表名. Defaults to DIARY_LOG_TABLE.
+        """
+        diary_log_db.delete_all_log(table_name=table, data_base_path=data_base_path)
+
     def process_content(self, content):
         """
         用于生成卡片笔记
