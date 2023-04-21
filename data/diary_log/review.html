@@ -5,58 +5,15 @@
     <meta charset="UTF-8">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        /* 样式 */
-        body {
-            font-family: Arial, sans-serif;
-            padding: 10px;
-        }
-        /* h1 {
-            font-size: 1em;
-            margin-bottom: 0.5em;
-        } */
-        /* form {
-			display:block;
-			flex-direction: column;
-			align-items: stretch;
-			margin-bottom: 5px;
-            font-size: 15px;
-		} */
-        /* input[type="text"], textarea {
-            display: block;
-            text-align: left;
-            width: 100%;
-            height: 180px;
-            padding: 5px;
-            margin-bottom: 5px;
-            border: 1px solid #ccc;
-            border-radius: 2px;
-            box-sizing: border-box;
-        } */
-        /* button[type="submit"] { 
-            background-color: #008CBA;
-            border: none;
-            color: rgb(172, 24, 116);
-            padding: 10px 10px;
-            text-align: left;
-            text-decoration: none;
-            display: block;
-            font-size: 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: auto;
-            align-self: flex-start;
-            transform: scale(1);    
-            position: relative;
-        } */
         hr {
             margin: 1em 0;
             border: none;
             border-top: 1px solid #ccc;
         }
         h3 {
-            font-size: 1.5em;
-            margin-top: 1em;
-            margin-bottom: 0.5em;
+            font-size: 1em;
+            margin-top: 0.1em;
+            margin-bottom: 0.1em;
         }
         /* p {
             margin-bottom: 1em;
@@ -64,19 +21,6 @@
         div{
             margin:10px 0;
         }
-		/* li {
-			margin-bottom: 10px;
-			padding: 10px;
-			border-radius: 5px;
-			background-color: #f2f2f2;
-			box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-		}
-		li:last-child {
-			margin-bottom: 0;
-		}     */
-        /* #log{
-            font-size: 20px;
-        } */
         pre {
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -86,27 +30,13 @@
             padding: 10px; /* 设置内边距 */ 
             margin-bottom: 10px; /* 设置外边距 */
         }
-       /* a {
-            display: block;
-            margin-bottom: 0.5em;
-            position: relative;
-            width: 30px;
-            height: 10px;
-    } */
 
 </style>
 </head>
 <body>
-    <!-- <h1>日记页面</h1> -->
-    <!-- <form>
-        <label for="log" style="font-size: 10px;">输入您的日志：</label>
-        <textarea id="log" name="log"></textarea>
-        <button id="submit" style="font-size: 20px;">提交</button>
-    </form> -->
-    <hr>
-    <!-- <a href="https://abc.qyzhizi.cn:5050" style="font-size: 30px;" >picture</a> -->
-    <a href="/v1/diary-log" style="font-size: 30px;" >主页</a>
+    <a href="/v1/diary-log/index.html" style="font-size: 20px;" >返回主页</a>
     <h3>review</h3>
+    <hr>
     <button id="delete_all" style="font-size: 20px;">删除所有</button>
     <hr>
     <div id="logList"; style="white-space: pre-line";></div>
