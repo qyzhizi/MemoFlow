@@ -100,6 +100,11 @@ class Manager(object):
         # conn.close()
         diary_log_db.delete_all_log(table_name=table, data_base_path=data_base_path)
     
+    def get_review_html(self, review_index_html_path):
+        with open(review_index_html_path, "r", encoding='UTF-8')as f:
+            res = f.read()
+        return res
+
     def get_review_logs(self, table, columns, data_base_path):
         """get all diary logs
 
