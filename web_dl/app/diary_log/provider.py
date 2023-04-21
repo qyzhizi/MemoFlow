@@ -61,7 +61,7 @@ class Manager(object):
                                           tags=tags_string,
                                           data_base_path=data_base_path)
     
-    def get_logs(self, table=DIARY_LOG_TABLE, columns=['contents'],
+    def get_logs(self, table=DIARY_LOG_TABLE, columns=['content'],
                  data_base_path=DATA_BASE_PATH):
         """get all diary logs
 
@@ -140,7 +140,7 @@ class Manager(object):
 
         return processed_content
     
-    def get_tags_from_content(content):
+    def get_tags_from_content(self, content):
         """get tags
 
         Args:

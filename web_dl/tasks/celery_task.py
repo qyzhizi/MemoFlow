@@ -63,12 +63,14 @@ def time_get_diary_log_task():
     rows=diary_log_db.get_rows_by_tags(table_name=DIARY_LOG_TABLE,
                                         tags=TAGS,
                                         data_base_path=DATA_BASE_PATH)
+    if not rows:
+        return 
     random_row = random.choice(rows)
     LOG.info(f"random_row: {random_row}")
-    # diary_log_db.inser_diary_to_table(table_name=REVIEW_DIARY_LOG,
-    #                                   content=random_row[0],
-    #                                   tags=random_row[1],
-    #                                   data_base_path=DATA_BASE_PATH)
+    diary_log_db.inser_diary_to_table(table_name=REVIEW_DIARY_LOG,
+                                      content=random_row[1],
+                                      tags=random_row[2],
+                                      data_base_path=DATA_BASE_PATH)
     
 
 celery.conf.beat_schedule = {
@@ -78,6 +80,6 @@ celery.conf.beat_schedule = {
     },
     'time_get_diary_log_task': {
     'task': 'web_dl.tasks.celery_task.time_get_diary_log_task',
-    'schedule': 5
+    'schedule': 1*60*60
     }
 }

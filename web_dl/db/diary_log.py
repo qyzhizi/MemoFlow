@@ -23,7 +23,7 @@ def create_table(data_base_path, table_name):
     conn.commit()
     conn.close()
 
-def get_all_logs(self, table_name, columns, data_base_path):
+def get_all_logs(table_name, columns, data_base_path):
     """get all logs form one table columns
 
     Args:
@@ -42,7 +42,7 @@ def get_all_logs(self, table_name, columns, data_base_path):
     conn.close()
     return rows
 
-def delete_all_log(self, table_name, data_base_path):
+def delete_all_log(table_name, data_base_path):
     conn = sqlite3.connect(data_base_path)
     c = conn.cursor()
     # 执行DELETE语句，删除表中的所有数据
@@ -72,6 +72,7 @@ def get_rows_by_tags(table_name, tags, data_base_path):
         if i > 0:
             query += "OR "
         query += f"tags LIKE '%{tag}%' "
+    LOG.info(f"query: {query}")
     # 执行查询并获取结果
     c.execute(query)
     rows = c.fetchall()
@@ -90,6 +91,6 @@ def inser_diary_to_table(table_name, content, tags, data_base_path):
     LOG.info(f"插入笔记, diary_log数据库: {data_base_path}, 数据表: {table_name}")
     conn = sqlite3.connect(data_base_path)
     c = conn.cursor()
-    c.execute(f'INSERT INTO {table_name}  (content, tags) VALUES (?)', (content, tags))
+    c.execute(f'INSERT INTO {table_name}  (content, tags) VALUES (?, ?)', (content, tags))
     conn.commit()
     conn.close()
