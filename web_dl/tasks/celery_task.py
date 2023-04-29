@@ -77,9 +77,10 @@ celery.conf.beat_schedule = {
     'run-every-12*60*60-seconds': {
         'task': 'web_dl.tasks.celery_task.time_task',
         'schedule': 12*60*60
-    },
-    'time_get_diary_log_task': {
-    'task': 'web_dl.tasks.celery_task.time_get_diary_log_task',
-    'schedule': 1*60*60
     }
+#,    
+#    'time_get_diary_log_task': {
+#    'task': 'web_dl.tasks.celery_task.time_get_diary_log_task',
+#    'schedule': 1*60*60
+#    }
 }
