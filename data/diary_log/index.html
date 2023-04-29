@@ -15,12 +15,12 @@
             margin-bottom: 0.5em;
         }
         form {
-			display:block;
-			flex-direction: column;
-			/* align-items: stretch; */
-			margin-bottom: 5px;
+            display:block;
+            flex-direction: column;
+            /* align-items: stretch; */
+            margin-bottom: 5px;
             font-size: 15px;
-		}
+    		}
         input[type="text"], textarea {
             display: block;
             text-align: left;
@@ -76,6 +76,60 @@
             padding: 10px; /* 设置内边距 */ 
             margin-bottom: 10px; /* 设置外边距 */
         }
+        /* 在黑暗模式下使用的样式 */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #333;
+                color: #fff;
+            }
+            h1 {
+                color: #fff;
+            }
+            input[type="text"], textarea {
+                background-color: #555;
+                color: #fff;
+                border: 1px solid #999;
+            }
+            button[type="submit"], #delete_all {
+                background-color: #999;
+                color: #333;
+            }
+            a {
+                color: #fff;
+            }
+            #logList {
+                background-color: #555;
+                color: #fff;
+            }
+        }
+        
+        /* 在浅色模式下使用的样式 */
+        @media (prefers-color-scheme: light) {
+            body {
+                background-color: #fff;
+                color: #333;
+            }
+            h1 {
+                color: #333;
+            }
+            input[type="text"], textarea {
+                background-color: #f5f5f5;
+                color: #333;
+                border: 1px solid #ccc;
+            }
+            button[type="submit"], #delete_all {
+                background-color: #008CBA;
+                color: rgb(172, 24, 116);
+            }
+            a {
+                color: #008CBA;
+            }
+            #logList {
+                background-color: #f5f5f5;
+                color: #333;
+            }
+        }        
+
 
 </style>
 </head>
@@ -90,7 +144,7 @@
     <a href="review" style="font-size: 30px;" >review</a>
     <!-- <a href="pasteboard" style="font-size: 30px;" >pasteboard</a> -->
     <h3>所有日记</h3>
-    <button id="delete_all" style="font-size: 20px;">删除所有</button>
+    <!-- <button id="delete_all" style="font-size: 20px;">删除所有</button> -->
     <div id="logList"; style="white-space: pre-line";></div>
     <script src="log.js"></script>
 </body>
