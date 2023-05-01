@@ -27,7 +27,7 @@ def main():
         drivers.update(dependency.resolve_future_dependencies())
         LOG.info("cf_defaults:%s", cf_defaults)
         api_paste = cf_defaults.get("api_paste_path")
-        app = deploy.loadapp("config:%s" % api_paste)
+        app = deploy.loadapp("config:%s" % api_paste, relative_to="./")
 
         LOG.info("app: %s", app)
         server = Server(cf_defaults)
