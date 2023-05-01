@@ -1,7 +1,13 @@
 #!/usr/bin/python3
+import os
 import sys
 from multiprocessing import Process
-sys.path.insert(0,"/root/git_rep/dl/web_dl/")
+# 获取当前文件的目录
+current_dir = os.path.dirname(os.path.abspath(__file__))
+top_dir = os.path.dirname(os.path.dirname(current_dir))
+# 将工作目录更改为当前文件的目录
+os.chdir(top_dir)
+sys.path.insert(0,top_dir)
 
 from web_dl.conf import CONF
 from web_dl import log_util

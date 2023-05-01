@@ -4,7 +4,7 @@
 # 将旧表数据插入新表，id 从 1 开始自增，其他列的值保持不变
 
 import sys
-sys.path.insert(0,"/root/git_rep/dl/web_dl/")
+# sys.path.insert(0,"")
 
 from datetime import datetime
 import sqlite3
@@ -12,7 +12,7 @@ import sqlite3
 from web_dl.conf import CONF
 
 path = CONF['diary_log']['data_base_path']
-#path = "/root/git_rep/dl/web_dl/data/diary_log/diary_log_test.db"
+#path = "data/diary_log/diary_log_test.db"
 
 conn = sqlite3.connect(path)
 c = conn.cursor()
