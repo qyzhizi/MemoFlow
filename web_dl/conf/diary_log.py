@@ -7,7 +7,7 @@ flomo_api_url = os.getenv("FLOMO_API_URL")
 database_id = os.getenv("DATABASE_ID")
 notion_api_key = os.getenv("NOTION_API_KEY")
 github_token = os.getenv("GITHUB_TOKEN")
-GITHUB_REPO = "qyzhizi/logseqnote"
+github_repo = os.getenv("GITHUB_REPO")
 
 
 # 声明配置项
@@ -50,7 +50,7 @@ CONF_OPTS = [
                default=github_token,
                help='github access token'),
     cfg.StrOpt("github_repo",
-               default=GITHUB_REPO,
+               default=github_repo,
                help='github repo')
 
 ]
