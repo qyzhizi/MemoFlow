@@ -1,5 +1,8 @@
 from celery import Celery
+from dotenv import load_dotenv
+load_dotenv()
 import logging
+import os
 import random
 
 from web_dl.conf import CONF
@@ -14,8 +17,8 @@ REVIEW_DIARY_LOG = CONF.diary_log['review_diary_log_table']
 REVIEW_TAGS = CONF.diary_log['review_tags'].split(',')
 DATA_BASE_PATH = CONF.diary_log['data_base_path']
 
-CELERY_BROKER_URL='redis://localhost:6379'
-CELERY_RESULT_BACKEND='redis://localhost:6379'
+CELERY_BROKER_URL=os.getenv("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND=os.getenv("CELERY_RESULT_BACKEND")
 
 LOG = logging.getLogger(__name__)
 
