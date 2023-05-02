@@ -5,6 +5,10 @@ $(function() {
         const dateStr = now.toLocaleDateString();
         const timeStr = now.toLocaleTimeString();
         var log = `## ${dateStr} ${timeStr}:\n`+ $('#log').val();
+        if ($('#log').val() === '') {
+            console.log("log is none")
+            return; // 退出函数
+        }
         // console.log($('#log').val())
         // console.log(log)
         $.ajax({
