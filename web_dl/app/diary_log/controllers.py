@@ -53,7 +53,8 @@ class DiaryLog(wsgi.Application):
         # # asyncio.run(self.diary_log_api.run_tasks(diary_log))
 
         # 向github仓库（logseq 笔记软件）发送数据
-        file_path = "pages/github_cards.md"
+        # file_path = "pages/github_cards.md"
+        file_path = CONF.diary_log['github_file_path']
         commit_message = "commit by web_dl"
         branch_name = "main"
         token = CONF.diary_log['github_token']

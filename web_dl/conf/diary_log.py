@@ -8,6 +8,7 @@ database_id = os.getenv("DATABASE_ID")
 notion_api_key = os.getenv("NOTION_API_KEY")
 github_token = os.getenv("GITHUB_TOKEN")
 github_repo = os.getenv("GITHUB_REPO")
+github_file_path = os.getenv("GITHUB_FILE_PATH")
 
 
 # 声明配置项
@@ -51,7 +52,10 @@ CONF_OPTS = [
                help='github access token'),
     cfg.StrOpt("github_repo",
                default=github_repo,
-               help='github repo')
+               help='github repo'),
+    cfg.StrOpt("github_file_path",
+               default=github_file_path,
+               help='github_file_path')
 
 ]
 

@@ -12,6 +12,20 @@ services:
     restart: always
     volumes:
       - ".:/app"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.web-dl-router.rule=Host(`localhost`)"
+      - "traefik.http.routers.web-dl-router.entrypoints=web"
+      - "traefik.http.routers.web-dl-router.service=web-dl-service"
+      - "traefik.http.services.web-dl-service.loadbalancer.server.port=9000"
+    networks:
+      - 2023-5-5-docker-compose-_traefik      
 
   redis:
     image: "redis/redis-stack-server:latest"
+    networks:
+      - 2023-5-5-docker-compose-_traefik    
+
+networks:
+  2023-5-5-docker-compose-_traefik:
+    external: true
