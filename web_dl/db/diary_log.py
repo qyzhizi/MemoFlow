@@ -23,6 +23,16 @@ def create_table(data_base_path, table_name):
     conn.commit()
     conn.close()
 
+def init_db_clipboard_log(data_base_path, table_name):
+
+    # 初始化clipboard数据库
+    LOG.info("初始化clipboard_log数据库路径: %s", data_base_path)
+    conn = sqlite3.connect(data_base_path)
+    c = conn.cursor()
+    c.execute(f'CREATE TABLE IF NOT EXISTS {table_name} (id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT)')
+    conn.commit()
+    conn.close()
+
 def get_all_logs(table_name, columns, data_base_path):
     """get all logs form one table columns
 
@@ -92,5 +102,25 @@ def inser_diary_to_table(table_name, content, tags, data_base_path):
     conn = sqlite3.connect(data_base_path)
     c = conn.cursor()
     c.execute(f'INSERT INTO {table_name}  (content, tags) VALUES (?, ?)', (content, tags))
+    conn.commit()
+    conn.close()
+
+def insert_columns_to_table(table_name, columns, data, data_base_path):
+    """Inserts columns to a table in a database.
+
+    Args:
+        table_name (str): The name of the table to insert data into.
+        columns (tuple or list): A tuple or list containing the names of the columns to insert data into.
+        data (tuple or list): A tuple or list containing the data to insert into the table.
+        data_base_path (str): The path to the database file.
+
+    Returns:
+        None
+    """
+    conn = sqlite3.connect(data_base_path)
+    c = conn.cursor()
+    placeholders = ', '.join(['?'] * len(columns))
+    query = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ({placeholders})"
+    c.execute(query, data).fetchall()
     conn.commit()
     conn.close()

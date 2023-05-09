@@ -19,6 +19,11 @@ REVIEW_INDEX_HTML_PATH = CONF.diary_log['review_index_html_path']
 LOG_JS_PATH = CONF.diary_log['log_js_path']
 REVIEW_JS_PATH = CONF.diary_log['review_js_path']
 
+#clipboard
+CLIPBOARD_HTML_PATH = CONF.diary_log['clipboard_html_path']
+CLIPBOARD_JS_PATH = CONF.diary_log['clipboard_js_path']
+CLIPBOARD_LOG_TABLE = CONF.diary_log['clipboard_log_table'] #clipboard数据表名
+CLIPBOARD_DATA_BASE_PATH = CONF.diary_log['clipboard_data_base_path'] #clipboard数据库路径
 
 @dependency.requires('diary_log_api')
 class DiaryLog(wsgi.Application):
@@ -97,6 +102,7 @@ class DiaryLog(wsgi.Application):
         self.diary_log_api.test_post_flomo()
         return "sucess"
 
+    # review
     def get_review_html(self, req):
         return self.diary_log_api.get_review_html(
             review_index_html_path=REVIEW_INDEX_HTML_PATH)
@@ -112,3 +118,35 @@ class DiaryLog(wsgi.Application):
     def delete_all_review_log(self, req):
         return self.diary_log_api.delete_all_review_log(data_base_path=DATA_BASE_PATH,
                                                         table=REVIEW_DIARY_LOG)
+
+    # clipboard
+    def get_clipboard_html(self, req):
+        return self.diary_log_api.get_clipboard_html(
+            clipboard_html_path=CLIPBOARD_HTML_PATH)
+    
+    def get_clipboard_js(self, req):
+        return self.diary_log_api.get_clipboard_js(
+            clipboard_js_path=CLIPBOARD_JS_PATH)
+
+    def get_clipboard_logs(self, req):
+        return self.diary_log_api.get_clipboard_logs(
+            table_name=CLIPBOARD_LOG_TABLE,
+            columns=['content'],
+            data_base_path=CLIPBOARD_DATA_BASE_PATH)
+    
+    def clipboard_addlog(self, req):
+        # 从请求中获取POST数据
+        data = req.body
+        # 将POST数据转换为JSON格式
+        diary_log = json.loads(data)
+        LOG.info("diary_log json_data:, %s" % diary_log["content"][:70])
+        # 保存到本地数据库
+        self.diary_log_api.save_log_to_clipboard_table(
+            table_name=CLIPBOARD_LOG_TABLE,
+            columns=['content'],
+            data = [diary_log["content"]],
+            data_base_path=CLIPBOARD_DATA_BASE_PATH
+            )
+        return json.dumps(diary_log) # data 是否可行？
+
+            
