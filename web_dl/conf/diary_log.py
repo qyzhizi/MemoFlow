@@ -55,7 +55,20 @@ CONF_OPTS = [
                help='github repo'),
     cfg.StrOpt("github_file_path",
                default=github_file_path,
-               help='github_file_path')
+               help='github_file_path'),
+    # #clipboard数据库
+    cfg.StrOpt('clipboard_html_path',
+               default='data/diary_log/clipboard/clipboard.html',
+               help='clipboard html路径'),
+    cfg.StrOpt('clipboard_js_path',
+                default="data/diary_log/clipboard/clipboard.js",
+                help='clipboard js文件路径'),
+    cfg.StrOpt("clipboard_data_base_path",
+               default='data/diary_log/clipboard/clipboard_log.db',
+               help='clipboard_log db file path'),
+    cfg.StrOpt("clipboard_log_table",
+               default='clipboard_log',
+               help='clipboard_log table name')
 
 ]
 

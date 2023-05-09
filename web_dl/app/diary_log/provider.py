@@ -100,6 +100,7 @@ class Manager(object):
         # conn.close()
         diary_log_db.delete_all_log(table_name=table, data_base_path=data_base_path)
     
+    # review provider
     def get_review_html(self, review_index_html_path):
         with open(review_index_html_path, "r", encoding='UTF-8')as f:
             res = f.read()
@@ -135,6 +136,41 @@ class Manager(object):
             table (string, optional): 表名. Defaults to DIARY_LOG_TABLE.
         """
         diary_log_db.delete_all_log(table_name=table, data_base_path=data_base_path)
+
+    # clipboard
+    def get_clipboard_html(self, clipboard_html_path):
+        with open(clipboard_html_path, "r", encoding='UTF-8')as f:
+            res = f.read()
+        return res
+
+    def get_clipboard_js(self, clipboard_js_path):
+        with open(clipboard_js_path, "r", encoding='UTF-8')as f:
+            res = f.read()
+        return res
+    
+    def get_clipboard_logs(self, table_name, columns, data_base_path):
+        """get all logs form one table columns
+
+        Args:
+            table_name (string): _description_
+            columns (tuple or list): ["content"]
+            data_base_path (tring): _description_
+
+        Returns:
+            list: [[content1], [content2], ...]
+        """
+        rows = diary_log_db.get_all_logs(table_name, columns, data_base_path)
+        contents = [row[0] for row in rows]
+        return json.dumps({'logs': contents})
+
+    def save_log_to_clipboard_table(self,table_name, columns, data, data_base_path):
+        diary_log_db.insert_columns_to_table(table_name=table_name,
+                                                  columns=columns,
+                                                  data=data,
+                                                  data_base_path=data_base_path)
+        
+
+
 
     def process_content(self, content):
         """
