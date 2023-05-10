@@ -45,6 +45,7 @@ class DiaryLog(wsgi.Application):
         tags = self.diary_log_api.get_tags_from_content(diary_log['content'])
         # 处理卡片笔记
         processed_content = self.diary_log_api.process_content(diary_log['content'])
+        processed_block_content = self.diary_log_api.process_block(processed_content)
 
         # 保存到本地数据库
         self.diary_log_api.save_log(processed_content, tags)
@@ -64,7 +65,7 @@ class DiaryLog(wsgi.Application):
         branch_name = "main"
         token = CONF.diary_log['github_token']
         repo = CONF.diary_log['github_repo']
-        added_content = processed_content
+        added_content = processed_block_content
         self.diary_log_api.celery_update_file_to_github(token,
                                                         repo,
                                                         file_path,
