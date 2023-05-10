@@ -69,6 +69,29 @@ $(function() {
     });
     
     var txtInput = document.getElementById('log');
+    txtInput.addEventListener('keydown', function(event) {
+        if (event.altKey && event.key === "q") {
+          console.log("alt+q was pressed.");
+          // 在这里编写按下alt+q 后要执行的代码
+            var start = this.selectionStart;
+            var end = this.selectionEnd;
+            var value = this.value;
+            var selectedText = value.substring(start, end);
+            var indentedText = selectedText.split('\n').map(function(line) {
+                const leading_t = '\t'
+                return leading_t + line; // 将生成的空格字符串和剩余的字符串拼接返回
+            }).join('\n');
+            this.value = value.substring(0, start) + indentedText + value.substring(end);
+            if (selectedText.length){
+                this.selectionStart = start;
+                this.selectionEnd = end + (indentedText.length - selectedText.length);
+            } else {
+                this.selectionEnd = end + (indentedText.length - selectedText.length);
+                this.selectionStart = this.selectionEnd;
+            }                
+        }
+      });
+
     txtInput.addEventListener('keydown', function(e) {
         if (e.key === "Tab") { // 按下Tab键或Shift+Tab键
             var start = this.selectionStart;
@@ -98,7 +121,7 @@ $(function() {
                         line = leadingSpaces + line.substring(i); // 将生成的空格字符串和剩余的字符串拼接返回
                         return line.substring(4);
                     } else if (line.match(/^ {1}/)) { // 前面至少有一个空格时
-                        const leadingSpaces = line.match(/^ {0,4}/)[0];
+                        const leadingSpaces = line.match(/^\x20/)[0];
                     return line.substring(leadingSpaces.length)
                     } else {
                         return line;

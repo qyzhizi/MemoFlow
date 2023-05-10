@@ -169,8 +169,58 @@ class Manager(object):
                                                   data=data,
                                                   data_base_path=data_base_path)
         
+    def process_block(self, block_string):
+        """items:  ['## 2023-5-10\nssssssssssssssssssssss',
+'\t- ', 'item1\n509348606-\n',
+'\t\t-    ', 'item1.1\n\t\t\t    45834056843\n',
+'\t\t\t- ', 'item1.2\n\t\t\t    405843068045\n',
+'\t- ', 'item2\n3405834056\n']
+"""
+        processed_result = []
 
+        items = re.split(r'(\t+-\s+)', block_string)
+        # print("items: ", items)
+        child_block_list = []
+        #去除第一个block,该block不带"\t", 奇数个，例如：
+        for i in range(1, len(items), 2):
+            if i+1 < len(items):
+                t_list = items[i].split("-")
+                t_num = len(t_list[0])
+                child_block_list.append((t_num, items[i+1]))
+        #第一个块
+        processed_result.append("- " + items[0].strip('\n'))
 
+        # 处理每个子块
+        for i, (t_num, item) in enumerate(child_block_list):
+            #得到每一行，相当于logseq的软回车的行
+            lines = item.split('\n')
+            # print("lines: ", lines)
+            for line_index, line in enumerate(lines):
+                # split操作会得到空字符串, 或者只要空格的字符串
+                if not line.strip():
+                    continue
+                # 子块第一行，比较特殊，最多给一个"\t"
+                if i == 0 and t_num > 1:
+                    t_num = 1
+                # 当前子块如果比上个子块多2个、2个以上的"\t"，进行现在，最多只能多一个"\t"
+                if i-1 >= 0 and t_num >= child_block_list[i-1][0] +1:
+                    t_num = child_block_list[i-1][0] +1
+                # 判断是否为block开头标识：t_num*'\t'+ "- "
+                if line_index == 0:
+                    pre_str = t_num*'\t'+ "- "
+                else:
+                    # 软回车标识
+                    pre_str = t_num*'\t'+ "  "
+                    # 匹配开头“\t\t  ”, 多个"\t", 至少两个空格
+                    match = re.match(r'^\x20{0,}\t+\x20{2,}', line)
+                    if match is not None:
+                        #统一先删除，后面再加上
+                        # print([match[0]])
+                        line = line[len(match[0]):]
+
+                #加上t_num*'\t'+ "  " 或者t_num*'\t'+ "- "
+                processed_result.append(pre_str + line)
+        return "\n".join(processed_result)
 
     def process_content(self, content):
         """
@@ -195,14 +245,16 @@ class Manager(object):
                 up_line = i-1
                 # 排除第0行，将上一行（带标签）当做子块
                 up_line_list = content_list[up_line].strip()
+                if up_line != 0 and content_list[up_line].startswith("\t- "):
+                    continue
                 if up_line != 0 and up_line_list and up_line_list[0] == "#":
-                    content_list[up_line] = " - " + content_list[up_line]
+                    content_list[up_line] = "\t- " + content_list[up_line]
                 else:
-                    content_list[i] = " - " + content_list[i]
+                    content_list[i] = "\t- " + content_list[i]
 
             # 这一行将视为特殊标签，并作为子块
             if content and (content.strip()[:4] == "#ans"):
-                new_content = " - " + content
+                new_content = "\t- " + content
                 content_list[i] = new_content
                 LOG.info("new_content: %s" % new_content)
             
