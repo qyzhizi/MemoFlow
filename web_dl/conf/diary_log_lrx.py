@@ -11,9 +11,6 @@ CONF_OPTS = [
     cfg.StrOpt('log_js_path',
                 default="data/diary_log_lrx/log.js",
                 help='主页的js文件路径'),
-    cfg.StrOpt('flomo_api_url',
-                default="https://flomoapp.com/iwh/MzA4ODk/bf5338002eb49cbd323c672e03eb5b1b/",
-                help='flomo api url')
 ]
 
 def register_opts(conf):
