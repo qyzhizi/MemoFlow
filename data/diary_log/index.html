@@ -4,10 +4,11 @@
     <title>日志页面</title>
     <meta charset="UTF-8">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro">
     <style>
         /* 样式 */
         body {
-            font-family: Arial, sans-serif;
+            font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
             padding: 10px;
         }
         h1 {
@@ -31,6 +32,7 @@
             border: 1px solid #ccc;
             border-radius: 2px;
             box-sizing: border-box;
+            font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
         }
         button[type="submit"] { 
             background-color: #008CBA;
@@ -72,9 +74,12 @@
             word-wrap: break-word;
             max-width: 80ch;
             font-size: 20px;
-            border: 2px solid #01040f73; /* 设置边框样式 */ 
+            border: 2px solid hwb(216 76% 20% / 0.922); /* 设置边框样式 */ 
             padding: 10px; /* 设置内边距 */ 
             margin-bottom: 10px; /* 设置外边距 */
+            font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
+            text-rendering: geometricPrecision;
+            line-height: 1.35;
         }
         /* 在黑暗模式下使用的样式 */
         @media (prefers-color-scheme: dark) {
