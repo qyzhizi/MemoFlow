@@ -170,6 +170,32 @@ class Manager(object):
                                                   data_base_path=data_base_path)
         
     def process_block(self, block_string):
+        """处理子块缩进
+        block_string: 使用process_content函数处理后的字符串,它在特的行
+        添加了子块标识"\t- "，一般地：`"\t"*n+"- "` 其中"\t"的数目n大于等于0
+
+        Returns:
+            _type_: 处理后的字符串
+        例如：
+        处理前的字符串：
+        ```
+        - ## 2023年5月13日 下午1:53:49:
+	        - #webdl #tab #制表符
+	    #que 在笔记页面中输入制表符
+	        - #ans
+	    快捷键: alt + q
+	    因为前段的js设置了该快捷键
+        ```
+        处理后的字符串：
+        ```
+        - ## 2023年5月13日 下午1:53:49:
+            - #webdl #tab #制表符
+              #que 在笔记页面中输入制表符
+            - #ans
+              快捷键: alt + q
+              因为前段的js设置了该快捷键
+        ```
+        """
         """items:  ['## 2023-5-10\nssssssssssssssssssssss',
 '\t- ', 'item1\n509348606-\n',
 '\t\t-    ', 'item1.1\n\t\t\t    45834056843\n',
@@ -188,7 +214,7 @@ class Manager(object):
                 t_num = len(t_list[0])
                 child_block_list.append((t_num, items[i+1]))
         #第一个块
-        processed_result.append("- " + items[0].strip('\n'))
+        processed_result.append(items[0].strip('\n'))
 
         # 处理每个子块
         for i, (t_num, item) in enumerate(child_block_list):
@@ -232,15 +258,19 @@ class Manager(object):
         'git log --oneline origin/main..HEAD']
 
         生成的效果：
-        ## 2023/3/24 03:15:14:
-        - #git #github #commit
+        ```
+        - ## 2023/3/24 03:15:14:
+            - #git #github #commit
         #que 如何展示在本地而不在远程的提交？  
-        - #ans 
+            - #ans 
         git log --oneline origin/main..HEAD
-
+        ```
         """
         content_list = content.split('\n')
         for i, content in enumerate(content_list):
+            if i == 0 and content.strip()[:2] == "##":
+                # 第一个时间戳标题需要设置为logseq最上层的子块，所以不带"\t"
+                content_list[i] = "- " + content_list[i]
             if content and (content.strip()[:4] == "#que"):
                 up_line = i-1
                 # 排除第0行，将上一行（带标签）当做子块
