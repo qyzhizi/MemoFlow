@@ -312,36 +312,60 @@ class Manager(object):
         git log --oneline origin/main..HEAD
         ```
         """
+        title_string = "##"
+        tag_string = "#"
+        block_pre_string = ["- ", "\t- "]
+        que_strings = ["#que ", "#que"]
+        ans_strings = ["#ans ", "#ans"]
+        normal_blk_strings = ["@blk ", "@blk"]
+
+        todo_key = ["--todo ", "--TODO ",
+                    "--done ", "--DONE "]
+        todo_value = ["\t- TODO ", "\t- DONE "]
+        todo_map = {todo_key[0]:todo_value[0],
+                    todo_key[1]:todo_value[0],
+                    todo_key[2]:todo_value[1],
+                    todo_key[3]:todo_value[1]}
+
         content_list = content.split('\n')
         for i, content in enumerate(content_list):
-            if i == 0 and content.strip()[:2] == "##":
+            if i == 0 and content.strip()[:len(title_string)] == title_string:
                 # 第一个时间戳标题需要设置为logseq最上层的子块，所以不带"\t"
-                content_list[i] = "- " + content_list[i]
-            if content and (content.strip()[:4] == "#que " or content.strip()=="#que"):
+                content_list[i] = block_pre_string[0] + content_list[i]
+            
+            # que_strings = ["#que ", "#que"]
+            if content and (content.strip()[:len(que_strings[0])] == que_strings[0]
+                            or content.strip()==que_strings[1]):
                 up_line = i-1
                 # 排除第0行，将上一行（带标签）当做子块
                 up_line_list = content_list[up_line].strip()
-                if up_line != 0 and content_list[up_line].startswith("\t- "):
+                if up_line != 0 and content_list[up_line].startswith(block_pre_string[1]):
                     continue
-                if up_line != 0 and up_line_list and up_line_list[0] == "#":
-                    content_list[up_line] = "\t- " + content_list[up_line]
+                if up_line != 0 and up_line_list and up_line_list[0] == tag_string:
+                    content_list[up_line] = block_pre_string[1] + content_list[up_line]
                 else:
-                    content_list[i] = "\t- " + content_list[i]
+                    content_list[i] = block_pre_string[1] + content_list[i]
 
             # 这一行将视为特殊标签，并作为子块
-            if content and (content.strip()[:4] == "#ans " or content.strip()=="#ans"):
-                new_content = "\t- " + content
+            # ans_strings = ["#ans ", "#ans"]
+            if content and (content.strip()[:len(ans_strings[0])] == ans_strings[0]
+                            or content.strip()==ans_strings[1]):
+                new_content = block_pre_string[1] + content
                 content_list[i] = new_content
-                # LOG.info("new_content: %s" % new_content)
+
             # 解析`-todo ` 变为子块
-            todo_string = {"--todo ":"\t- TODO ", "--done ":"\t- DONE "}
-            if content and (content.strip()[:7] in todo_string or content.strip() in todo_string):
-                LOG.info("content:%s" % content.strip()[:7])
-                new_content = todo_string[content.strip()[:7]] + content[7:]
+            # todo_string = {"--todo ":"\t- TODO ", "--done ":"\t- DONE "}
+            if content and (content.strip()[:len(todo_key[0])] in todo_map
+                            or content.strip() in todo_map):
+                new_content = todo_map[content.strip()[:len(todo_key[0])]] + content[
+                    len(todo_key[0]):]
                 content_list[i] = new_content
+
             # 解析`@blk` 变为子块
-            if content and (content.strip()[:4] == "@blk " or content.strip()=="@blk"):
-                new_content = "\t- " + content
+            # normal_blk_strings = ["@blk ", "@blk"]
+            if content and (content.strip()[:len(normal_blk_strings[0])]==normal_blk_strings[0]
+                            or content.strip()==normal_blk_strings[1]):
+                new_content = block_pre_string[1] + content
                 content_list[i] = new_content
 
             
