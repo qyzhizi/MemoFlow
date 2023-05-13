@@ -317,7 +317,7 @@ class Manager(object):
             if i == 0 and content.strip()[:2] == "##":
                 # 第一个时间戳标题需要设置为logseq最上层的子块，所以不带"\t"
                 content_list[i] = "- " + content_list[i]
-            if content and (content.strip()[:4] == "#que"):
+            if content and (content.strip()[:4] == "#que " or content.strip()=="#que"):
                 up_line = i-1
                 # 排除第0行，将上一行（带标签）当做子块
                 up_line_list = content_list[up_line].strip()
@@ -329,10 +329,21 @@ class Manager(object):
                     content_list[i] = "\t- " + content_list[i]
 
             # 这一行将视为特殊标签，并作为子块
-            if content and (content.strip()[:4] == "#ans"):
+            if content and (content.strip()[:4] == "#ans " or content.strip()=="#ans"):
                 new_content = "\t- " + content
                 content_list[i] = new_content
-                LOG.info("new_content: %s" % new_content)
+                # LOG.info("new_content: %s" % new_content)
+            # 解析`-todo ` 变为子块
+            todo_string = {"--todo ":"\t- TODO ", "--done ":"\t- DONE "}
+            if content and (content.strip()[:7] in todo_string or content.strip() in todo_string):
+                LOG.info("content:%s" % content.strip()[:7])
+                new_content = todo_string[content.strip()[:7]] + content[7:]
+                content_list[i] = new_content
+            # 解析`@blk` 变为子块
+            if content and (content.strip()[:4] == "@blk " or content.strip()=="@blk"):
+                new_content = "\t- " + content
+                content_list[i] = new_content
+
             
         # 重新组成串,并去除前后的空格与换行符等空白字符
         processed_content = "\n".join(content_list).strip()
