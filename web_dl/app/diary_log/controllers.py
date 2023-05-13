@@ -59,33 +59,34 @@ class DiaryLog(wsgi.Application):
         # # asyncio.run(self.diary_log_api.run_tasks(diary_log))
 
         # 向github仓库（logseq 笔记软件）发送数据
-        # file_path = "pages/github_cards.md"
-        file_path = CONF.diary_log['github_file_path']
-        commit_message = "commit by web_dl"
-        branch_name = "main"
-        token = CONF.diary_log['github_token']
-        repo = CONF.diary_log['github_repo']
-        added_content = processed_block_content
-        self.diary_log_api.celery_update_file_to_github(token,
-                                                        repo,
-                                                        file_path,
-                                                        added_content,
-                                                        commit_message,
-                                                        branch_name)
+        if CONF.diary_log['send_to_github'] == True:
+            file_path = CONF.diary_log['github_file_path']
+            commit_message = "commit by web_dl"
+            branch_name = "main"
+            token = CONF.diary_log['github_token']
+            repo = CONF.diary_log['github_repo']
+            added_content = processed_block_content
+            self.diary_log_api.celery_update_file_to_github(token,
+                                                            repo,
+                                                            file_path,
+                                                            added_content,
+                                                            commit_message,
+                                                            branch_name)
 
         # 向坚果云发送异步任务，更新文件
         # lzp 的坚果云账号
-        lzp_jianguoyun_count = CONF.api_conf.lzp_jianguoyun_count
-        lzp_jianguoyun_token = CONF.api_conf.lzp_jianguoyun_token
-        base_url = CONF.api_conf.base_url
-        to_path = CONF.api_conf.lzp_jianguoyun_to_path
-        added_content = processed_content
-        self.diary_log_api.celery_update_file_to_jianguoyun(base_url,
-                                                            lzp_jianguoyun_count,
-                                                            lzp_jianguoyun_token,
-                                                            to_path,
-                                                            added_content,
-                                                            overwrite = True)
+        if CONF.diary_log['send_to_jianguoyun'] == True:
+            lzp_jianguoyun_count = CONF.api_conf.lzp_jianguoyun_count
+            lzp_jianguoyun_token = CONF.api_conf.lzp_jianguoyun_token
+            base_url = CONF.api_conf.base_url
+            to_path = CONF.api_conf.lzp_jianguoyun_to_path
+            added_content = processed_block_content
+            self.diary_log_api.celery_update_file_to_jianguoyun(base_url,
+                                                                lzp_jianguoyun_count,
+                                                                lzp_jianguoyun_token,
+                                                                to_path,
+                                                                added_content,
+                                                                overwrite = True)
 
         return json.dumps({"content": processed_content})
         # return Response(json_data)
