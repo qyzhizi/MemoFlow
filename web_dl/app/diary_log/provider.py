@@ -288,8 +288,8 @@ class Manager(object):
                 content_list[i] = new_content
                 LOG.info("new_content: %s" % new_content)
             
-        # 重新组成串
-        processed_content = "\n".join(content_list)
+        # 重新组成串,并去除前后的空格与换行符等空白字符
+        processed_content = "\n".join(content_list).strip()
         # LOG.info("processed_content: %s" % processed_content)
 
         return processed_content
