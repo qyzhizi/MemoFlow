@@ -306,11 +306,28 @@ class Manager(object):
         生成的效果：
         ```
         - ## 2023/3/24 03:15:14:
-            - #git #github #commit
+        \t- #git #github #commit
         #que 如何展示在本地而不在远程的提交？  
-            - #ans 
+        \t- #ans 
         git log --oneline origin/main..HEAD
         ```
+        新增例子:
+        输入:
+        ```
+        ## 2023/5/14 07:11:00:
+        --todo sdfjslfjds
+        @blk djfslfjs
+        @blk
+        djfsfjsfjds;
+        ```
+        生成效果：
+        ```
+        - ## 2023/5/14 07:11:00:
+        \t- TODO sdfjslfjds
+        \t- @blk djfslfjs
+        \t- @blk
+        djfsfjsfjds;
+        ```        
         """
         title_string = "##"
         tag_string = "#"
@@ -354,7 +371,6 @@ class Manager(object):
                 content_list[i] = new_content
 
             # 解析`-todo ` 变为子块
-            # todo_string = {"--todo ":"\t- TODO ", "--done ":"\t- DONE "}
             if content and (content.strip()[:len(todo_key[0])] in todo_map
                             or content.strip() in todo_map):
                 new_content = todo_map[content.strip()[:len(todo_key[0])]] + content[
@@ -368,12 +384,8 @@ class Manager(object):
                 new_content = block_pre_string[1] + content
                 content_list[i] = new_content
 
-            
         # 重新组成串,并去除前后的空格与换行符等空白字符
-        processed_content = "\n".join(content_list).strip()
-        # LOG.info("processed_content: %s" % processed_content)
-
-        return processed_content
+        return "\n".join(content_list).strip()
     
     def get_tags_from_content(self, content):
         """get tags
