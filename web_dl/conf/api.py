@@ -4,38 +4,38 @@ load_dotenv()
 import os
 
 BASE_URL = 'https://dav.jianguoyun.com/dav/'
-lzp_jianguoyun_count = os.getenv("LZP_JIANGUOYUN_COUNT")
-lzp_jianguoyun_token = os.getenv("LZP_JIANGUOYUN_TOKEN")
-lzp_jianguoyun_to_path = os.getenv("LZP_JIANGUOYUN_TO_PATH")
+JIANGUOYUN_COUNT = os.getenv("JIANGUOYUN_COUNT")
+JIANGUOYUN_TOKEN = os.getenv("JIANGUOYUN_TOKEN")
+JIANGUOYUN_TO_PATH = os.getenv("JIANGUOYUN_TO_PATH")
 
-lrx_jianguoyun_count = os.getenv("LRX_JIANGUOYUN_COUNT")
-lrx_jianguoyun_token = os.getenv("LRX_JIANGUOYUN_TOKEN")
-lrx_jianguoyun_to_path = os.getenv("LRX_JIANGUOYUN_TO_PATH")
+second_jianguoyun_count = os.getenv("second_JIANGUOYUN_COUNT")
+second_jianguoyun_token = os.getenv("second_JIANGUOYUN_TOKEN")
+second_jianguoyun_to_path = os.getenv("second_JIANGUOYUN_TO_PATH")
 
 # 声明配置项
 CONF_OPTS = [
     cfg.StrOpt('base_url',
                default=BASE_URL,
                help='坚果云的基地址'),
-    cfg.StrOpt('lzp_jianguoyun_count',
-                default=lzp_jianguoyun_count,
+    cfg.StrOpt('JIANGUOYUN_COUNT',
+                default=JIANGUOYUN_COUNT,
                 help='lzp 的坚果云账号'),
-    cfg.StrOpt('lzp_jianguoyun_token',
-               default=lzp_jianguoyun_token,
+    cfg.StrOpt('JIANGUOYUN_TOKEN',
+               default=JIANGUOYUN_TOKEN,
                help='lzp 的坚果云token'),
-    cfg.StrOpt('lzp_jianguoyun_to_path',
-               default=lzp_jianguoyun_to_path,
+    cfg.StrOpt('JIANGUOYUN_TO_PATH',
+               default=JIANGUOYUN_TO_PATH,
                help='lzp 的坚果云笔记更新文件的路径'),
 
-    cfg.StrOpt('lrx_jianguoyun_count',
-                default=lrx_jianguoyun_count,
-                help='lrx 的坚果云账号'),
-    cfg.StrOpt('lrx_jianguoyun_token',
-               default=lrx_jianguoyun_token,
-               help='lrx 的坚果云token'),
-    cfg.StrOpt('lrx_jianguoyun_to_path',
-               default=lrx_jianguoyun_to_path,
-               help='lrx 的坚果云笔记更新文件的路径'),
+    cfg.StrOpt('second_jianguoyun_count',
+                default=second_jianguoyun_count,
+                help='second 的坚果云账号'),
+    cfg.StrOpt('second_jianguoyun_token',
+               default=second_jianguoyun_token,
+               help='second 的坚果云token'),
+    cfg.StrOpt('second_jianguoyun_to_path',
+               default=second_jianguoyun_to_path,
+               help='second 的坚果云笔记更新文件的路径'),
 ]
 
 def register_opts(conf):

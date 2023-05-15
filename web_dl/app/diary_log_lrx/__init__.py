@@ -1,1 +1,0 @@
-from web_dl.app.diary_log_lrx.provider import *

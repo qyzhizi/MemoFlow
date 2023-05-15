@@ -7,9 +7,9 @@ services:
     build: ./
     env_file:
       - .env
-    ports:
-      - "9000:9000"
-    restart: always
+    expose:
+      - 9000
+    # restart: always
     volumes:
       - ".:/app"
     labels:
@@ -19,13 +19,13 @@ services:
       - "traefik.http.routers.web-dl-router.service=web-dl-service"
       - "traefik.http.services.web-dl-service.loadbalancer.server.port=9000"
     networks:
-      - 2023-5-5-docker-compose-_traefik      
+      - traefik-server_traefik      
 
   redis:
     image: "redis/redis-stack-server:latest"
     networks:
-      - 2023-5-5-docker-compose-_traefik    
+      - traefik-server_traefik    
 
 networks:
-  2023-5-5-docker-compose-_traefik:
+  traefik-server_traefik:
     external: true
