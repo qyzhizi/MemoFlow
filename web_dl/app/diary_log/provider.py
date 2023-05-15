@@ -170,36 +170,108 @@ class Manager(object):
                                                   data_base_path=data_base_path)
         
     def process_block(self, block_string):
-        """items:  ['## 2023-5-10\nssssssssssssssssssssss',
-'\t- ', 'item1\n509348606-\n',
-'\t\t-    ', 'item1.1\n\t\t\t    45834056843\n',
-'\t\t\t- ', 'item1.2\n\t\t\t    405843068045\n',
-'\t- ', 'item2\n3405834056\n']
-"""
+        """处理子块缩进
+        block_string: 使用process_content函数处理后的字符串,它在特的行
+        添加了子块标识"\t- "，一般地：`"\t"*n+"- "` 其中"\t"的数目n大于等于0
+
+        Returns:
+            _type_: 处理后的字符串
+        例如：
+        处理前的字符串：
+        ```
+        - ## 2023年5月13日 下午1:53:49:
+        这是最上层的子块，也是第一个子块
+            - #webdl #tab #制表符
+        这是第二层子块
+        #que 在笔记页面中输入制表符
+            - #ans
+        这也是第二层子块
+        快捷键: alt + q
+        因为前段的js设置了该快捷键
+        ```
+        处理后的字符串：
+        ```
+        - ## 2023年5月13日 下午1:53:49:
+            这是最上层的子块，也是第一个子块
+            - #webdl #tab #制表符
+                这是第二层子块
+                #que 在笔记页面中输入制表符
+            - #ans
+                这也是第二层子块
+                快捷键: alt + q
+                因为前段的js设置了该快捷键
+        ```
+        """
+        
+        """
+        另外一个更复杂的例子：
+
+        s = '''- ## 2023-5-10
+        top block
+        \t- item1
+        509348606-
+        \t\t-    item1.1
+        45834056843
+
+        \t\t\t- item1.2
+        \t\t\t    405843068045
+        \t- item2
+        3405834056
+        '''
+        items = re.split(r'(\t+-\s+)', block_string)
+        items:  ['## 2023-5-10\nssssssssssssssssssssss',
+        '\t- ', 'item1\n509348606-\n',
+        '\t\t-    ', 'item1.1\n\t\t\t    45834056843\n',
+        '\t\t\t- ', 'item1.2\n\t\t\t    405843068045\n',
+        '\t- ', 'item2\n3405834056\n']
+        result:
+        ```
+        - ## 2023-5-10
+          top block
+        - item1
+                - item1.1
+                  45834056843
+
+                        - item1.2
+                          405843068045
+        - item2
+          3405834056
+        ```
+        """
         processed_result = []
 
         items = re.split(r'(\t+-\s+)', block_string)
-        # print("items: ", items)
+
+        # 假设block_string以`- ## 2023-5-10`开头，
+        # 开头是第一个block,但该block不带"\t", 额外做处理，变为0个"\t"
+        # 之所以这样处理，是因为`- `很常见，不能直接使用上面那样的正则匹配
+        if items[0].startswith("- "):
+            # items[0] 分割成两部分：'- ' , items[0][2:]
+            items = ['- ' , items[0][2:]] + items[1:]
+        else:
+            # 额外添加'- '，把第一行默认做一个子块，
+            # 比如：block_string 以`## 2023-5-10`开头
+            items = ['- ' , items[0]] + items[1:]
+
         child_block_list = []
-        #去除第一个block,该block不带"\t", 奇数个，例如：
-        for i in range(1, len(items), 2):
+        #子块(block)与"\t"的个数是成对的, 偶数个
+        for i in range(0, len(items), 2):
             if i+1 < len(items):
                 t_list = items[i].split("-")
                 t_num = len(t_list[0])
                 child_block_list.append((t_num, items[i+1]))
-        #第一个块
-        processed_result.append("- " + items[0].strip('\n'))
 
         # 处理每个子块
         for i, (t_num, item) in enumerate(child_block_list):
             #得到每一行，相当于logseq的软回车的行
             lines = item.split('\n')
-            # print("lines: ", lines)
+            # split('\n')操作会可能会多得到一个空字符串, 去除最后一个空字符串
+            if lines[-1].strip(" ") == "":
+                lines = lines[:-1]
             for line_index, line in enumerate(lines):
-                # split操作会得到空字符串, 或者只要空格的字符串
-                if not line.strip():
-                    continue
-                # 子块第一行，比较特殊，最多给一个"\t"
+                # 子块第一行，比较特殊，最多给一个"\t"，或者不给"\t"
+                # 因为已经把最上层的子块考虑进来了，例如：`- ## 2023-5-10`
+                # i == 0时， t_num一般是等于0的
                 if i == 0 and t_num > 1:
                     t_num = 1
                 # 当前子块如果比上个子块多2个、2个以上的"\t"，进行现在，最多只能多一个"\t"
@@ -232,37 +304,88 @@ class Manager(object):
         'git log --oneline origin/main..HEAD']
 
         生成的效果：
-        ## 2023/3/24 03:15:14:
-        - #git #github #commit
+        ```
+        - ## 2023/3/24 03:15:14:
+        \t- #git #github #commit
         #que 如何展示在本地而不在远程的提交？  
-        - #ans 
+        \t- #ans 
         git log --oneline origin/main..HEAD
-
+        ```
+        新增例子:
+        输入:
+        ```
+        ## 2023/5/14 07:11:00:
+        --todo sdfjslfjds
+        @blk djfslfjs
+        @blk
+        djfsfjsfjds;
+        ```
+        生成效果：
+        ```
+        - ## 2023/5/14 07:11:00:
+        \t- TODO sdfjslfjds
+        \t- @blk djfslfjs
+        \t- @blk
+        djfsfjsfjds;
+        ```        
         """
+        title_string = "##"
+        tag_string = "#"
+        block_pre_string = ["- ", "\t- "]
+        que_strings = ["#que ", "#que"]
+        ans_strings = ["#ans ", "#ans"]
+        normal_blk_strings = ["@blk ", "@blk"]
+
+        todo_key = ["--todo ", "--TODO ",
+                    "--done ", "--DONE "]
+        todo_value = ["\t- TODO ", "\t- DONE "]
+        todo_map = {todo_key[0]:todo_value[0],
+                    todo_key[1]:todo_value[0],
+                    todo_key[2]:todo_value[1],
+                    todo_key[3]:todo_value[1]}
+
         content_list = content.split('\n')
         for i, content in enumerate(content_list):
-            if content and (content.strip()[:4] == "#que"):
+            if i == 0 and content.strip()[:len(title_string)] == title_string:
+                # 第一个时间戳标题需要设置为logseq最上层的子块，所以不带"\t"
+                content_list[i] = block_pre_string[0] + content_list[i]
+            
+            # que_strings = ["#que ", "#que"]
+            if content and (content.strip()[:len(que_strings[0])] == que_strings[0]
+                            or content.strip()==que_strings[1]):
                 up_line = i-1
                 # 排除第0行，将上一行（带标签）当做子块
                 up_line_list = content_list[up_line].strip()
-                if up_line != 0 and content_list[up_line].startswith("\t- "):
+                if up_line != 0 and content_list[up_line].startswith(block_pre_string[1]):
                     continue
-                if up_line != 0 and up_line_list and up_line_list[0] == "#":
-                    content_list[up_line] = "\t- " + content_list[up_line]
+                if up_line != 0 and up_line_list and up_line_list[0] == tag_string:
+                    content_list[up_line] = block_pre_string[1] + content_list[up_line]
                 else:
-                    content_list[i] = "\t- " + content_list[i]
+                    content_list[i] = block_pre_string[1] + content_list[i]
 
             # 这一行将视为特殊标签，并作为子块
-            if content and (content.strip()[:4] == "#ans"):
-                new_content = "\t- " + content
+            # ans_strings = ["#ans ", "#ans"]
+            if content and (content.strip()[:len(ans_strings[0])] == ans_strings[0]
+                            or content.strip()==ans_strings[1]):
+                new_content = block_pre_string[1] + content
                 content_list[i] = new_content
-                LOG.info("new_content: %s" % new_content)
-            
-        # 重新组成串
-        processed_content = "\n".join(content_list)
-        # LOG.info("processed_content: %s" % processed_content)
 
-        return processed_content
+            # 解析`-todo ` 变为子块
+            if content and (content.strip()[:len(todo_key[0])] in todo_map
+                            or content.strip() in todo_map):
+                new_content = todo_map[content.strip()[:len(todo_key[0])]] + content[
+                    len(todo_key[0]):]
+                content_list[i] = new_content
+
+            # 解析`@blk` 变为子块
+            # normal_blk_strings = ["@blk ", "@blk"]
+            if content and (content.strip()[:len(normal_blk_strings[0])]==normal_blk_strings[0]
+                            or content.strip()==normal_blk_strings[1]):
+                new_content = block_pre_string[1] + content
+                content_list[i] = new_content
+
+        # 重新组成串,并去除前后的空格与换行符等空白字符
+        return "\n".join(content_list).strip()
     
     def get_tags_from_content(self, content):
         """get tags

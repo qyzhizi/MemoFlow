@@ -10,6 +10,9 @@ github_token = os.getenv("GITHUB_TOKEN")
 github_repo = os.getenv("GITHUB_REPO")
 github_file_path = os.getenv("GITHUB_FILE_PATH")
 
+#获取发送任务标志位
+send_to_github = bool(int(os.getenv("SEND_TO_GITHUB")))
+send_to_jianguoyun = bool(int(os.getenv("SEND_TO_JIANGUOYUN")))
 
 # 声明配置项
 CONF_OPTS = [     
@@ -68,7 +71,14 @@ CONF_OPTS = [
                help='clipboard_log db file path'),
     cfg.StrOpt("clipboard_log_table",
                default='clipboard_log',
-               help='clipboard_log table name')
+               help='clipboard_log table name'),
+    # 发送任务标志位
+    cfg.BoolOpt("send_to_github",
+               default=send_to_github,
+               help='clipboard_log table name'),
+    cfg.BoolOpt("send_to_jianguoyun",
+            default=send_to_jianguoyun,
+            help='clipboard_log table name'),
 
 ]
 
