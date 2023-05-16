@@ -1,14 +1,14 @@
 # log卡片笔记服务
 向logseq所在的远程同步文件(github 或者坚果云)发送笔记，实现一个轻量化的卡片笔记记录页面。
-启动服务后，访问：`http://localhost/:9090/v1/diary-log/index.html`
+启动服务后，访问：`http://localhost/:9000/v1/diary-log/index.html`
 ，可得到页面：
 
 <img src="https://qyzhizi.cn/img/202305160912106.png" width="60%" height="60%">
 
 未来也可以扩展出跟多的页面，提供给多人使用, 例如：
 ```
-本地访问：http://localhost/:9090/v1/diary-log/index.html
-本地访问：http://localhost/:9090/v1/diary-log-second/index.html
+本地访问：http://localhost/:9000/v1/diary-log/index.html
+本地访问：http://localhost/:9000/v1/diary-log-second/index.html
 ```
 
 数据会在数据库sqlite中保留一份，然后通过异步方式向远程同步文件发送一份（插入到文件最上面），由于采用异步发送方式，所以感受不到延迟。如果后台异步发送任务失败，那么远程同步文件得不到更新。未来考虑后台发送任务失败时，给出页面提示。
@@ -104,9 +104,9 @@
     ```
 - 4、访问log笔记页面
 
-    浏览器输入：http://x.x.x.x:9090/v1/diary-log/index.html
+    浏览器输入：http://x.x.x.x:9000/v1/diary-log/index.html
 
-    本地访问：http://localhost/:9090/v1/diary-log/index.html
+    本地访问：http://localhost/:9000/v1/diary-log/index.html
 
 ## linux 环境启动
 - 1、环境准备
@@ -153,6 +153,6 @@
 
 - 4、访问log笔记页面
 
-    浏览器输入：http://x.x.x.x:9090/v1/diary-log/index.html
+    浏览器输入：http://x.x.x.x:9000/v1/diary-log/index.html
 
-    本地访问：http://localhost/:9090/v1/diary-log/index.html
+    本地访问：http://localhost/:9000/v1/diary-log/index.html
