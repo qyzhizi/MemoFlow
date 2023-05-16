@@ -5,7 +5,7 @@
 
 <img src="https://qyzhizi.cn/img/202305160912106.png" width="60%" height="60%">
 
-有两个独立的、功能一样的页面，后期也可以扩展出跟多的页面，提供给多人使用：
+也可以扩展出跟多的页面，提供给多人使用, 例如：
 ```
 本地访问：http://localhost/:9090/v1/diary-log/index.html
 本地访问：http://localhost/:9090/v1/diary-log-second/index.html
