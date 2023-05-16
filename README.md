@@ -1,7 +1,7 @@
 # log卡片笔记服务
 向logseq所在的远程同步文件(github 或者坚果云)发送笔记，实现一个轻量化的卡片笔记记录页面。
-
-页面：
+启动服务后，访问：`http://localhost/:9090/v1/diary-log/index.html`
+，可得到页面：
 
 <img src="https://qyzhizi.cn/img/202305160912106.png" width="60%" height="60%">
 
