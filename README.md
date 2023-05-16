@@ -9,7 +9,7 @@
 
 <img src="https://qyzhizi.cn/img/202305160947021.png" width="60%" height="60%">
 
-未来也可以扩展出跟多的页面，提供给多人使用, 例如：
+未来也可以扩展出更多的页面，提供给多人使用, 例如：
 ```
 本地访问：http://localhost:9000/v1/diary-log/index.html
 本地访问：http://localhost:9000/v1/diary-log-second/index.html
