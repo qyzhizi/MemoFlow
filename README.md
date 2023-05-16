@@ -73,7 +73,6 @@
     ```
     git pull git@github.com:qyzhizi/web_dl.git
     ```
-    与之非docker部署相比，这里只有CELERY_BROKER_URL 与CELERY_RESULT_BACKEND 的配置修改变了。
     ```
     CELERY_BROKER_URL=redis://redis:6379
     CELERY_RESULT_BACKEND=redis://redis:6379
@@ -109,7 +108,7 @@
 
     本地访问：http://localhost/:9090/v1/diary-log/index.html
 
-## linux 环境部署
+## linux 环境启动
 - 1、环境准备
     - 一个linux环境
     - 安装依赖:
@@ -120,6 +119,7 @@
 - 2、拉取代码，并修改配置文件`.env`
     ```
     git pull git@github.com:qyzhizi/web_dl.git
+    与docker-compose.yml部署相比，这里只有CELERY_BROKER_URL 与CELERY_RESULT_BACKEND 的配置改变了。
     ```
     ```
     CELERY_BROKER_URL=redis://localhost:6379
