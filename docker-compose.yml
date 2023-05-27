@@ -5,6 +5,7 @@ services:
     depends_on:
       - redis
     build: ./
+    # image: web_dl-main_server:latest
     env_file:
       - .env
     ports:
