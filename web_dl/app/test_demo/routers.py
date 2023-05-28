@@ -11,31 +11,11 @@ class Router(wsgi.ComposableRouter):
                        action='test',
                        conditions=dict(method=['GET']))
 
-        mapper.connect('/hello2/{name}',
-                       controller=test_controller,
-                       action='test2',
-                       conditions=dict(method=['GET']))
-
-        mapper.connect('/lzw/{name}',
-                       controller=test_controller,
-                       action='test_lzw',
-                       conditions=dict(method=['GET']))
-
         mapper.connect('/chatgpt/{question}',
                        controller=test_controller,
                        action='test_chatgpt',
                        conditions=dict(method=['GET']))
 
-        mapper.connect('/lzw-hello',
-                       controller=test_controller,
-                       action='test_hello',
-                       conditions=dict(method=['GET']))
-        
-        mapper.connect('/lzw-hello/{kkk}',
-                       controller=test_controller,
-                       action='test_kkk',
-                       conditions=dict(method=['GET']))
-        
         mapper.connect('/get-html',
                         controller=test_controller,
                         action='get_html',
