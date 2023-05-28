@@ -1,11 +1,11 @@
 import logging
-from web_dl.ConfigParse import ConfigParse
-from web_dl import log_util
+from web_dl.core.ConfigParse import ConfigParse
+from web_dl.core import log_util
 from web_dl.conf import CONF
 from paste import deploy
-from web_dl.wsgi import Server
-from web_dl.common import dependency
-from web_dl.common import backends
+from web_dl.core.wsgi_server import Server
+from web_dl.core import dependency
+from web_dl.core import backends
 from web_dl.db import init_db
 
 cp = ConfigParse(CONF.server['server_conf_path'])

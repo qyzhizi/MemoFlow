@@ -10,8 +10,8 @@ os.chdir(top_dir)
 sys.path.insert(0,top_dir)
 
 from web_dl.conf import CONF
-from web_dl import log_util
-from web_dl.ConfigParse import ConfigParse
+from web_dl.core import log_util
+from web_dl.core.ConfigParse import ConfigParse
 from web_dl.tasks import celery_task
 
 # 配置日志，但好像work进程的日志还是没有打印在指定的文件中
