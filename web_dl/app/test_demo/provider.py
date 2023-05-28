@@ -3,8 +3,8 @@
 import os
 import logging
 
-from web_dl.common import dependency
-from web_dl.common import manager
+from web_dl.core import dependency
+from web_dl.core import manager
 
 LOG = logging.getLogger(__name__)
 

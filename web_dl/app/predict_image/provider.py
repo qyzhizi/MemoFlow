@@ -12,8 +12,8 @@ from torchvision import transforms as T
 from torchvision.models import resnet50
 
 from web_dl.conf import CONF
-from web_dl.common import dependency
-from web_dl.common import manager
+from web_dl.core import dependency
+from web_dl.core import manager
 
 
 LOG = logging.getLogger(__name__)

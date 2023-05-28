@@ -1,5 +1,5 @@
 # coding=utf-8
-from web_dl.common import wsgi
+from web_dl.core import wsgi
 from web_dl.app.predict_image import controllers
 
 class Router(wsgi.ComposableRouter):

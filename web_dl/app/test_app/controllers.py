@@ -6,8 +6,8 @@ import logging
 
 from webob.response import Response
 
-from web_dl.common import wsgi
-from web_dl.common import dependency
+from web_dl.core import wsgi
+from web_dl.core import dependency
 
 LOG = logging.getLogger(__name__)
 

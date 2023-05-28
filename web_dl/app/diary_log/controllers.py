@@ -6,8 +6,8 @@ import json
 import time
 
 from web_dl.conf import CONF
-from web_dl.common import wsgi
-from web_dl.common import dependency
+from web_dl.core import wsgi
+from web_dl.core import dependency
 
 LOG = logging.getLogger(__name__)
 
@@ -74,7 +74,7 @@ class DiaryLog(wsgi.Application):
                                                             branch_name)
 
         # 向坚果云发送异步任务，更新文件
-        # lzp 的坚果云账号
+        # 坚果云账号
         if CONF.diary_log['send_to_jianguoyun'] == True:
             JIANGUOYUN_COUNT = CONF.api_conf.JIANGUOYUN_COUNT
             JIANGUOYUN_TOKEN = CONF.api_conf.JIANGUOYUN_TOKEN

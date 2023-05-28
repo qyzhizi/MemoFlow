@@ -5,10 +5,9 @@ import logging as log
 import routes
 import sys
 
-from web_dl.common import wsgi
+from web_dl.core import wsgi
 import web_dl.app.test_demo.routers as test_demo_routers
 import web_dl.app.test_app.routers as test_app_routers
-import web_dl.app.lzw_app.routers as lzw_app_routers
 import web_dl.app.diary_log.routers as diary_log_routers
 import web_dl.app.diary_log_second.routers as diary_log_second_routers
 import web_dl.app.predict_image.routers as predict_image_routers
@@ -47,7 +46,6 @@ def public_app_factory(global_conf, **local_conf):
                                [
                                 test_demo_routers.Router(),
                                 test_app_routers.Router(),
-                                lzw_app_routers.Router(),
                                 diary_log_routers.Router(),
                                 diary_log_second_routers.Router(),
                                 predict_image_routers.Router()
