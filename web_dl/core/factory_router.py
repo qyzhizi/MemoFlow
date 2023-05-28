@@ -9,7 +9,7 @@ from web_dl.core import wsgi
 import web_dl.app.test_demo.routers as test_demo_routers
 import web_dl.app.test_app.routers as test_app_routers
 import web_dl.app.diary_log.routers as diary_log_routers
-import web_dl.app.diary_log_second.routers as diary_log_second_routers
+import web_dl.app.diary_log_lrx.routers as diary_log_second_routers
 import web_dl.app.predict_image.routers as predict_image_routers
 LOG = log.getLogger(__name__)
 

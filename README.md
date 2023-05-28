@@ -12,7 +12,7 @@
 未来也可以扩展出更多的页面，提供给多人使用, 例如：
 ```
 本地访问：http://localhost:9000/v1/diary-log/index.html
-本地访问：http://localhost:9000/v1/diary-log-second/index.html
+本地访问：http://localhost:9000/v1/diary-log-lrx/index.html
 ```
 
 数据会在数据库sqlite中保留一份，然后通过异步方式向远程同步文件发送一份（插入到文件最上面），由于采用异步发送方式，所以感受不到延迟。如果后台异步发送任务失败，那么远程同步文件得不到更新。未来考虑后台发送任务失败时，给出页面提示。

@@ -8,7 +8,7 @@ $(function() {
         // console.log($('#log').val())
         // console.log(log)
         $.ajax({
-            url: '/v1/diary-log-second/addlog',
+            url: '/v1/diary-log-lrx/addlog',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({content: log}),
@@ -29,7 +29,7 @@ $(function() {
         });
     });
     $.ajax({
-        url: '/v1/diary-log-second/getlogs',
+        url: '/v1/diary-log-lrx/getlogs',
         type: 'GET',
         success: function(response) {
             // console.log(response);
@@ -50,7 +50,7 @@ $(function() {
         event.preventDefault();
         // var log = $('#log').val();
         $.ajax({
-            url: '/v1/diary-log-second/delete_all_log',
+            url: '/v1/diary-log-lrx/delete_all_log',
             type: 'GET',
             success: function(response) {
                 var logList= $('#logList');
