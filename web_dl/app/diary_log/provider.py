@@ -6,8 +6,8 @@ import json
 import requests
 import re
 
-from web_dl.common import dependency
-from web_dl.common import manager
+from web_dl.core import dependency
+from web_dl.core import manager
 from web_dl.conf import CONF
 from web_dl.api import notion_api
 from web_dl.tasks import celery_task

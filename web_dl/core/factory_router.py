@@ -5,7 +5,7 @@ import logging as log
 import routes
 import sys
 
-from web_dl.common import wsgi
+from web_dl.core import wsgi
 import web_dl.app.test_demo.routers as test_demo_routers
 import web_dl.app.test_app.routers as test_app_routers
 import web_dl.app.diary_log.routers as diary_log_routers

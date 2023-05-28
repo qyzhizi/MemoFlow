@@ -5,8 +5,8 @@ import json
 import requests
 import sqlite3
 
-from web_dl.common import dependency
-from web_dl.common import manager
+from web_dl.core import dependency
+from web_dl.core import manager
 from web_dl.conf import CONF
 
 LOG = logging.getLogger(__name__)
