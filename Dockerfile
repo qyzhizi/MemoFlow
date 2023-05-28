@@ -1,28 +1,33 @@
-# 使用 Python 3.10 镜像作为基础镜像
-FROM python:3.10-slim
+# Use the Python 3.10 image as the base image
+FROM python:3.10
+
 
 # RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
-#     && apt-get update \
-#     && apt-get install -y build-essential
+#     && apt-get update --fix-missing \
+#     && apt-get install -y build-essential --fix-missing \
+#     && apt-get clean \
+#     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update \
-    && apt-get install -y build-essential
-
-# 将工作目录设置为 /app
+# Set the working directory to /app
 WORKDIR /app
 
-# 将当前目录下的所有文件复制到 /app
+# Copy all files in the current directory to /app
 COPY . /app
 
-# 安装脚本所需要的依赖包
-#RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+# Dependencies required by the installation script
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 暴露容器的端口
+# If you want to use Tencent Cloud mirroring, use the following command
+# RUN pip install -r requirements.txt -i https://mirrors.cloud.tencent.com/pypi/simple
+
+# delete pip cache file
+# RUN rm -rf $(pip cache dir)/*
+
+# Expose the port of the container
 EXPOSE 9000
 
-# 给 run.sh 文件添加可执行权限
+# Add executable permissions to the run.sh file
 RUN chmod +x web_dl/cmd/run.sh
 
-# 运行脚本
+# run script
 CMD ["bash", "-c", "web_dl/cmd/run.sh"]
