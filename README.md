@@ -194,7 +194,7 @@
 
     - 点击 Personal access tokens。
 
-    - 点击 Generate new token (New personal access token)。
+    - 点击 Tokens(classic) , 然后点击Generate new token (New personal access token)。
 
     - 在 "Note" 字段中输入一个描述性的名称，以便于记忆和识别。
 
