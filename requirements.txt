@@ -7,9 +7,10 @@ oslo.serialization!=2.19.1,>=1.10.0 # Apache-2.0
 stevedore>=1.20.0 # Apache-2.0
 Pillow >= 8.4.0
 openai <=0.26.5
-Celery
-oslo_config
-redis
-python-dotenv
-PyGithub
-webdav4
+celery <= 5.2.7
+oslo_config <= 9.1.1
+redis <= 4.5.4
+python-dotenv <= 1.0.0
+PyGithub <= 1.58.1
+webdav4 <= 0.9.8
+debugpy <= 1.6.7
