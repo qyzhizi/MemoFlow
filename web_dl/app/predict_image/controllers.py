@@ -3,7 +3,6 @@
 import io
 import logging
 import json
-from webob.response import Response
 from PIL import Image
 
 from web_dl.core import wsgi

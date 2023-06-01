@@ -49,18 +49,11 @@ class Model(object):
 class Manager(object):
     def prepare_image(self, req, image, target_size=(224, 224)):
         """Do image preprocessing before prediction on any data.
-        :param image:       original image
+        :param image:       original image, PIL format
         :param target_size: target image size
         :return: preprocessed image
         """
 
-#        # Read the image in PIL format
-#        LOG.info("read image, type of readed image: %s", type(image))
-#        image = image.read()
-#        image = Image.open(io.BytesIO(image))
-#        LOG.info("type of Image.opened image: %s", type(image))
-
- 
         # Preprocess the image and prepare it for classification.
         if image.mode != 'RGB':
             LOG.info("convert to RGB")

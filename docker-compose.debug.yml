@@ -9,8 +9,12 @@ services:
       - .env
     ports:
      - "9000:9000"
+     - "5678:5678"
     restart: always
     volumes:
       - ".:/app"
+    command: >
+      sh -c "python web_dl/cmd/celery_work > celery_work.log 2>&1 &
+             python -m debugpy --listen 0.0.0.0:5678 --wait-for-client  web_dl/cmd/main"
   redis:
     image: "redis/redis-stack-server:latest"
