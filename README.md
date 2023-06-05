@@ -1,239 +1,28 @@
-# log卡片笔记服务
-向logseq所在的远程同步文件(github 或者坚果云)发送笔记，实现一个轻量化的卡片笔记记录页面。
-启动服务后，访问：`http://localhost:9000/v1/diary-log/index.html`
-，可得到页面：
+# MemoCard
+<p align="left">
+    <img src='https://img.shields.io/badge/language-python3.9-green'>
+    <img src='https://img.shields.io/badge/Docker-Yes-brightgreen'>
+    <img src='https://img.shields.io/badge/OpenStack-Architecture-orange'>
+</p>
+logseq与obsidian是很好的本地笔记，通过强大双链与标签搜索功能，可以非常方便地记录卡片笔记，配远程仓库(github或者坚果云)，可以实现笔记的在线同步。但是如果我想让仓库中某一个文档成为在线页面呢？因为在浏览器页面中可以更方便地浏览、记录卡片笔记，并且该页面会发送到远程仓库中，这样在需要时本地依然可以利用logseq或obsidian的链接与标签搜索功能来纳管该页面。而MemoCard作为一个连接工具打算提供这种卡片笔记在线浏览、编辑与同步的服务。
 
-<img src="https://qyzhizi.cn/img/202305160912106.png" width="60%" height="60%">
+## Usage
+简单来说MemoCard是一个卡片笔记服务, 主要目的是向远程文件(github 或者坚果云)发送卡片笔记，实现一个轻量化在线卡片笔记的编辑与同步服务。MemoCard页面能够在浏览器显示，并且同步到logseq、obsidian的远程仓库(github 或者坚果云)的文件中。你可以选择在本地使用docker部署，那么这个服务只会在本地运行，安全可靠。或者在云服务器部署，它将成为一个在线服务。
 
-对应的远程同步文件：
+[点击查看详细信息](./docs/usage.md)
 
-<img src="https://qyzhizi.cn/img/202305160947021.png" width="60%" height="60%">
+## Deployment method
+[使用docker-compose.yml 部署](./docs/docker_deployment_approach.md)
 
-未来也可以扩展出更多的页面，提供给多人使用, 例如：
-```
-本地访问：http://localhost:9000/v1/diary-log/index.html
-本地访问：http://localhost:9000/v1/diary-log-lrx/index.html
-```
+[linux 环境非docker部署](./docs/linux_deployment_approach.md)
 
-数据会在数据库sqlite中保留一份，然后通过异步方式向远程同步文件发送一份（插入到文件最上面），由于采用异步发送方式，所以感受不到延迟。如果后台异步发送任务失败，那么远程同步文件得不到更新。未来考虑后台发送任务失败时，给出页面提示。
+## Remote Sync configuration
+[sync_config](./docs/sync_config.md)
 
-相比logseq,打开速度更快，自动添加时间戳标题，使用一个简单的自定义规则实现卡片笔记。如果未来有更好且容易使用的规则就更好了。
 
-当你输入：
-```
-#key1 #key2
-#que 如何使用一个简单的自定义规则实现卡片笔记
-#ans
-就像这样, 这是一个例子
---todo 代办事项1
---todo 代办事项2
-```
-在本地页面的内容：
-```
-- ## 2023/5/16 08:36:48:
-	- #key1 #key2
-#que 如何使用一个简单的自定义规则实现卡片笔记
-	- #ans
-就像这样, 这是一个例子
-	- TODO 代办事项1
-	- TODO 代办事项2
-```
-在远程同步文件中内容：
-```
-- ## 2023/5/16 08:36:48:
-	- #key1 #key2
-	  #que 如何使用一个简单的自定义规则实现卡片笔记
-	- #ans
-	  就像这样, 这是一个例子
-	- TODO 代办事项1
-	- TODO 代办事项2      
-```
-自定义规则解释：
-```
-#key1 表示关键字标签 
-#que 表示问题标签
-#ans 表示答案标签
-关键字标签与问题部分在一个子块，子块是logseq中的概念，表示一个段落
-答案部分单独作为一个子块
---todo 表示代办事项
-另外代办事项（- TODO xxxx）也是一个单独子块
-本地页面的内容 与 远程同步文件中内容之所以不一样，是考虑到方便复制与粘贴本地页面的内容，因为远程同步文件中内容中子块会统一带"\t"的缩进，复制后，有时候还要去除"\t",不太方便。
-```
-最终markdown 渲染效果是：
+## Contributing
+Feel free to dive in! pen an issue or submit PRs.
+MemoCard follows PEP 8（Python Enhancement Proposal 8）
 
-<img src="https://qyzhizi.cn/img/202305160910034.png" width="60%" height="60%">
-
-# 部署方式
-## (一)使用docker-compose.yml 部署
-- 1、先安装好docker
-
-    如果是windows环境，可以安装docker桌面版
-
-    如果是linux环境，安装更简单一点，可以使用 docker 一键安装脚本(使用阿里云的源)
-    ```
-    curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
-    ```
-- 2、拉取代码，并修改配置文件`.env`
-
-    ```
-    git pull git@github.com:qyzhizi/web_dl.git
-    ```
-    将`.env.template` 复制一份并命名为`.env`，添加以下内容
-
-    其中github仓库的账号token，仓库名与文件名需要配置，坚果云也时类似，具体如何配置见下文的`远程文件配置`
-
-    ```
-    CELERY_BROKER_URL=redis://redis:6379
-    CELERY_RESULT_BACKEND=redis://redis:6379
-
-    # 发送到github仓库
-    #github token, @todo 如何获取token
-    GITHUB_TOKEN=xxxx
-    GITHUB_REPO=github用户名/仓库名
-    #仓库文件路径,相对仓库的根目录，例如：xxxx/demo.md
-    GITHUB_FILE_PATH=xxxx/demo.md
-
-    # 发送到坚果云
-    # 坚果云账号，例如：你的坚果云邮箱
-    JIANGUOYUN_COUNT=坚果云账号
-    # 坚果云api token
-    JIANGUOYUN_TOKEN=xxxx
-    # 文件路径,从根目录/开始
-    JIANGUOYUN_TO_PATH=/xxxx/demo.md
-
-    # 发送github仓库任务标志位， 如果不需要发送，设置为0
-    SEND_TO_JIANGUOYUN=1
-    # 发送坚果云任务标志位， 如果不需要发送，设置为0
-    SEND_TO_GITHUB=1
-    ```
-
-- 3、启动docker服务，在终端中输入(如果是windows，则在命令提示符中输入)：
-    ```
-    docker-compose up -d
-    ```
-    该命令会自动构建镜像、拉取redis镜像，然后启动笔记服务。
-- 4、访问log笔记页面
-
-    浏览器输入：http://x.x.x.x:9000/v1/diary-log/index.html
-
-    本地访问：http://localhost:9000/v1/diary-log/index.html
-
-## (二) linux 环境非docker部署
-- 1、环境准备
-    - 一个linux环境
-    - 安装依赖:
-    pip install -r requirements.txt
-    - 安装 redis: 
-    安装方法, @todo
-
-- 2、拉取代码，并修改配置文件`.env`
-    ```
-    git pull git@github.com:qyzhizi/web_dl.git
-    ```
-    与docker-compose.yml部署相比，这里只有CELERY_BROKER_URL 与CELERY_RESULT_BACKEND 的配置改变了。
-    ```
-    CELERY_BROKER_URL=redis://localhost:6379
-    CELERY_RESULT_BACKEND=redis://localhost:6379
-
-    # 发送到github仓库
-    #github token, @todo 如何获取token
-    GITHUB_TOKEN=xxxx
-    GITHUB_REPO=github用户名/仓库名
-    #仓库文件路径,相对仓库的根目录，例如：xxxx/demo.md
-    GITHUB_FILE_PATH=xxxx/demo.md
-
-    # 发送到坚果云
-    # 坚果云账号，例如：你的坚果云邮箱
-    JIANGUOYUN_COUNT=坚果云账号
-    # 坚果云api token
-    JIANGUOYUN_TOKEN=xxxx
-    # 文件路径,从根目录/开始
-    JIANGUOYUN_TO_PATH=/xxxx/demo.md
-
-    # 发送github仓库任务标志位， 如果不需要发送，设置为0
-    SEND_TO_JIANGUOYUN=1
-    # 发送坚果云任务标志位， 如果不需要发送，设置为0
-    SEND_TO_GITHUB=1
-    ```
-- 3、启动
-    ```
-    cd web_dl/web_dl/cmd
-    python3 main.py &
-    ```
-
-- 4、访问log笔记页面
-
-    浏览器输入：http://x.x.x.x:9000/v1/diary-log/index.html
-
-    本地访问：http://localhost:9000/v1/diary-log/index.html
-
-## (三）远程文件配置
-为了实现远程文件同步，这里采用了两种方式:
-
-- 3.1、github仓库文件同步
-    
-    配置如下
-    ```
-    # 发送到github仓库
-    #github token, @todo 如何获取token
-    GITHUB_TOKEN=xxxx
-    GITHUB_REPO=github用户名/仓库名
-    #仓库文件路径,相对仓库的根目录，例如：xxxx/demo.md
-    GITHUB_FILE_PATH=xxxx/demo.md
-    ```
-    (1)github token如何获取呢？
-    首先要开启GitHub API
-
-    要使用 GitHub API，你需要先创建一个 Personal access token。Personal access token 是一个安全令牌，可以用来访问 GitHub API。以下是创建 Personal access token 的步骤：
-
-    - 登录到你的 GitHub 帐户。
-
-    - 点击右上角的头像，选择 Settings。
-
-    - 在左侧导航栏中选择 Developer settings。
-
-    - 点击 Personal access tokens。
-
-    - 点击 Tokens(classic) , 然后点击Generate new token (New personal access token)。
-
-    - 在 "Note" 字段中输入一个描述性的名称，以便于记忆和识别。
-
-    - 在 "Select scopes" 中选择需要使用的权限。根据你使用 GitHub API 的具体情况，可以选择不同的权限，例如 repo、user、admin:org 等。如果不确定需要什么权限，可以先选择默认的权限。
-
-    - 点击 Generate token。
-
-    - 将生成的 Personal access token 复制到剪贴板中，并保存到安全的地方。
-
-    (2) GITHUB_REPO 是github用户名/仓库名， 例如：`qyzhizi/logseqnote`
-
-    (3) GITHUB_FILE_PATH 是待同步的文件名路径，例如：`pages/github_cards_2.md`,`pages` 是仓库根目录下一个文件夹
-
-- 3.2、坚果云文件同步
-
-    配置为：
-
-    ```
-    # 发送到坚果云
-    # 坚果云账号，例如：你的坚果云邮箱
-    JIANGUOYUN_COUNT=坚果云账号
-    # 坚果云api token
-    JIANGUOYUN_TOKEN=xxxx
-    # 文件路径,从根目录/开始
-    JIANGUOYUN_TO_PATH=/xxxx/demo.md
-    ```
-    **(1) 获取坚果云api token**
-
-    坚果云提供了API，可以通过 API 访问坚果云的文件和文件夹。要使用坚果云 API，需要进行以下步骤：
-
-    - 登录到坚果云官网。
-
-    - 点击右上角的头像，选择账号信息，点击安全选项
-
-    - 点击「点击添加应用」按钮，填写应用名称，然后点击「生成密码」。
-
-    - 在页面中，可以看到应用密码(token)。
-
-    **(2) 设置待同步的文件路径**
-
-    JIANGUOYUN_TO_PATH=/xxxx/demo.md
-
+## License
+This project is licensed under the terms of the [MIT license](./LICENSE)
