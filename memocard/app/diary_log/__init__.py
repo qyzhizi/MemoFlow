@@ -1,0 +1,1 @@
+from memocard.app.diary_log.provider import *

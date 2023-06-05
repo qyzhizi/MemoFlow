@@ -22,7 +22,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 9000
 
 # 给 run.sh 文件添加可执行权限
-RUN chmod +x web_dl/cmd/run.sh
+RUN chmod +x memocard/cmd/run.sh
 
 # 运行脚本
-CMD ["bash", "-c", "web_dl/cmd/run.sh"]
+CMD ["bash", "-c", "memocard/cmd/run.sh"]
