@@ -1,4 +1,4 @@
-### linux 环境非docker部署
+## linux 环境非docker部署
 - 1、环境准备
     - 一个linux环境
     - 安装依赖:
