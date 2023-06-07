@@ -10,7 +10,7 @@
 - 2、拉取代码，并修改配置文件`.env`
 
     ```
-    git pull git@github.com:qyzhizi/memocard.git
+    git pull git@github.com:qyzhizi/memoflow.git
     ```
     将`.env.template` 复制一份并命名为`.env`，添加以下内容
 

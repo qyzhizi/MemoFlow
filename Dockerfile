@@ -15,14 +15,14 @@ WORKDIR /app
 COPY . /app
 
 # 安装脚本所需要的依赖包
-#RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+# RUN pip install --no-cache-dir -r requirements.txt
 
 # 暴露容器的端口
 EXPOSE 9000
 
 # 给 run.sh 文件添加可执行权限
-RUN chmod +x memocard/cmd/run.sh
+RUN chmod +x memoflow/cmd/run.sh
 
 # 运行脚本
-CMD ["bash", "-c", "memocard/cmd/run.sh"]
+CMD ["bash", "-c", "memoflow/cmd/run.sh"]

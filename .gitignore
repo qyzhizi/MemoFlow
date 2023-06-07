@@ -2,9 +2,9 @@
 *.pyc
 *__pycache__/
 *.log
-memocard.log.*
+memoflow.log.*
 dist/
-memocard.egg-info/
+memoflow.egg-info/
 build/
 .spyproject/
 .eggs

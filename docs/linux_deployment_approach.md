@@ -8,7 +8,7 @@
 
 - 2、拉取代码，并修改配置文件`.env`
     ```
-    git pull git@github.com:qyzhizi/memocard.git
+    git pull git@github.com:qyzhizi/memoflow.git
     ```
     与docker-compose.yml部署相比，这里只有CELERY_BROKER_URL 与CELERY_RESULT_BACKEND 的配置改变了。
     ```
@@ -37,7 +37,7 @@
     ```
 - 3、启动
     ```
-    cd memocard/memocard/cmd
+    cd memoflow/memoflow/cmd
     python3 main.py &
     ```
 
