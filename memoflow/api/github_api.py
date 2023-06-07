@@ -1,4 +1,9 @@
+import logging
+
 from github import Github
+from github.GithubException import UnknownObjectException
+
+LOG = logging.getLogger(__name__)
 
 
 class GitHupApi(object):
@@ -11,7 +16,14 @@ class GitHupApi(object):
 
     def update_file(self, file_path, added_content, commit_message, branch_name):
         # 获取要更新的文件
-        file = self.repo.get_contents(file_path)
+        try:
+            file = self.repo.get_contents(file_path)
+        # 判断异常类型，如果是未找到文件，则创建文件
+        except UnknownObjectException as e:
+            LOG.warning(f"Exception: {e}")
+            LOG.info(f"File {file_path} not found, create it.")
+            self.repo.create_file(file_path, commit_message, added_content, branch_name)
+            return
 
         # 获取base64解码的内容，不能直接获得源字符串吗？非要解码，有点浪费？
         existing_content = file.decoded_content.decode()

@@ -1,4 +1,4 @@
-# memoflow
+# MemoFlow
 <p align="left">
     <img src='https://img.shields.io/badge/language-python3.9-green'>
     <img src='https://img.shields.io/badge/Docker-Yes-brightgreen'>

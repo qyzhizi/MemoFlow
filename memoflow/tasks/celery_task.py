@@ -39,10 +39,10 @@ def celery_update_file_to_github(token, repo, file_path, added_content,
     if github_api_instance.get(repo, None) is None:
         github_api_instance[repo] = github_api.GitHupApi(token=token, repo=repo)
     my_api_instance = github_api_instance[repo]
-    return my_api_instance.update_file(file_path=file_path,
-                                       added_content=added_content,
-                                       commit_message=commit_message,
-                                       branch_name=branch_name)
+    my_api_instance.update_file(file_path=file_path,
+                                added_content=added_content,
+                                commit_message=commit_message,
+                                branch_name=branch_name)
 
 # 更新文件到坚果云
 @celery.task

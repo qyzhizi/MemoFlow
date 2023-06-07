@@ -27,6 +27,8 @@ class JianGuoYunClient(object):
         if not self.client.exists(to_path):
             file_obj = io.BytesIO(content.encode(encoding))
             self.client.upload_fileobj(file_obj, to_path, overwrite)
+            # 创建新文件后，更新file_exists，否者后续一直认为该文件不存在
+            self.file_exists[to_path] = to_path
 
 
     def add_content_to_file(self, added_content: str, file_path: str, mode: str = 'r',
