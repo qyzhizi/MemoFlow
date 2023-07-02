@@ -152,4 +152,16 @@ $(function() {
             e.preventDefault();
         }
     });   
+
+    // 监听窗口关闭事件
+    window.addEventListener("beforeunload", function (event) {
+        var inputBox = document.getElementById("log");
+        // 检测输入框内容是否为空
+        if (inputBox.value.trim().length > 0) {
+            // 显示提示框
+            event.preventDefault();
+            // beforeunload 事件的返回值
+            event.returnValue = " ";
+        }
+    });
 });
