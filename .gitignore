@@ -2,9 +2,9 @@
 *.pyc
 *__pycache__/
 *.log
-web_dl.log.*
+memoflow.log.*
 dist/
-web_dl.egg-info/
+memoflow.egg-info/
 build/
 .spyproject/
 .eggs

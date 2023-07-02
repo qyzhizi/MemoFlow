@@ -1,1 +1,0 @@
-from web_dl.app.predict_image.provider import *

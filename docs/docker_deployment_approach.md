@@ -1,4 +1,4 @@
-### 使用docker-compose.yml 部署
+## 使用docker-compose.yml 部署
 - 1、先安装好docker
 
     如果是windows环境，可以安装docker桌面版
@@ -10,7 +10,7 @@
 - 2、拉取代码，并修改配置文件`.env`
 
     ```
-    git pull git@github.com:qyzhizi/web_dl.git
+    git pull git@github.com:qyzhizi/memoflow.git
     ```
     将`.env.template` 复制一份并命名为`.env`，添加以下内容
 
