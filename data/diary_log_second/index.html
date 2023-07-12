@@ -1,44 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>日志页面</title>
+    <title>MemoFlow</title>
     <meta charset="UTF-8">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro">
     <style>
-        /* 样式 */
         body {
             font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
             padding: 10px;
-                background-color: #333;
-                color: #c9cdd1;
+            background-color: #333;
+            color: #c9cdd1;
         }
-            .container {
-                max-width: 100ch;
-                margin-left: auto;
-                margin-right: auto;
+        .container {
+            max-width: 100ch;
+            margin-left: auto;
+            margin-right: auto;
             }               
         form {
-                width: 100%;
-                font-size: 15px;
-                margin-bottom: 10px;
-                display: flex;
+            width: 100%;
+            font-size: 15px;
+            margin-bottom: 10px;
+            display: flex;
 			flex-direction: column;
 		}
-            imput[type="text"], textarea {
+        textarea {
             width: 100%;
-                height: 50vh; /* 设置高度 */
+            height: 30vh; /* 设置高度 */
             font-size: 20px;
-                border: 2px solid hwb(216 76% 20% / 0.922); /* 设置边框样式 */ 
-                margin: 0 auto 10px; /* 设置外边距 */
-                font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
-                text-rendering: geometricPrecision;
-                line-height: 1.35;
-                tab-size: 2;
-                display: block; /* 设置为块级元素 */
-                background-color: #131415;
-                color: #fff;
-                border: 1px solid #999;
+            border: 2px solid hwb(216 76% 20% / 0.922); /* 设置边框样式 */ 
+            margin: 0 auto 10px; /* 设置外边距 */
+            font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
+            text-rendering: geometricPrecision;
+            line-height: 1.35;
+            tab-size: 2;
+            display: block; /* 设置为块级元素 */
+            background-color: #131415;
+            color: #fff;
+            border: 1px solid #999;
         }
         hr {
             margin: 1em 0;
@@ -46,51 +45,54 @@
             border-top: 1px solid #ccc;
         }
         h3 {
-            font-size: 1em;
+            font-size: 1.5em;
             margin-top: 0.5em;
             margin-bottom: 0.5em;
+            color: coral;
         }
-        p {
+            /* p {
             margin-bottom: 1em;
-        }
+            } */
         div{
-                max-width: 100ch;
+            max-width: 100ch;
         }
         pre {
             white-space: pre-wrap;
             word-wrap: break-word;
-                width: 100%;
+            width: 100%;
             font-size: 20px;
-                border: 2px solid hsl(205deg 44.25% 33.3%); /* 设置边框样式 */ 
-                margin: 0 auto 10px; /* 设置外边距 */
+            border: 2px solid hsl(0, 0%, 0%); /* 设置边框样式 */ 
+            margin: 0 auto 10px; /* 设置外边距 */
             font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
             text-rendering: geometricPrecision;
             line-height: 1.35;
-                tab-size: 2;
-                display: block; /* 设置为块级元素 */
+            tab-size: 2;
+            display: block; /* 设置为块级元素 */
             }
 
-            #log{
-                font-size: 20px;
+        #log{
+            font-size: 20px;
             }
-            #submit {
-                align-self: flex-end;
-                font-size: 20px;
+        #submit{
+            align-self: flex-end;
+            font-size: 20px;
+            color: gold;
+            background-color: #565755;
             }
     </style>
 </head>
 <body>
-        <div class="container">
-    <form>
-                <label for="log" style="font-size: 10px;">INPUT: </label>
-        <textarea id="log" name="log"></textarea>
-                <button id="submit">commit</button>
-    </form>
-    <hr>
-    <h3>ALL LOGS:</h3>
-    <!-- <button id="delete_all" style="font-size: 20px;">删除所有</button> -->
-            <div id="logList"; ></div>
-        </div>
+    <div class="container">
+        <form>
+            <label for="log" style="font-size: 20px; color: rgb(10, 209, 10);">INPUT: </label>
+            <textarea id="log" name="log"></textarea>
+            <button id="submit">commit</button>
+        </form>
+        <hr>
+        <h3>Logs:</h3>
+        <!-- <button id="delete_all" style="font-size: 20px;">删除所有</button> -->
+        <div id="logList"; ></div>
+    </div>
 
     <script src="log.js"></script>
 </body>
