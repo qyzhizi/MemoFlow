@@ -1,153 +1,108 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>clipboard</title>
-    <meta charset="UTF-8">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro">
-    <style>
-        body {
-            font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
-            padding: 10px;
-        }
-        hr {
-            margin: 1em 0;
-            border: none;
-            border-top: 1px solid #ccc;
-        }
-        form {
-            display:block;
-            flex-direction: column;
-            /* align-items: stretch; */
-            margin-bottom: 5px;
-            font-size: 15px;
-    		}
-        input[type="text"], textarea {
-            display: block;
-            text-align: left;
-            width: 100%;
-            height: 180px;
-            padding: 5px;
-            margin-bottom: 5px;
-            border: 1px solid #ccc;
-            border-radius: 2px;
-            box-sizing: border-box;
-            font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
-            tab-size: 2;
-        }
-        button[type="submit"] { 
-            background-color: #008CBA;
-            border: none;
-            color: rgb(172, 24, 116);
-            padding: 10px 10px;
-            text-align: left;
-            text-decoration: none;
-            display: block;
-            font-size: 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: auto;
-            align-self: flex-start;
-            transform: scale(1);    
-            position: relative;
-        }
-        /* textarea txt size */
-        #log{
-            font-size: 20px;
-        }
-        h3 {
-            font-size: 1em;
-            margin-top: 0.1em;
-            margin-bottom: 0.1em;
-        }
-        /* p {
-            margin-bottom: 1em;
-        } */
-        div{
-            margin:10px 0;
-        }
-        pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            max-width: 80ch;
-            font-size: 20px;
-            border: 2px solid hwb(216 76% 20% / 0.922); /* 设置边框样式 */ 
-            padding: 10px; /* 设置内边距 */ 
-            margin-bottom: 10px; /* 设置外边距 */
-            font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
-            text-rendering: geometricPrecision;
-            line-height: 1.35;
-            tab-size: 2;
-        }
-        /* 在黑暗模式下使用的样式 */
-        @media (prefers-color-scheme: dark) {
+    <head>
+            <title>MemoFlow</title>
+        <meta charset="UTF-8">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro">
+        <style>
             body {
-                background-color: #333;
-                color: #fff;
+                font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
+                padding: 10px;
+                /* background-color: #333; */
+                background-color: #565755;
+                color: #c9cdd1;
             }
-            h1 {
-                color: #fff;
-            }
-            input[type="text"], textarea {
-                background-color: #555;
+            .container {
+                max-width: 100ch;
+                margin-left: auto;
+                margin-right: auto;
+                }         
+            form {
+                width: 100%;
+                font-size: 15px;
+                margin-bottom: 10px;
+                display: flex;
+                flex-direction: column;
+                }
+            textarea {
+                width: 100%;
+                height: 25vh; /* 设置高度 */
+                font-size: 20px;
+                border: 2px solid hwb(216 76% 20% / 0.922); /* 设置边框样式 */ 
+                margin: 0 auto 10px; /* 设置外边距 */
+                font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
+                text-rendering: geometricPrecision;
+                line-height: 1.35;
+                tab-size: 2;
+                display: block; /* 设置为块级元素 */
+                background-color: #131415;
                 color: #fff;
                 border: 1px solid #999;
             }
-            button[type="submit"], #delete_all {
-                background-color: #999;
-                color: #333;
+            hr {
+                margin: 1em 0;
+                border: none;
+                border-top: 1px solid #ccc;
             }
-            a {
-                color: #fff;
+            h3 {
+                font-size: 1.5em;
+                margin-top: 0.5em;
+                margin-bottom: 0.5em;
+                color: coral;
             }
-            #logList {
-                background-color: #555;
-                color: #fff;
+            /* p {
+                margin-bottom: 1em;
+            } */
+            div{
+                max-width: 100ch;
             }
-        }
-        
-        /* 在浅色模式下使用的样式 */
-        @media (prefers-color-scheme: light) {
-            body {
-                background-color: #fff;
-                color: #333;
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                width: 100%;
+                font-size: 20px;
+                border: 2px solid hsl(240, 2%, 9%); /* 设置边框样式 */ 
+                margin: 0 auto 10px; /* 设置外边距 */
+                font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
+                text-rendering: geometricPrecision;
+                line-height: 1.35;
+                tab-size: 2;
+                display: block; /* 设置为块级元素 */
             }
-            h1 {
-                color: #333;
+            links {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                /* margin-bottom: 50px; */
             }
-            input[type="text"], textarea {
-                background-color: #f5f5f5;
-                color: #333;
-                border: 1px solid #ccc;
-            }
-            button[type="submit"], #delete_all {
-                background-color: #008CBA;
-                color: rgb(172, 24, 116);
-            }
-            a {
-                color: #008CBA;
-            }
-            #logList {
-                background-color: #f5f5f5;
-                color: #333;
-            }
-        }        
-
-
-</style>
-</head>
-<body>
-    <a href="/v1/diary-log/index.html" style="font-size: 20px;" >返回主页</a>
-    <form>
-        <label for="log" style="font-size: 10px;">输入您的日志：</label>
-        <textarea id="log" name="log"></textarea>
-        <button id="submit" style="font-size: 20px;">提交</button>
-    </form>
-    <hr>
-    <h3>logs</h3>
-    <!-- <button id="delete_all" style="font-size: 20px;">删除所有</button> -->
-    <!-- <hr> -->
-    <div id="logList"; style="white-space: pre-line";></div>
-    <script src="clipboard.js"></script>
-</body>
+            
+            #log{
+                font-size: 20px;
+                }
+            #submit {
+                align-self: flex-end;
+                font-size: 20px;
+                color: gold;
+                background-color: #565755;
+                }
+    </style>
+    </head>
+        <body>
+            <div class="container">            
+                <a href="/v1/diary-log/index.html" style="font-size: 20px; color: #fff;" >Return Homepage</a>
+                <form>
+                    <label for="log" style="font-size: 20px; color: rgb(10, 209, 10);">INPUT: </label>
+                    <textarea id="log" name="log"></textarea>
+                    <button id="submit">commit</button>
+                </form>
+                <hr>
+                <h3>Logs</h3>
+                <!-- <button id="delete_all" style="font-size: 20px;">删除所有</button> -->
+                <!-- <hr> -->
+                <div id="logList"></div>
+            </div>
+            <script src="clipboard.js"></script>
+        </body>
 </html>
