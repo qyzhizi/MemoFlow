@@ -15,40 +15,29 @@
             font-size: 1em;
             margin-bottom: 0.5em;
         }
+            .container {
+                max-width: 100ch;
+                margin-left: auto;
+                margin-right: auto;
+            }               
         form {
-			display:block;
+                width: 100%;
+                font-size: 15px;
+                margin-bottom: 10px;
+                display: flex;
 			flex-direction: column;
-			/* align-items: stretch; */
-			margin-bottom: 5px;
-            font-size: 15px;
 		}
-        input[type="text"], textarea {
-            display: block;
-            text-align: left;
+            imput[type="text"], textarea {
             width: 100%;
-            height: 180px;
-            padding: 5px;
-            margin-bottom: 5px;
-            border: 1px solid #ccc;
-            border-radius: 2px;
-            box-sizing: border-box;
-            font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
-        }
-        button[type="submit"] { 
-            background-color: #008CBA;
-            border: none;
-            color: rgb(172, 24, 116);
-            padding: 10px 10px;
-            text-align: left;
-            text-decoration: none;
-            display: block;
+                height: 50vh; /* 设置高度 */
             font-size: 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: auto;
-            align-self: flex-start;
-            transform: scale(1);    
-            position: relative;
+                border: 2px solid hwb(216 76% 20% / 0.922); /* 设置边框样式 */ 
+                margin: 0 auto 10px; /* 设置外边距 */
+                font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
+                text-rendering: geometricPrecision;
+                line-height: 1.35;
+                tab-size: 2;
+                display: block; /* 设置为块级元素 */
         }
         hr {
             margin: 1em 0;
@@ -64,28 +53,26 @@
             margin-bottom: 1em;
         }
         div{
-            margin:10px 0;
-        }
-        #log{
-            font-size: 20px;
+                max-width: 100ch;
         }
         pre {
             white-space: pre-wrap;
             word-wrap: break-word;
-            max-width: 80ch;
+                width: 100%;
             font-size: 20px;
-            border: 2px solid hwb(216 76% 20% / 0.922); /* 设置边框样式 */ 
-            padding: 10px; /* 设置内边距 */ 
-            margin-bottom: 10px; /* 设置外边距 */
+                border: 2px solid hsl(205deg 44.25% 33.3%); /* 设置边框样式 */ 
+                margin: 0 auto 10px; /* 设置外边距 */
             font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
             text-rendering: geometricPrecision;
             line-height: 1.35;
-        }
+                tab-size: 2;
+                display: block; /* 设置为块级元素 */
+            }
         /* 在黑暗模式下使用的样式 */
         @media (prefers-color-scheme: dark) {
             body {
                 background-color: #333;
-                color: #fff;
+                    color: #e3e8ee;
             }
             h1 {
                 color: #fff;
@@ -95,15 +82,7 @@
                 color: #fff;
                 border: 1px solid #999;
             }
-            button[type="submit"], #delete_all {
-                background-color: #999;
-                color: #333;
-            }
             a {
-                color: #fff;
-            }
-            #logList {
-                background-color: #555;
                 color: #fff;
             }
         }
@@ -122,10 +101,6 @@
                 color: #333;
                 border: 1px solid #ccc;
             }
-            button[type="submit"], #delete_all {
-                background-color: #008CBA;
-                color: rgb(172, 24, 116);
-        }
             a {
                 color: #008CBA;
             }
@@ -135,19 +110,28 @@
             }
         }        
 
- 
+            #log{
+                font-size: 20px;
+            }
+            #submit {
+                align-self: flex-end;
+                font-size: 20px;
+            }
     </style>
 </head>
 <body>
+        <div class="container">
     <form>
-        <label for="log" style="font-size: 10px;">输入您的日志：</label>
+                <label for="log" style="font-size: 10px;">INPUT: </label>
         <textarea id="log" name="log"></textarea>
-        <button id="submit" style="font-size: 20px;">提交</button>
+                <button id="submit">commit</button>
     </form>
     <hr>
-    <h3>所有日记</h3>
+    <h3>ALL LOGS:</h3>
     <!-- <button id="delete_all" style="font-size: 20px;">删除所有</button> -->
-    <div id="logList"; style="white-space: pre-line";></div>
+            <div id="logList"; ></div>
+        </div>
+
     <script src="log.js"></script>
 </body>
 </html>
