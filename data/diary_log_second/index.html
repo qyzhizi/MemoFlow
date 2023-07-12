@@ -10,10 +10,8 @@
         body {
             font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
             padding: 10px;
-        }
-        h1 {
-            font-size: 1em;
-            margin-bottom: 0.5em;
+                background-color: #333;
+                color: #c9cdd1;
         }
             .container {
                 max-width: 100ch;
@@ -38,6 +36,9 @@
                 line-height: 1.35;
                 tab-size: 2;
                 display: block; /* 设置为块级元素 */
+                background-color: #131415;
+                color: #fff;
+                border: 1px solid #999;
         }
         hr {
             margin: 1em 0;
@@ -68,47 +69,6 @@
                 tab-size: 2;
                 display: block; /* 设置为块级元素 */
             }
-        /* 在黑暗模式下使用的样式 */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background-color: #333;
-                    color: #e3e8ee;
-            }
-            h1 {
-                color: #fff;
-            }
-            input[type="text"], textarea {
-                background-color: #555;
-                color: #fff;
-                border: 1px solid #999;
-            }
-            a {
-                color: #fff;
-            }
-        }
-        
-        /* 在浅色模式下使用的样式 */
-        @media (prefers-color-scheme: light) {
-            body {
-                background-color: #fff;
-                color: #333;
-            }
-            h1 {
-                color: #333;
-            }
-            input[type="text"], textarea {
-                background-color: #f5f5f5;
-                color: #333;
-                border: 1px solid #ccc;
-            }
-            a {
-                color: #008CBA;
-            }
-            #logList {
-                background-color: #f5f5f5;
-                color: #333;
-            }
-        }        
 
             #log{
                 font-size: 20px;
