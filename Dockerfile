@@ -6,7 +6,7 @@ FROM python:3.10-slim
 #     && apt-get install -y build-essential
 
 RUN apt-get update \
-    && apt-get install -y build-essential
+    && apt-get install -y build-essential git
 
 # 将工作目录设置为 /app
 WORKDIR /app
@@ -20,6 +20,8 @@ RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # 暴露容器的端口
 EXPOSE 9000
+
+RUN python setup.py sdist
 
 # 给 run.sh 文件添加可执行权限
 RUN chmod +x memoflow/cmd/run.sh
