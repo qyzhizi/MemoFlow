@@ -33,6 +33,29 @@ $(function() {
             }
         });
     });
+    $('#pull').on('click', function(event) {
+        event.preventDefault();
+        // ask for confirmation
+        if (!confirm("Are you sure to pull files from github?")) {
+            return;
+        }
+        $.ajax({
+            url: '/v1/diary-log/sync-contents-from-github-to-db',
+            type: 'GET',
+            success: function(response) {
+                console.log(response);
+                // pop up a dialog
+                alert(response);
+                // reload the page
+                window.location.reload();
+            },
+            error: function(error) {
+                // pop up a dialog
+                alert(error);
+                console.log(error);
+            }
+        });
+    });
     $.ajax({
         url: '/v1/diary-log/getlogs',
         type: 'GET',

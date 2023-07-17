@@ -65,3 +65,14 @@ class Router(wsgi.ComposableRouter):
                        controller=diary_log_controller,
                        action='clipboard_addlog',
                        conditions=dict(method=['POST']))
+        
+        # get contents from github
+        mapper.connect('/diary-log/get_contents_from_github',
+                       controller=diary_log_controller,
+                       action='get_contents_from_github',
+                       conditions=dict(method=['GET']))
+        # sync contents from github to db
+        mapper.connect('/diary-log/sync-contents-from-github-to-db',
+                       controller=diary_log_controller,
+                       action='sync_contents_from_github_to_db',
+                       conditions=dict(method=['GET']))

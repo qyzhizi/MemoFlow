@@ -9,7 +9,7 @@
     GITHUB_TOKEN=xxxx
     GITHUB_REPO=github用户名/仓库名
     #仓库文件路径,相对仓库的根目录，例如：xxxx/demo.md
-    GITHUB_FILE_PATH=xxxx/demo.md
+    GITHUB_CURRENT_SYNC_FILE_PATH=xxxx/demo.md
     ```
     (1)github token如何获取呢？
     首先要开启GitHub API
@@ -36,7 +36,7 @@
 
     (2) GITHUB_REPO 是github用户名/仓库名， 例如：`qyzhizi/logseqnote`
 
-    (3) GITHUB_FILE_PATH 是待同步的文件名路径，例如：`pages/github_cards_2.md`,`pages` 是仓库根目录下一个文件夹
+    (3) GITHUB_CURRENT_SYNC_FILE_PATH 是待同步的文件名路径，例如：`pages/github_cards_2.md`,`pages` 是仓库根目录下一个文件夹
 
 - 2、坚果云文件同步
 

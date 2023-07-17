@@ -20,7 +20,7 @@
     GITHUB_TOKEN=xxxx
     GITHUB_REPO=github用户名/仓库名
     #仓库文件路径,相对仓库的根目录，例如：xxxx/demo.md
-    GITHUB_FILE_PATH=xxxx/demo.md
+    GITHUB_CURRENT_SYNC_FILE_PATH=xxxx/demo.md
 
     # 发送到坚果云
     # 坚果云账号，例如：你的坚果云邮箱
