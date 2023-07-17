@@ -60,7 +60,7 @@ class DiaryLog(wsgi.Application):
 
         # 向github仓库（logseq 笔记软件）发送数据
         if CONF.diary_log['send_to_github'] == True:
-            file_path = CONF.diary_log['github_file_path']
+            file_path = CONF.diary_log['github_current_sync_file_path']
             commit_message = "commit by memoflow"
             branch_name = "main"
             token = CONF.diary_log['github_token']
@@ -150,5 +150,44 @@ class DiaryLog(wsgi.Application):
             data_base_path=CLIPBOARD_DATA_BASE_PATH
             )
         return json.dumps(diary_log) # data 是否可行？
+    
+    def get_contents_from_github(self, req):
+        # data = req.body
+        # 将POST数据转换为JSON格式
+        # file_list = json.loads(data)
+        # LOG.info("get_contents_file_list json_data:, %s" % file_list)
 
-            
+        # get_contents_from_github
+        sync_file_path_list = CONF.diary_log['github_sync_file_list']
+        sync_file_path_list = sync_file_path_list.split(",")
+        token = CONF.diary_log['github_token']
+        repo = CONF.diary_log['github_repo']
+        branch_name = "main"
+        contents = self.diary_log_api.get_contents_from_github( token,
+                                                                repo,
+                                                                sync_file_path_list,
+                                                                branch_name)
+        return json.dumps({"contents": contents})
+
+    def sync_contents_from_github_to_db(self, req):
+        sync_file_path_list = CONF.diary_log['github_sync_file_list']
+        sync_file_path_list = sync_file_path_list.split(",")
+        # remove empty string, and strip space
+        for idx, file_path in enumerate(sync_file_path_list):
+            file_path = file_path.strip()
+            if file_path == "":
+                sync_file_path_list.remove(file_path)
+            else:
+                sync_file_path_list[idx] = file_path
+
+        token = CONF.diary_log['github_token']
+        repo = CONF.diary_log['github_repo']
+        branch_name = "main"
+        contents = self.diary_log_api.get_contents_from_github( token,
+                                                                repo,
+                                                                sync_file_path_list,
+                                                                branch_name)
+        # sync contents to db
+        self.diary_log_api.sync_contents_to_db(contents,
+                                               table_name=DIARY_LOG_TABLE, data_base_path=DATA_BASE_PATH)
+        return "success"

@@ -22,11 +22,11 @@ INDEX_HTML_PATH = CONF.diary_log['index_html_path']
 LOG_JS_PATH = CONF.diary_log['log_js_path']
 
 @dependency.provider('diary_log_api')
-class Manager(object):
-    driver_namespace = "diary_log_api"
+class Manager(manager.Manager):
+    driver_namespace = "memoflow.app.diary_log.driver"
 
-    # def __init__(self):
-    #     super().__init__(driver_name)
+    def __init__(self):
+        super(Manager, self).__init__(CONF.diary_log.driver)
 
     def get_html(self, index_html_path=INDEX_HTML_PATH):
         with open(index_html_path, "r", encoding='UTF-8')as f:
@@ -456,8 +456,11 @@ class Manager(object):
         await asyncio.gather(*tasks)
     
     # 向celery 发送异步任务
-    def celery_update_file_to_github(self, token, repo, file_path, added_content, commit_message, branch_name):
-        return celery_task.celery_update_file_to_github.delay(token, repo, file_path,
+    def celery_update_file_to_github(self, token, repo, file_path,
+                                     added_content, commit_message,
+                                     branch_name):
+        return celery_task.celery_update_file_to_github.delay(token, repo,
+                                                              file_path,
                                                               added_content,
                                                               commit_message,
                                                               branch_name)
@@ -469,3 +472,14 @@ class Manager(object):
         celery_task.update_file_to_janguoyun.delay(base_url, acount, token,
                                                    to_path, content, overwrite)
 
+    # 同步任务，批量获取 github 文件内容
+    def get_contents_from_github(self, token, repo, sync_file_path_list,
+                                 branch_name):
+        contents = self.driver.get_contents_from_github(token, repo,
+                                                    sync_file_path_list,
+                                                    branch_name)
+        return contents
+    
+    # sync contents to database
+    def sync_contents_to_db(self, contents, table_name, data_base_path):
+        self.driver.sync_contents_to_db(contents, table_name, data_base_path)

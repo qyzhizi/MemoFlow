@@ -20,7 +20,7 @@
             form {
                 width: 100%;
                 font-size: 15px;
-                margin-bottom: 10px;
+                margin-bottom: 5px;
                 display: flex;
                 flex-direction: column;
                 }
@@ -86,6 +86,19 @@
                 color: gold;
                 background-color: #565755;
             }
+            .action {
+                width: 100%;
+                font-size: 15px;
+                margin-bottom: 5px;
+                display: flex;
+                flex-direction: row;
+                }            
+            #pull {
+                align-self: flex-end;
+                font-size: 20px;
+                color: gold;
+                background-color: #565755;
+            }
         </style>
     </head>
     <body>
@@ -97,13 +110,14 @@
             </form>
 
             <div class="links">
-            <a href="https://abc.qyzhizi.cn:5050" style="font-size: 30px; color: #c9cdd1;" >picture</a>
-            <a href="review" style="font-size: 30px; color: #c9cdd1;" >review</a>
-            <a href="clipboard.html" style="font-size: 30px; color: #c9cdd1;" >clipboard</a>
+            <a href="https://abc.qyzhizi.cn:5050" style="font-size: 20px; color: #c9cdd1;" >picture</a>
+            <a href="review" style="font-size: 20px; color: #c9cdd1;" >review</a>
+            <a href="clipboard.html" style="font-size: 20px; color: #c9cdd1;" >clipboard</a>
             <!-- <a href="pasteboard" style="font-size: 30px;" >pasteboard</a> -->
             </div>
 
-            <h3>Logs: </h3>
+            <h3>Logs: </h3> 
+            <div class="action"> <button id="pull">pull</button> </div>
             <!-- <button id="delete_all" style="font-size: 20px;">删除所有</button> -->
             <div id="logList"; ></div>
         </div>

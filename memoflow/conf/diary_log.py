@@ -8,7 +8,8 @@ database_id = os.getenv("DATABASE_ID")
 notion_api_key = os.getenv("NOTION_API_KEY")
 github_token = os.getenv("GITHUB_TOKEN")
 github_repo = os.getenv("GITHUB_REPO")
-github_file_path = os.getenv("GITHUB_FILE_PATH")
+github_current_sync_file_path = os.getenv("GITHUB_CURRENT_SYNC_FILE_PATH")
+github_sync_file_list = os.getenv("GITHUB_SYNC_FILE_LIST")
 
 #获取发送任务标志位
 send_to_github = bool(int(os.getenv("SEND_TO_GITHUB")))
@@ -56,9 +57,12 @@ CONF_OPTS = [
     cfg.StrOpt("github_repo",
                default=github_repo,
                help='github repo'),
-    cfg.StrOpt("github_file_path",
-               default=github_file_path,
-               help='github_file_path'),
+    cfg.StrOpt("github_current_sync_file_path",
+               default=github_current_sync_file_path,
+               help='github_current_sync_file_path'),
+    cfg.StrOpt("github_sync_file_list",
+                default=github_sync_file_list,
+                help='github_sync_file_list'),
     # #clipboard数据库
     cfg.StrOpt('clipboard_html_path',
                default='data/diary_log/clipboard/clipboard.html',
@@ -82,11 +86,18 @@ CONF_OPTS = [
 
 ]
 
+driver = cfg.StrOpt(
+    'driver',
+    default='driver',
+    help='The driver to use for memoflow.app.diary_log',
+)
+CONF_OPTS.append(driver)
+
+GROUP_NAME = __name__.split('.')[-1]
+ALL_OPTS = CONF_OPTS
+
 def register_opts(conf):
-    
-    # 声明group
-    opt_group = cfg.OptGroup('diary_log')
-    # 注册group
-    conf.register_group(opt_group)
-    
-    conf.register_opts(CONF_OPTS, group=opt_group)
+    conf.register_opts(CONF_OPTS, group=GROUP_NAME)
+
+def list_opts():
+    return {GROUP_NAME: ALL_OPTS}

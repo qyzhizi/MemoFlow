@@ -47,7 +47,8 @@ def celery_update_file_to_github(token, repo, file_path, added_content,
 # 更新文件到坚果云
 @celery.task
 def update_file_to_janguoyun(base_url: str, acount: str, token: str,
-                             to_path: str, content: str, overwrite: bool = True) -> None:
+                             to_path: str, content: str,
+                             overwrite: bool = True) -> None:
     if jianguoyun_clients.get(acount, None) is None:
         jianguoyun_clients[acount] = JianGuoYunClient(base_url, acount, token)
     my_client = jianguoyun_clients[acount]
