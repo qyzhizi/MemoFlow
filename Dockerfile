@@ -8,7 +8,10 @@ FROM python:3.10
 #     && apt-get clean \
 #     && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory to /app
+RUN apt-get update \
+    && apt-get install -y build-essential git
+
+# 将工作目录设置为 /app
 WORKDIR /app
 
 # Copy all files in the current directory to /app
@@ -26,6 +29,8 @@ RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # Expose the port of the container
 EXPOSE 9000
+
+RUN python setup.py sdist
 
 # 给 run.sh 文件添加可执行权限
 RUN chmod +x memoflow/cmd/run.sh
