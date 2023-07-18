@@ -18,8 +18,6 @@ LOG = logging.getLogger(__name__)
 # driver_name = CONF.diary_log['driver']
 DATA_BASE_PATH = CONF.diary_log['data_base_path']
 DIARY_LOG_TABLE = CONF.diary_log['diary_log_table']
-INDEX_HTML_PATH = CONF.diary_log['index_html_path']
-LOG_JS_PATH = CONF.diary_log['log_js_path']
 
 @dependency.provider('diary_log_api')
 class Manager(manager.Manager):
@@ -28,16 +26,6 @@ class Manager(manager.Manager):
     def __init__(self):
         super(Manager, self).__init__(CONF.diary_log.driver)
 
-    def get_html(self, index_html_path=INDEX_HTML_PATH):
-        with open(index_html_path, "r", encoding='UTF-8')as f:
-            res = f.read()
-        return res
-    
-    def get_js(self, log_js_path=LOG_JS_PATH):
-        with open(log_js_path, "r", encoding='UTF-8')as f:
-            res = f.read()
-        return res        
-    
     def save_log(self, content, tags, table_name=DIARY_LOG_TABLE,
                  data_base_path=DATA_BASE_PATH):
         """save diary(content, tags) to table
@@ -101,16 +89,6 @@ class Manager(manager.Manager):
         diary_log_db.delete_all_log(table_name=table, data_base_path=data_base_path)
     
     # review provider
-    def get_review_html(self, review_index_html_path):
-        with open(review_index_html_path, "r", encoding='UTF-8')as f:
-            res = f.read()
-        return res
-
-    def get_review_js(self, review_js_path):
-        with open(review_js_path, "r", encoding='UTF-8')as f:
-            res = f.read()
-        return res        
-    
     def get_review_logs(self, table, columns, data_base_path):
         """get all diary logs
 
@@ -138,16 +116,6 @@ class Manager(manager.Manager):
         diary_log_db.delete_all_log(table_name=table, data_base_path=data_base_path)
 
     # clipboard
-    def get_clipboard_html(self, clipboard_html_path):
-        with open(clipboard_html_path, "r", encoding='UTF-8')as f:
-            res = f.read()
-        return res
-
-    def get_clipboard_js(self, clipboard_js_path):
-        with open(clipboard_js_path, "r", encoding='UTF-8')as f:
-            res = f.read()
-        return res
-    
     def get_clipboard_logs(self, table_name, columns, data_base_path):
         """get all logs form one table columns
 
