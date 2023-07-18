@@ -6,7 +6,7 @@ CONF = cfg.CONF
 from memoflow.conf import server
 from memoflow.conf import api
 from memoflow.conf.app import diary_log
-from memoflow.conf import diary_log_second
+from memoflow.conf.app import diary_log_second
 
 from memoflow.conf.client import diary_log as diary_log_client
 
