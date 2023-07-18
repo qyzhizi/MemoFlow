@@ -3,13 +3,13 @@ from oslo_config import cfg
 # 声明配置项
 CONF_OPTS = [     
     cfg.StrOpt('data_base_path',
-               default='data/diary_log_second/diary_log_second.db',
+               default='db_data/diary_log_second/diary_log_second.db',
                help='sqlite3数据库的路径'),
     cfg.StrOpt('index_html_path',
-               default='data/diary_log_second/index.html',
+               default='memoflow/data/app/diary_log_second/index.html',
                help='主页html路径'),
     cfg.StrOpt('log_js_path',
-                default="data/diary_log_second/log.js",
+                default="memoflow/data/app/diary_log_second/log.js",
                 help='主页的js文件路径'),
 ]
 

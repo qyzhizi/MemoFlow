@@ -1,3 +1,4 @@
+import os
 import logging
 import sqlite3
 
@@ -5,6 +6,11 @@ LOG = logging.getLogger(__name__)
 
 def init_db_diary_log(data_base_path, table_name):
 
+    # 判断data_base_path是否存在，不存在则创建
+    dir_path = os.path.dirname(data_base_path)
+    if not os.path.exists(dir_path):
+        LOG.info("diary_log数据库路径不存在，创建路径: %s", dir_path)
+        os.makedirs(dir_path)
     # 初始化数据库
     LOG.info("初始化diary_log数据库路径: %s", data_base_path)
     conn = sqlite3.connect(data_base_path)
@@ -24,6 +30,12 @@ def create_table(data_base_path, table_name):
     conn.close()
 
 def init_db_clipboard_log(data_base_path, table_name):
+
+    # 判断data_base_path是否存在，不存在则创建
+    dir_path = os.path.dirname(data_base_path)
+    if not os.path.exists(dir_path):
+        LOG.info("diary_log数据库路径不存在，创建路径: %s", dir_path)
+        os.makedirs(dir_path)
 
     # 初始化clipboard数据库
     LOG.info("初始化clipboard_log数据库路径: %s", data_base_path)

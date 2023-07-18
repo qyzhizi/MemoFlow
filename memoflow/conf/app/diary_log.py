@@ -10,6 +10,9 @@ github_token = os.getenv("GITHUB_TOKEN")
 github_repo = os.getenv("GITHUB_REPO")
 github_current_sync_file_path = os.getenv("GITHUB_CURRENT_SYNC_FILE_PATH")
 github_sync_file_list = os.getenv("GITHUB_SYNC_FILE_LIST")
+data_base_main_path= os.getenv("DATA_BASE_MAIN_PATH")
+data_base_clipboard_path = os.getenv("DATA_BASE_CLIPBOARD_PATH")
+
 
 #获取发送任务标志位
 send_to_github = bool(int(os.getenv("SEND_TO_GITHUB")))
@@ -18,7 +21,7 @@ send_to_jianguoyun = bool(int(os.getenv("SEND_TO_JIANGUOYUN")))
 # 声明配置项
 CONF_OPTS = [     
     cfg.StrOpt('data_base_path',
-               default='data/diary_log/diary_log.db',
+               default=data_base_main_path,
                help='sqlite3数据库的路径'),
     cfg.StrOpt('diary_log_table',
                default='diary_log',
@@ -26,21 +29,9 @@ CONF_OPTS = [
     cfg.StrOpt('review_diary_log_table',
                default='review_diary_log',
                help='存储笔记的表'),
-    cfg.StrOpt('review_index_html_path',
-               default='data/diary_log/review.html',
-               help='review html路径'),
-    cfg.StrOpt('review_js_path',
-                default="data/diary_log/review.js",
-                help='review js文件路径'),
     cfg.StrOpt('review_tags',
                default='que,web',
                help='存储笔记的表'),
-    cfg.StrOpt('index_html_path',
-               default='data/diary_log/index.html',
-               help='主页html路径'),
-    cfg.StrOpt('log_js_path',
-                default="data/diary_log/log.js",
-                help='主页的js文件路径'),
     cfg.StrOpt('flomo_api_url',
             #@todo os.environ
             default=flomo_api_url,
@@ -63,15 +54,8 @@ CONF_OPTS = [
     cfg.StrOpt("github_sync_file_list",
                 default=github_sync_file_list,
                 help='github_sync_file_list'),
-    # #clipboard数据库
-    cfg.StrOpt('clipboard_html_path',
-               default='data/diary_log/clipboard/clipboard.html',
-               help='clipboard html路径'),
-    cfg.StrOpt('clipboard_js_path',
-                default="data/diary_log/clipboard/clipboard.js",
-                help='clipboard js文件路径'),
     cfg.StrOpt("clipboard_data_base_path",
-               default='data/diary_log/clipboard/clipboard_log.db',
+               default=data_base_clipboard_path,
                help='clipboard_log db file path'),
     cfg.StrOpt("clipboard_log_table",
                default='clipboard_log',
