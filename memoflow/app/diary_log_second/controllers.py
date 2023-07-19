@@ -37,7 +37,7 @@ class DiaryLog(wsgi.Application):
         # 保存到github
         # added_content = diary_log['content']
         # file_path = "pages/github_cards.md"
-        # commit_message = "commit by web_dl"
+        # commit_message = "commit by memoflow"
         # branch_name = "main"
         # token = CONF.diary_log['github_token']
         # repo = CONF.diary_log['github_repo']

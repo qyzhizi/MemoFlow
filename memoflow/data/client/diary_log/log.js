@@ -33,6 +33,29 @@ $(function() {
             }
         });
     });
+    $('#pull').on('click', function(event) {
+        event.preventDefault();
+        // ask for confirmation
+        if (!confirm("Are you sure to pull files from github?")) {
+            return;
+        }
+        $.ajax({
+            url: '/v1/diary-log/sync-contents-from-github-to-db',
+            type: 'GET',
+            success: function(response) {
+                console.log(response);
+                // pop up a dialog
+                alert(response);
+                // reload the page
+                window.location.reload();
+            },
+            error: function(error) {
+                // pop up a dialog
+                alert(error);
+                console.log(error);
+            }
+        });
+    });
     $.ajax({
         url: '/v1/diary-log/getlogs',
         type: 'GET',
@@ -152,4 +175,16 @@ $(function() {
             e.preventDefault();
         }
     });   
+
+    // 监听窗口关闭事件
+    window.addEventListener("beforeunload", function (event) {
+        var inputBox = document.getElementById("log");
+        // 检测输入框内容是否为空
+        if (inputBox.value.trim().length > 0) {
+            // 显示提示框
+            event.preventDefault();
+            // beforeunload 事件的返回值
+            event.returnValue = " ";
+        }
+    });
 });

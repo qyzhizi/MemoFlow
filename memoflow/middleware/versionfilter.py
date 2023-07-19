@@ -6,7 +6,7 @@ import webob.dec
 import webob
 
 from .middleware import Middleware
-#from web_dl.controller.version import VersionController
+#from memoflow.controller.version import VersionController
 
 LOG = logging.getLogger(__name__)
 

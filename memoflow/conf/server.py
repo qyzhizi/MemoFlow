@@ -3,7 +3,7 @@ from oslo_config import cfg
 # 声明配置项
 SEVER_OPTS = [     
     cfg.StrOpt('server_conf_path',
-               default='etc/web_dl/web-dl.conf',
+               default='etc/memoflow/memoflow.conf',
                help='服务配置文件的路径'),
 ]
 

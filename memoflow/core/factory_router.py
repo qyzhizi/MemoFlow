@@ -11,6 +11,7 @@ import memoflow.app.test_app.routers as test_app_routers
 import memoflow.app.diary_log.routers as diary_log_routers
 import memoflow.app.diary_log_second.routers as diary_log_second_routers
 import memoflow.app.predict_image.routers as predict_image_routers
+import memoflow.client_app.diary_log.routers as diary_log_client_routers
 LOG = log.getLogger(__name__)
 
 
@@ -48,6 +49,7 @@ def public_app_factory(global_conf, **local_conf):
                                 test_app_routers.Router(),
                                 diary_log_routers.Router(),
                                 diary_log_second_routers.Router(),
-                                predict_image_routers.Router()
+                                predict_image_routers.Router(),
+                                diary_log_client_routers.Router(),
                                ])
 

@@ -39,15 +39,16 @@ def celery_update_file_to_github(token, repo, file_path, added_content,
     if github_api_instance.get(repo, None) is None:
         github_api_instance[repo] = github_api.GitHupApi(token=token, repo=repo)
     my_api_instance = github_api_instance[repo]
-    return my_api_instance.update_file(file_path=file_path,
-                                       added_content=added_content,
-                                       commit_message=commit_message,
-                                       branch_name=branch_name)
+    my_api_instance.update_file(file_path=file_path,
+                                added_content=added_content,
+                                commit_message=commit_message,
+                                branch_name=branch_name)
 
 # 更新文件到坚果云
 @celery.task
 def update_file_to_janguoyun(base_url: str, acount: str, token: str,
-                             to_path: str, content: str, overwrite: bool = True) -> None:
+                             to_path: str, content: str,
+                             overwrite: bool = True) -> None:
     if jianguoyun_clients.get(acount, None) is None:
         jianguoyun_clients[acount] = JianGuoYunClient(base_url, acount, token)
     my_client = jianguoyun_clients[acount]
@@ -58,7 +59,7 @@ def update_file_to_janguoyun(base_url: str, acount: str, token: str,
 
 @celery.task
 def time_task():
-    print("Running time task ...")
+    LOG.info("Running time task ...")
 
 @celery.task
 def time_get_diary_log_task():
@@ -78,11 +79,11 @@ def time_get_diary_log_task():
 
 celery.conf.beat_schedule = {
     'run-every-12*60*60-seconds': {
-        'task': 'web_dl.tasks.celery_task.time_task',
+        'task': 'memoflow.tasks.celery_task.time_task',
         'schedule': 12*60*60
     },
    'time_get_diary_log_task': {
-   'task': 'web_dl.tasks.celery_task.time_get_diary_log_task',
+   'task': 'memoflow.tasks.celery_task.time_get_diary_log_task',
    'schedule': 1*60*60
    }
 }

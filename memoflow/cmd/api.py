@@ -10,7 +10,7 @@ from memoflow.db import init_db
 
 cp = ConfigParse(CONF.server['server_conf_path'])
 cf_defaults = cp.read_file().get("default")
-log_util.server_setup(cf_defaults.get("log_file"),'web_dl')
+log_util.server_setup(cf_defaults.get("log_file"),'memoflow')
 
 LOG = logging.getLogger(__name__)
 

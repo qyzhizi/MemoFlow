@@ -26,7 +26,7 @@ class Manager(object):
         # LOG.info(data_path)
         # LOG.info(html_file)
         
-        with open("data/test_demo/index.html", "r", encoding='UTF-8')as f:
+        with open("memoflow/data/app/test_demo/index.html", "r", encoding='UTF-8')as f:
             res = f.read()
         return res
 

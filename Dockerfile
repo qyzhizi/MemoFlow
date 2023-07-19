@@ -8,14 +8,18 @@ FROM python:3.10
 #     && apt-get clean \
 #     && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory to /app
+RUN apt-get update \
+    && apt-get install -y build-essential git
+
+# 将工作目录设置为 /app
 WORKDIR /app
 
 # Copy all files in the current directory to /app
 COPY . /app
 
-# Dependencies required by the installation script
-RUN pip install --no-cache-dir -r requirements.txt
+# 安装脚本所需要的依赖包
+RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+# RUN pip install --no-cache-dir -r requirements.txt
 
 # If you want to use Tencent Cloud mirroring, use the following command
 # RUN pip install -r requirements.txt -i https://mirrors.cloud.tencent.com/pypi/simple
@@ -26,8 +30,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Expose the port of the container
 EXPOSE 9000
 
-# Add executable permissions to the run.sh file
-RUN chmod +x web_dl/cmd/run.sh
+RUN python setup.py sdist
 
-# run script
-CMD ["bash", "-c", "web_dl/cmd/run.sh"]
+# 给 run.sh 文件添加可执行权限
+RUN chmod +x memoflow/cmd/run.sh
+
+# 运行脚本
+CMD ["bash", "-c", "memoflow/cmd/run.sh"]

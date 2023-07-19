@@ -6,10 +6,6 @@ from memoflow.app.diary_log import controllers
 class Router(wsgi.ComposableRouter):
     def add_routes(self, mapper):
         diary_log_controller = controllers.DiaryLog()
-        mapper.connect('/diary-log/index.html',
-                       controller=diary_log_controller,
-                       action='get_html',
-                       conditions=dict(method=['GET']))
         mapper.connect('/diary-log/getlogs',
                        controller=diary_log_controller,
                        action='get_logs',
@@ -18,10 +14,6 @@ class Router(wsgi.ComposableRouter):
                        controller=diary_log_controller,
                        action='add_log',
                        conditions=dict(method=['POST']))
-        mapper.connect('/diary-log/log.js',
-                       controller=diary_log_controller,
-                       action='get_js',
-                       conditions=dict(method=['GET']))                                             
         mapper.connect('/diary-log/delete_all_log',
                        controller=diary_log_controller,
                        action='delete_all_log',
@@ -31,14 +23,6 @@ class Router(wsgi.ComposableRouter):
                        action='test_flomo',
                        conditions=dict(method=['GET']))                           
         # review
-        mapper.connect('/diary-log/review',
-                       controller=diary_log_controller,
-                       action='get_review_html',
-                       conditions=dict(method=['GET']))
-        mapper.connect('/diary-log/review.js',
-                       controller=diary_log_controller,
-                       action='get_review_js',
-                       conditions=dict(method=['GET']))                                             
         mapper.connect('/diary-log/get_review_logs',
                        controller=diary_log_controller,
                        action='get_review_logs',
@@ -49,14 +33,6 @@ class Router(wsgi.ComposableRouter):
                        conditions=dict(method=['GET']))
         
         # 粘贴板
-        mapper.connect('/diary-log/clipboard.html',
-                       controller=diary_log_controller,
-                       action='get_clipboard_html',
-                       conditions=dict(method=['GET']))
-        mapper.connect('/diary-log/clipboard.js',
-                       controller=diary_log_controller,
-                       action='get_clipboard_js',
-                       conditions=dict(method=['GET']))                                             
         mapper.connect('/diary-log/get_clipboard_logs',
                        controller=diary_log_controller,
                        action='get_clipboard_logs',
@@ -65,3 +41,14 @@ class Router(wsgi.ComposableRouter):
                        controller=diary_log_controller,
                        action='clipboard_addlog',
                        conditions=dict(method=['POST']))
+        
+        # get contents from github
+        mapper.connect('/diary-log/get_contents_from_github',
+                       controller=diary_log_controller,
+                       action='get_contents_from_github',
+                       conditions=dict(method=['GET']))
+        # sync contents from github to db
+        mapper.connect('/diary-log/sync-contents-from-github-to-db',
+                       controller=diary_log_controller,
+                       action='sync_contents_from_github_to_db',
+                       conditions=dict(method=['GET']))

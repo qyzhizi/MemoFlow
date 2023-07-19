@@ -26,7 +26,12 @@ import stevedore
 
 
 LOG = log.getLogger(__name__)
+TRACE  = 5
 
+if hasattr(inspect, 'getfullargspec'):
+    getargspec = inspect.getfullargspec
+else:
+    getargspec = inspect.getargspec
 
 def response_truncated(f):
     """Truncate the list returned by the wrapped function.
@@ -87,7 +92,7 @@ class _TraceMeta(type):
 
     @staticmethod
     def wrapper(__f, __classname):
-        __argspec = inspect.getargspec(__f)
+        __argspec = getargspec(__f)
         __fn_info = '%(module)s.%(classname)s.%(funcname)s' % {
             'module': inspect.getmodule(__f).__name__,
             'classname': __classname,
@@ -104,11 +109,11 @@ class _TraceMeta(type):
         def wrapped(*args, **kwargs):
             __exc = None
             __t = time.time()
-            __do_trace = LOG.logger.getEffectiveLevel() <= log.TRACE
+            __do_trace = LOG.getEffectiveLevel() <= TRACE
             __ret_val = None
             try:
                 if __do_trace:
-                    LOG.trace('CALL => %s', __fn_info)
+                    LOG.info('CALL => %s', __fn_info)
                 __ret_val = __f(*args, **kwargs)
             except Exception as e:  # nosec
                 __exc = e
@@ -136,7 +141,7 @@ class _TraceMeta(type):
                         # was a cache hit or cache miss.
                         __msg = ('[%(run_time)ss] %(function)s'
                                  '(%(passed_args)s) => %(ret_val)r')
-                    LOG.trace(__msg, __subst)
+                    LOG.info(__msg, __subst)
             return __ret_val
         return wrapped
 

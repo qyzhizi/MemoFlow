@@ -14,25 +14,13 @@ LOG = logging.getLogger(__name__)
 DATA_BASE_PATH = CONF.diary_log['data_base_path']
 DIARY_LOG_TABLE = CONF.diary_log['diary_log_table']
 REVIEW_DIARY_LOG = CONF.diary_log['review_diary_log_table']
-INDEX_HTML_PATH = CONF.diary_log['index_html_path']
-REVIEW_INDEX_HTML_PATH = CONF.diary_log['review_index_html_path']
-LOG_JS_PATH = CONF.diary_log['log_js_path']
-REVIEW_JS_PATH = CONF.diary_log['review_js_path']
 
 #clipboard
-CLIPBOARD_HTML_PATH = CONF.diary_log['clipboard_html_path']
-CLIPBOARD_JS_PATH = CONF.diary_log['clipboard_js_path']
 CLIPBOARD_LOG_TABLE = CONF.diary_log['clipboard_log_table'] #clipboard数据表名
 CLIPBOARD_DATA_BASE_PATH = CONF.diary_log['clipboard_data_base_path'] #clipboard数据库路径
 
 @dependency.requires('diary_log_api')
 class DiaryLog(wsgi.Application):
-    def get_html(self, req):
-        return self.diary_log_api.get_html()
-
-    def get_js(self, req):
-        return self.diary_log_api.get_js()
-
     def add_log(self, req):
         # 从请求中获取POST数据
         data = req.body
@@ -60,8 +48,8 @@ class DiaryLog(wsgi.Application):
 
         # 向github仓库（logseq 笔记软件）发送数据
         if CONF.diary_log['send_to_github'] == True:
-            file_path = CONF.diary_log['github_file_path']
-            commit_message = "commit by web_dl"
+            file_path = CONF.diary_log['github_current_sync_file_path']
+            commit_message = "commit by memoflow"
             branch_name = "main"
             token = CONF.diary_log['github_token']
             repo = CONF.diary_log['github_repo']
@@ -105,13 +93,6 @@ class DiaryLog(wsgi.Application):
         return "sucess"
 
     # review
-    def get_review_html(self, req):
-        return self.diary_log_api.get_review_html(
-            review_index_html_path=REVIEW_INDEX_HTML_PATH)
-
-    def get_review_js(self, req):
-        return self.diary_log_api.get_review_js(review_js_path=REVIEW_JS_PATH)
-
     def get_review_logs(self, req):
         return self.diary_log_api.get_review_logs(table=REVIEW_DIARY_LOG,
                                                   columns=['content'],
@@ -122,14 +103,6 @@ class DiaryLog(wsgi.Application):
                                                         table=REVIEW_DIARY_LOG)
 
     # clipboard
-    def get_clipboard_html(self, req):
-        return self.diary_log_api.get_clipboard_html(
-            clipboard_html_path=CLIPBOARD_HTML_PATH)
-    
-    def get_clipboard_js(self, req):
-        return self.diary_log_api.get_clipboard_js(
-            clipboard_js_path=CLIPBOARD_JS_PATH)
-
     def get_clipboard_logs(self, req):
         return self.diary_log_api.get_clipboard_logs(
             table_name=CLIPBOARD_LOG_TABLE,
@@ -150,5 +123,44 @@ class DiaryLog(wsgi.Application):
             data_base_path=CLIPBOARD_DATA_BASE_PATH
             )
         return json.dumps(diary_log) # data 是否可行？
+    
+    def get_contents_from_github(self, req):
+        # data = req.body
+        # 将POST数据转换为JSON格式
+        # file_list = json.loads(data)
+        # LOG.info("get_contents_file_list json_data:, %s" % file_list)
 
-            
+        # get_contents_from_github
+        sync_file_path_list = CONF.diary_log['github_sync_file_list']
+        sync_file_path_list = sync_file_path_list.split(",")
+        token = CONF.diary_log['github_token']
+        repo = CONF.diary_log['github_repo']
+        branch_name = "main"
+        contents = self.diary_log_api.get_contents_from_github( token,
+                                                                repo,
+                                                                sync_file_path_list,
+                                                                branch_name)
+        return json.dumps({"contents": contents})
+
+    def sync_contents_from_github_to_db(self, req):
+        sync_file_path_list = CONF.diary_log['github_sync_file_list']
+        sync_file_path_list = sync_file_path_list.split(",")
+        # remove empty string, and strip space
+        for idx, file_path in enumerate(sync_file_path_list):
+            file_path = file_path.strip()
+            if file_path == "":
+                sync_file_path_list.remove(file_path)
+            else:
+                sync_file_path_list[idx] = file_path
+
+        token = CONF.diary_log['github_token']
+        repo = CONF.diary_log['github_repo']
+        branch_name = "main"
+        contents = self.diary_log_api.get_contents_from_github( token,
+                                                                repo,
+                                                                sync_file_path_list,
+                                                                branch_name)
+        # sync contents to db
+        self.diary_log_api.sync_contents_to_db(contents,
+                                               table_name=DIARY_LOG_TABLE, data_base_path=DATA_BASE_PATH)
+        return "success"
