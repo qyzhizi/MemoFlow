@@ -1,0 +1,1 @@
+from memoflow.app.predict_image.provider import *

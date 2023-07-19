@@ -2,9 +2,10 @@
 *.pyc
 *__pycache__/
 *.log
+*.log.*
 web_dl.log.*
 dist/
-web_dl.egg-info/
+*.egg-info/
 build/
 .spyproject/
 .eggs
