@@ -70,7 +70,7 @@ def time_get_diary_log_task():
     if not rows:
         return 
     random_row = random.choice(rows)
-    LOG.info(f"random_row: {random_row}")
+    # LOG.info(f"random_row: {random_row}")
     diary_log_db.inser_diary_to_table(table_name=REVIEW_DIARY_LOG,
                                       content=random_row[1],
                                       tags=random_row[2],
