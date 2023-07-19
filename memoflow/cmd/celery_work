@@ -2,6 +2,7 @@
 import os
 import sys
 from multiprocessing import Process
+from celery.signals import worker_process_init
 # 获取当前文件的目录
 current_dir = os.path.dirname(os.path.abspath(__file__))
 top_dir = os.path.dirname(os.path.dirname(current_dir))
@@ -17,17 +18,22 @@ from memoflow.tasks import celery_task
 # 配置日志，但好像work进程的日志还是没有打印在指定的文件中
 cp = ConfigParse(CONF.server['server_conf_path'])
 cf_defaults = cp.read_file().get("default")
-log_util.server_setup(cf_defaults.get("celery_log_file"),'celery')
+
+@worker_process_init.connect
+def configure_logging(**kwargs):
+    # logging.config.fileConfig('logging.ini')
+    log_util.server_setup(cf_defaults.get("celery_log_file"),'celery')
 
 app = celery_task.celery
 
 # 异步任务
 def start_worker():
-    app.worker_main(argv=['worker', '-l', 'info'])
+    app.worker_main(argv=['worker', '-l', 'info',
+                          '-f', cf_defaults.get("celery_log_file")])
 
 # 定时任务
 def start_beat():
-    beat = app.Beat(loglevel='info')
+    beat = app.Beat(loglevel='info', logfile=cf_defaults.get("celery_log_file"))
     beat.run()
 
 if __name__ == "__main__":
