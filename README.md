@@ -4,10 +4,20 @@
     <img src='https://img.shields.io/badge/Docker-Yes-brightgreen'>
     <img src='https://img.shields.io/badge/OpenStack-Architecture-orange'>
 </p>
-logseq与obsidian是很好的本地笔记，通过强大双链与标签搜索功能可以非常方便地记录、管理卡片笔记，配合远程仓库(github或者坚果云)可以实现笔记的线上同步。但是如果我想让仓库中某一个文档成为在线页面呢？相比logseq，在浏览器页面中可以更便捷地浏览、记录卡片笔记，并且该页面会被立即同步到远程仓库中，而本地依然可以利用logseq或obsidian的链接与标签搜索功能来纳管该页面。因此memoflow作为一个连接工具打算提供这种卡片笔记在线浏览、编辑与同步的服务。
+本项目是一个基于 Paste-WebOb-Routes 、RESTful API 风格的 python 应用服务，实现向 github 仓库或者坚果云仓库同步 logseq 风格的卡片笔记。另外本项目有一个简陋的、未完善的网页客户端，支持提交、拉取、浏览与编辑（暂不支持）卡片笔记。
+
+具体来说，本项目会将卡片笔记在后台转换为 logseq 段落的格式，然后同步到云端存储，配合同步工具（git或坚果云）同步的卡片笔记文档可以在本地笔记应用(logseq、obsidian)中展示。
+
+<div style="text-align: center; height: 500px; margin: auto;">
+  <img src="https://qyzhizi.cn/img/202307201141763.png" alt="居中显示的图片">
+</div>
+<div style="text-align: center;">
+  <p>网页客户端。</p>
+</div>
 
 ## Usage
-简单来说memoflow是一个卡片笔记服务, 主要目的是向远程文件(github 或者坚果云)发送卡片笔记，实现一个轻量化在线卡片笔记的编辑与同步服务。memoflow页面能够在浏览器显示，并且同步到logseq、obsidian的远程仓库(github 或者坚果云)的文件中。你可以选择在本地使用docker部署，那么这个服务只会在本地运行，安全可靠。或者在云服务器部署，它将成为一个在线服务。
+简单来说memoflow实现卡片笔记的在线记录、同步(github 或者 坚果云)。你可以选择在本地使用docker部署，那么这个服务只会在本地运行，安全可靠。或者在云服务器部署，它将成为一个在线服务，
+不过目前没有实现多用户的注册于登录（精力有限）。
 
 [点击查看详细信息](./docs/usage.md)
 

@@ -1,23 +1,27 @@
-## 使用方法
+## 卡片笔记的记录
 以本地启动为例，启动服务后，访问：`http://localhost:9000/v1/diary-log/index.html`
-，可得到页面：
+，可得到页面， 输入框中输入卡片笔记，然后点击`commit`：
 
-<img src="https://qyzhizi.cn/img/202305160912106.png" width="60%" height="60%">
+<div style="text-align: center; height: 500px; margin: auto;">
+  <img src="https://qyzhizi.cn/img/202307201141763.png" alt="居中显示的图片">
+</div>
+<div style="text-align: center;">
+  <p>网页客户端。</p>
+</div>
 
-对应的远程同步文件：
+logseq 显示的卡片笔记内容：
 
-<img src="https://qyzhizi.cn/img/202305160947021.png" width="60%" height="60%">
 
-未来也可以扩展出更多的页面，提供给多人使用, 例如：
-```
-本地访问：http://localhost:9000/v1/diary-log/index.html
-本地访问：http://localhost:9000/v1/diary-log-lrx/index.html
-```
-memoflow是一个网页在线笔记，功能简单，打开速度快。输入的内容保留空格、换行符和其他空白字符，支持tab与shift+tab 缩进。当你提交输入的内容后，后台会自动添加时间戳标题，目前使用一些简单的规则实现卡片笔记的标签、子块与todo功能。未来考虑添加其他容易使用的规则。
+<div style="text-align: center; width: 80%; margin: auto;">
+  <img src="https://qyzhizi.cn/img/202307201141747.png" alt="居中显示的图片">
+</div>
+
+memoflow网页客户端有一个大的输入框。输入的内容保留空格、换行符和其他空白字符，支持tab与shift+tab 缩进。当你提交输入的内容后，后台会自动添加时间戳标题，目前使用一些简单的规则实现卡片笔记的标签、子块与todo功能。未来考虑添加其他容易使用的规则。
 
 另外数据会在数据库sqlite中保留一份，然后通过异步方式向远程同步文件发送一份（插入到文件最上面），由于采用异步发送方式，所以感受不到延迟。如果后台异步发送任务失败，那么远程同步文件得不到更新。未来考虑后台发送任务失败时，给出页面提示。
 
 ## 卡片笔记示例
+记录卡片笔记，可以围绕一个问题(#que 标记)来进行：
 当你在笔记页面输入：
 ```
 #key1 #key2
@@ -49,7 +53,7 @@ memoflow是一个网页在线笔记，功能简单，打开速度快。输入的
 ```
 最终在logseq本地markdown 渲染效果是：
 
-<img src="https://qyzhizi.cn/img/202305160910034.png" width="60%" height="60%">
+<img src="https://qyzhizi.cn/img/202307201143114.png" width="60%" height="60%">
 
 ## 规则解释
 ```

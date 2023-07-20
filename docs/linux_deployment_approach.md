@@ -6,21 +6,30 @@
     - 安装 redis: 
     安装方法, @todo
 
-- 2、拉取代码，并修改配置文件`.env`
+- 2、拉取代码，将工程根目录下的`.env.template` 重命名为`.env`, 并修改配置文件`.env`
     ```
-    git pull git@github.com:qyzhizi/memoflow.git
+    git pull https://github.com/qyzhizi/MemoFlow.git
     ```
     与docker-compose.yml部署相比，这里只有CELERY_BROKER_URL 与CELERY_RESULT_BACKEND 的配置改变了。
     ```
+    # 非docker部署
     CELERY_BROKER_URL=redis://localhost:6379
     CELERY_RESULT_BACKEND=redis://localhost:6379
 
+    # docker部署
+    #CELERY_BROKER_URL=redis://redis:6379
+    #CELERY_RESULT_BACKEND=redis://redis:6379
+
     # 发送到github仓库
-    #github token, @todo 如何获取token
+    # github token, @todo 如何获取token
     GITHUB_TOKEN=xxxx
     GITHUB_REPO=github用户名/仓库名
-    #仓库文件路径,相对仓库的根目录，例如：xxxx/demo.md
+    # 仓库文件路径,相对仓库的根目录，例如：xxxx/demo.md
     GITHUB_CURRENT_SYNC_FILE_PATH=xxxx/demo.md
+    # 同步文档数据库相对路径，文件不存在会自动创建，以当前工作目录为根目录
+    DATA_BASE_MAIN_PATH=db_data/diary_log/diary_log.db
+    # 粘贴板数据库相对路径，文件不存在会自动创建，以当前工作目录为根目录
+    DATA_BASE_CLIPBOARD_PATH=db_data/diary_log/clipboard_log.db
 
     # 发送到坚果云
     # 坚果云账号，例如：你的坚果云邮箱
@@ -38,7 +47,7 @@
 - 3、启动
     ```
     cd memoflow/memoflow/cmd
-    python3 main.py &
+    bash run.sh &
     ```
 
 - 4、访问log笔记页面
