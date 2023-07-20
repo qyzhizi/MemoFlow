@@ -7,25 +7,34 @@
     ```
     curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
     ```
-- 2、拉取代码，并修改配置文件`.env`
+- 2、拉取代码，将将工程根目录下的`.env.template` 重命名为`.env`, 并修改配置文件`.env`
 
     ```
-    git pull git@github.com:qyzhizi/memoflow.git
+    git pull https://github.com/qyzhizi/MemoFlow.git
     ```
     将`.env.template` 复制一份并命名为`.env`，添加以下内容
 
     其中github仓库的账号token，仓库名与文件名需要配置，坚果云也时类似，具体如何配置见下文的`远程文件配置`
 
     ```
+    # 非docker部署
+    #CELERY_BROKER_URL=redis://localhost:6379
+    #CELERY_RESULT_BACKEND=redis://localhost:6379
+
+    # docker部署
     CELERY_BROKER_URL=redis://redis:6379
     CELERY_RESULT_BACKEND=redis://redis:6379
 
     # 发送到github仓库
-    #github token, @todo 如何获取token
+    # github token, @todo 如何获取token
     GITHUB_TOKEN=xxxx
     GITHUB_REPO=github用户名/仓库名
-    #仓库文件路径,相对仓库的根目录，例如：xxxx/demo.md
+    # 仓库文件路径,相对仓库的根目录，例如：xxxx/demo.md
     GITHUB_CURRENT_SYNC_FILE_PATH=xxxx/demo.md
+    # 同步文档数据库相对路径，文件不存在会自动创建，以当前工作目录为根目录
+    DATA_BASE_MAIN_PATH=db_data/diary_log/diary_log.db
+    # 粘贴板数据库相对路径，文件不存在会自动创建，以当前工作目录为根目录
+    DATA_BASE_CLIPBOARD_PATH=db_data/diary_log/clipboard_log.db
 
     # 发送到坚果云
     # 坚果云账号，例如：你的坚果云邮箱
