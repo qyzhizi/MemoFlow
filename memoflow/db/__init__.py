@@ -1,23 +1,27 @@
 from memoflow.db import diary_log
-from memoflow.db import diary_log_second
 from memoflow.conf import CONF
 
-DATA_BASE_PATH = CONF.diary_log['data_base_path']
-DIARY_LOG_TABLE = CONF.diary_log['diary_log_table']
-REVIEW_DIARY_LOG = CONF.diary_log['review_diary_log_table']
+SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
+SYNC_TABLE_NAME = CONF.diary_log['SYNC_TABLE_NAME']
+REVIEW_TABLE_NAME = CONF.diary_log['REVIEW_TABLE_NAME']
 
+SECOND_SYNC_DATA_BASE_PATH =  CONF.diary_log_second['SYNC_DATA_BASE_PATH']
+SECOND_SYNC_TABLE_NAME = CONF.diary_log_second['SYNC_TABLE_NAME']
 # clipboard
 #clipboard数据表名
-CLIPBOARD_LOG_TABLE = CONF.diary_log['clipboard_log_table'] 
+CLIPBOARD_TABLE_NAME = CONF.diary_log['CLIPBOARD_TABLE_NAME'] 
 #clipboard数据库路径
-CLIPBOARD_DATA_BASE_PATH = CONF.diary_log['clipboard_data_base_path'] 
+CLIPBOARD_DATA_BASE_PATH = CONF.diary_log['DATA_BASE_CLIPBOARD_PATH'] 
 
 def init_db():
-    diary_log.init_db_diary_log(data_base_path=DATA_BASE_PATH,
-                                table_name=DIARY_LOG_TABLE)
-    diary_log_second.init_db_diary_log_second()
-    diary_log.create_table(data_base_path=DATA_BASE_PATH,
-                           table_name=REVIEW_DIARY_LOG)
+    diary_log.init_db_diary_log(data_base_path=SYNC_DATA_BASE_PATH,
+                                table_name=SYNC_TABLE_NAME)
+    # diary_log_second.init_db_diary_log_second(data_base_path=SECOND_DATA_BASE_PATH,
+    #                                           table_name=SYNC_TABLE_NAME)
+    diary_log.init_db_diary_log(data_base_path=SECOND_SYNC_DATA_BASE_PATH,
+                                table_name=SECOND_SYNC_TABLE_NAME)
+    diary_log.create_table(data_base_path=SYNC_DATA_BASE_PATH,
+                           table_name=REVIEW_TABLE_NAME)
     diary_log.init_db_clipboard_log(
         data_base_path=CLIPBOARD_DATA_BASE_PATH,
-        table_name=CLIPBOARD_LOG_TABLE)
+        table_name=CLIPBOARD_TABLE_NAME)

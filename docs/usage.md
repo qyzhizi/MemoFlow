@@ -3,7 +3,7 @@
 ，可得到页面， 输入框中输入卡片笔记，然后点击`commit`：
 
 <div style="text-align: center; height: 500px; margin: auto;">
-  <img src="https://qyzhizi.cn/img/202307201141763.png" alt="居中显示的图片">
+  <img src="https://qyzhizi.cn/img/202307202132935.png" alt="居中显示的图片">
 </div>
 <div style="text-align: center;">
   <p>网页客户端。</p>

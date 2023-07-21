@@ -12,10 +12,10 @@ from memoflow.api.jianguoyun_api import JianGuoYunClient
 from memoflow.api.jianguoyun_api import jianguoyun_clients
 from memoflow.db import diary_log as diary_log_db
 
-DIARY_LOG_TABLE = CONF.diary_log['diary_log_table']
-REVIEW_DIARY_LOG = CONF.diary_log['review_diary_log_table']
-REVIEW_TAGS = CONF.diary_log['review_tags'].split(',')
-DATA_BASE_PATH = CONF.diary_log['data_base_path']
+SYNC_TABLE_NAME = CONF.diary_log['SYNC_TABLE_NAME']
+REVIEW_TABLE_NAME = CONF.diary_log['REVIEW_TABLE_NAME']
+REVIEW_TAGS = CONF.diary_log['REVIEW_TAGS'].split(',')
+SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
 
 CELERY_BROKER_URL=os.getenv("CELERY_BROKER_URL")
 CELERY_RESULT_BACKEND=os.getenv("CELERY_RESULT_BACKEND")
@@ -28,8 +28,8 @@ celery = Celery(__name__,
 
 @celery.task
 def celery_send_log_notion(diary_log):
-    return notion_api.create_database_page(CONF.diary_log['notion_api_key'],
-                                           CONF.diary_log['database_id'],
+    return notion_api.create_database_page(CONF.diary_log['NOTION_API_KEY'],
+                                           CONF.diary_log['DATABASE_ID'],
                                            diary_log)
 github_api_instance ={}
 
@@ -64,17 +64,17 @@ def time_task():
 @celery.task
 def time_get_diary_log_task():
     LOG.info("Running time_get_diary_log_task ...")
-    rows=diary_log_db.get_rows_by_tags(table_name=DIARY_LOG_TABLE,
+    rows=diary_log_db.get_rows_by_tags(table_name=SYNC_TABLE_NAME,
                                         tags=REVIEW_TAGS,
-                                        data_base_path=DATA_BASE_PATH)
+                                        data_base_path=SYNC_DATA_BASE_PATH)
     if not rows:
         return 
     random_row = random.choice(rows)
-    LOG.info(f"random_row: {random_row}")
-    diary_log_db.inser_diary_to_table(table_name=REVIEW_DIARY_LOG,
+    # LOG.info(f"random_row: {random_row}")
+    diary_log_db.inser_diary_to_table(table_name=REVIEW_TABLE_NAME,
                                       content=random_row[1],
                                       tags=random_row[2],
-                                      data_base_path=DATA_BASE_PATH)
+                                      data_base_path=SYNC_DATA_BASE_PATH)
     
 
 celery.conf.beat_schedule = {
