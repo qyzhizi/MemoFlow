@@ -1,16 +1,63 @@
-PasteDeploy>=1.5.2
-Paste <=3.5.2
-WebOb>=1.8.6
-Routes>=2.4.1
-eventlet>=0.25.2
-oslo.serialization!=2.19.1,>=1.10.0 # Apache-2.0
-stevedore>=1.20.0 # Apache-2.0
-Pillow >= 8.4.0
-openai <=0.26.5
-celery <= 5.2.7
-oslo_config <= 9.1.1
-redis <= 4.5.4
-python-dotenv <= 1.0.0
-PyGithub <= 1.58.1
-webdav4 <= 0.9.8
-debugpy <= 1.6.7
+aiohttp==3.8.4
+aiosignal==1.3.1
+amqp==5.1.1
+anyio==3.6.2
+async-timeout==4.0.2
+attrs==23.1.0
+billiard==3.6.4.0
+celery==5.2.7
+certifi==2022.12.7
+cffi==1.15.1
+charset-normalizer==3.1.0
+click==8.1.3
+click-didyoumean==0.3.0
+click-plugins==1.1.1
+click-repl==0.2.0
+cryptography==40.0.2
+debtcollector==2.5.0
+debugpy==1.6.7
+Deprecated==1.2.13
+dnspython==2.3.0
+eventlet==0.33.3
+exceptiongroup==1.1.2
+frozenlist==1.3.3
+greenlet==2.0.2
+h11==0.14.0
+httpcore==0.17.0
+httpx==0.24.0
+idna==3.4
+kombu==5.2.4
+multidict==6.0.4
+netaddr==0.8.0
+openai==0.26.5
+oslo.config==9.1.1
+oslo.i18n==6.0.0
+Paste==3.5.2
+PasteDeploy==3.0.1
+pbr==5.11.1
+Pillow==9.5.0
+prompt-toolkit==3.0.38
+pycparser==2.21
+PyGithub==1.58.1
+PyJWT==2.6.0
+python-dateutil==2.8.2
+python-dotenv==1.0.0
+pytz==2023.3
+PyYAML==6.0
+redis==4.5.4
+repoze.lru==0.7
+requests==2.29.0
+rfc3986==2.0.0
+Routes==2.5.1
+six==1.16.0
+sniffio==1.3.0
+stevedore==5.0.0
+tqdm==4.65.0
+typing_extensions==4.5.0
+urllib3==1.26.15
+vine==5.0.0
+wcwidth==0.2.6
+webdav4==0.9.8
+WebOb==1.8.7
+wrapt==1.15.0
+yarl==1.9.2

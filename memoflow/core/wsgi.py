@@ -24,7 +24,8 @@
 import wsgiref.util
 import logging as log
 import routes.middleware
-from oslo_serialization import jsonutils
+# from oslo_serialization import jsonutils
+import json
 import six
 from six.moves import http_client
 import webob.dec
@@ -116,14 +117,21 @@ class ComposableRouter(Router):
         pass
 
 
-class SmarterEncoder(jsonutils.json.JSONEncoder):
+# class SmarterEncoder(jsonutils.json.JSONEncoder):
+#     """Help for JSON encoding dict-like objects."""
+
+#     def default(self, obj):
+#         if not isinstance(obj, dict) and hasattr(obj, 'iteritems'):
+#             return dict(obj.iteritems())
+#         return super(SmarterEncoder, self).default(obj)
+
+class SmarterEncoder(json.JSONEncoder):
     """Help for JSON encoding dict-like objects."""
 
     def default(self, obj):
-        if not isinstance(obj, dict) and hasattr(obj, 'iteritems'):
-            return dict(obj.iteritems())
-        return super(SmarterEncoder, self).default(obj)
-
+        if not isinstance(obj, dict) and hasattr(obj, 'items'):
+            return dict(obj.items())
+        return super().default(obj)
 
 def render_response(body=None, status=None, headers=None, method=None):
     """Form a WSGI response."""
@@ -145,7 +153,8 @@ def render_response(body=None, status=None, headers=None, method=None):
             content_type = None
 
         if content_type is None or content_type in JSON_ENCODE_CONTENT_TYPES:
-            body = jsonutils.dump_as_bytes(body, cls=SmarterEncoder)
+            # body = jsonutils.dump_as_bytes(body, cls=SmarterEncoder)
+            body = json.dumps(body, indent=4, default=SmarterEncoder().default)
             if content_type is None:
                 headers.append(('Content-Type', 'application/json'))
         status = status or (http_client.OK,
