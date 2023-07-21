@@ -4,7 +4,7 @@
     <img src='https://img.shields.io/badge/Docker-Yes-brightgreen'>
     <img src='https://img.shields.io/badge/OpenStack-Architecture-orange'>
 </p>
-本项目(MemoFlow)是一个基于 Paste-WebOb-Routes 、RESTful API 风格的 python 应用服务，实现向 github 仓库或者坚果云仓库同步 logseq 风格的卡片笔记。另外有一个简陋的、未完善的网页客户端，支持提交、拉取、浏览与编辑（暂不支持）卡片笔记。
+本项目是一个基于 Paste-WebOb-Routes 、RESTful API 风格的 python 应用服务，实现向 github 仓库或者坚果云仓库同步 logseq 风格的卡片笔记。另外有一个简陋的、未完善的网页客户端，支持提交、拉取、浏览与编辑（暂不支持）卡片笔记。
 
 具体来说，卡片笔记内容在后台转换为 logseq 段落格式的字符串，然后同步到云端存储的文档中，配合同步工具（git或坚果云）文档可以在本地笔记应用(logseq、obsidian)中展示。
 
@@ -16,7 +16,7 @@
 </div>
 
 ## Usage
-简单来说 MemoFlow 实现卡片笔记的在线记录、同步(github 或者 坚果云)。你可以选择在本地使用docker部署，那么这个服务只会在本地运行，安全可靠。或者在云服务器部署，它将成为一个在线服务，
+本项目实现卡片笔记的在线记录、同步(github 或者 坚果云)。你可以选择在本地使用docker部署，那么这个服务只会在本地运行，安全可靠。或者在云服务器部署，它将成为一个在线服务，
 不过目前没有实现多用户的注册于登录（精力有限）。
 
 [more information](./docs/usage.md)
