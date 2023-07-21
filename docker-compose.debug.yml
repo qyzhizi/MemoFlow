@@ -5,6 +5,7 @@ services:
     depends_on:
       - redis
     build: ./
+    # image: web_dl-main_server:latest
     ports:
      - "9000:9000"
      - "5678:5678"
