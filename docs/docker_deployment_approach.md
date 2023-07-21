@@ -30,4 +30,4 @@
     本地访问：http://localhost:9000/v1/diary-log/index.html
     
     正式使用前，需要配置，参考：
-    [MemoFlow Configuration](./docs/memoflow_configuration.md)
+    [MemoFlow Configuration](./memoflow_configuration.md)
