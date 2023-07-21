@@ -24,8 +24,8 @@ CLIPBOARD_TABLE_NAME = env_vars.get("CLIPBOARD_TABLE_NAME", None)
 
 
 #获取发送任务标志位
-SEND_TO_GITHUB = bool(int(env_vars.get("SEND_TO_GITHUB", None)))
-SEND_TO_JIANGUOYUN = bool(int(env_vars.get("SEND_TO_JIANGUOYUN", None)))
+SEND_TO_GITHUB = bool(int(env_vars.get("SEND_TO_GITHUB", 0)))
+SEND_TO_JIANGUOYUN = bool(int(env_vars.get("SEND_TO_JIANGUOYUN", 0)))
 
 
 # 默认配置项

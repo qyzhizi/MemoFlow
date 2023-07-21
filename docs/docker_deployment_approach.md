@@ -17,10 +17,11 @@
     ```
     也可以使用国内镜像加速安装：`pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple`
 
-- 3、启动docker服务，在终端中输入(如果是windows，则在命令提示符中输入)：
+- 3、启动docker服务，在终端中进入工程根目录（存在配置文件`docker-compose.yml`） ， 然后输入：
     ```
     docker-compose up -d
     ```
+    如果是windows，则在命令提示符中输入上面的命令。
     该命令会自动构建镜像、拉取redis镜像，然后启动笔记服务。
 
 - 4、访问log笔记页面
