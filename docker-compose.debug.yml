@@ -5,8 +5,6 @@ services:
     depends_on:
       - redis
     build: ./
-    env_file:
-      - .env
     ports:
      - "9000:9000"
      - "5678:5678"

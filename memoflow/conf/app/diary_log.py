@@ -1,30 +1,31 @@
-from oslo_config import cfg
-from dotenv import load_dotenv
-load_dotenv()
 import os
+from oslo_config import cfg
+from dotenv import dotenv_values
 
-FLOMO_API_URL = os.getenv("FLOMO_API_URL")
+env_vars = dotenv_values(".env")
 
-DATABASE_ID = os.getenv("DATABASE_ID")
-NOTION_API_KEY = os.getenv("NOTION_API_KEY")
+FLOMO_API_URL = env_vars.get("FLOMO_API_URL", None)
 
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-GITHUB_REPO = os.getenv("GITHUB_REPO")
+DATABASE_ID = env_vars.get("DATABASE_ID", None)
+NOTION_API_KEY = env_vars.get("NOTION_API_KEY", None)
 
-GITHUB_CURRENT_SYNC_FILE_PATH = os.getenv("GITHUB_CURRENT_SYNC_FILE_PATH")
-GITHUB_SYNC_FILE_LIST = os.getenv("GITHUB_SYNC_FILE_LIST")
+GITHUB_TOKEN = env_vars.get("GITHUB_TOKEN", None)
+GITHUB_REPO = env_vars.get("GITHUB_REPO", None)
 
-SYNC_DATA_BASE_PATH= os.getenv("SYNC_DATA_BASE_PATH")
-SYNC_TABLE_NAME = os.getenv("SYNC_TABLE_NAME")
-REVIEW_TABLE_NAME = os.getenv("REVIEW_TABLE_NAME")
+GITHUB_CURRENT_SYNC_FILE_PATH = env_vars.get("GITHUB_CURRENT_SYNC_FILE_PATH", None)
+GITHUB_SYNC_FILE_LIST = env_vars.get("GITHUB_SYNC_FILE_LIST", None)
 
-DATA_BASE_CLIPBOARD_PATH = os.getenv("DATA_BASE_CLIPBOARD_PATH")
-CLIPBOARD_TABLE_NAME = os.getenv("CLIPBOARD_TABLE_NAME")
+SYNC_DATA_BASE_PATH= env_vars.get("SYNC_DATA_BASE_PATH", None)
+SYNC_TABLE_NAME = env_vars.get("SYNC_TABLE_NAME", None)
+REVIEW_TABLE_NAME = env_vars.get("REVIEW_TABLE_NAME", None)
+
+DATA_BASE_CLIPBOARD_PATH = env_vars.get("DATA_BASE_CLIPBOARD_PATH", None)
+CLIPBOARD_TABLE_NAME = env_vars.get("CLIPBOARD_TABLE_NAME", None)
 
 
 #获取发送任务标志位
-SEND_TO_GITHUB = bool(int(os.getenv("SEND_TO_GITHUB")))
-SEND_TO_JIANGUOYUN = bool(int(os.getenv("SEND_TO_JIANGUOYUN")))
+SEND_TO_GITHUB = bool(int(env_vars.get("SEND_TO_GITHUB", None)))
+SEND_TO_JIANGUOYUN = bool(int(env_vars.get("SEND_TO_JIANGUOYUN", None)))
 
 
 # 默认配置项
@@ -38,7 +39,14 @@ if SYNC_DATA_BASE_PATH == None:
     # 当前工作目录下，db_data文件夹
     SYNC_DATA_BASE_PATH = os.path.join("db_data", "memoflow_sync_data.db")
 if SYNC_TABLE_NAME == None:
-    SYNC_TABLE_NAME = "sync_data" 
+    # get GITHUB_CURRENT_SYNC_FILE_PATH file name
+    file_name = os.path.basename(GITHUB_CURRENT_SYNC_FILE_PATH)
+    if file_name == "":
+        file_name = "sync_data"
+    file_name = file_name.split(".")[0] 
+    # 当前工作目录下，db_data文件夹
+    SYNC_TABLE_NAME = file_name 
+
 if REVIEW_TABLE_NAME == None:
     REVIEW_TABLE_NAME = "review_diary_log"
 
