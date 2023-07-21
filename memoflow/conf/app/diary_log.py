@@ -3,69 +3,100 @@ from dotenv import load_dotenv
 load_dotenv()
 import os
 
-flomo_api_url = os.getenv("FLOMO_API_URL")
-database_id = os.getenv("DATABASE_ID")
-notion_api_key = os.getenv("NOTION_API_KEY")
-github_token = os.getenv("GITHUB_TOKEN")
-github_repo = os.getenv("GITHUB_REPO")
-github_current_sync_file_path = os.getenv("GITHUB_CURRENT_SYNC_FILE_PATH")
-github_sync_file_list = os.getenv("GITHUB_SYNC_FILE_LIST")
-data_base_main_path= os.getenv("DATA_BASE_MAIN_PATH")
-data_base_clipboard_path = os.getenv("DATA_BASE_CLIPBOARD_PATH")
+FLOMO_API_URL = os.getenv("FLOMO_API_URL")
+
+DATABASE_ID = os.getenv("DATABASE_ID")
+NOTION_API_KEY = os.getenv("NOTION_API_KEY")
+
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GITHUB_REPO = os.getenv("GITHUB_REPO")
+
+GITHUB_CURRENT_SYNC_FILE_PATH = os.getenv("GITHUB_CURRENT_SYNC_FILE_PATH")
+GITHUB_SYNC_FILE_LIST = os.getenv("GITHUB_SYNC_FILE_LIST")
+
+SYNC_DATA_BASE_PATH= os.getenv("SYNC_DATA_BASE_PATH")
+SYNC_TABLE_NAME = os.getenv("SYNC_TABLE_NAME")
+REVIEW_TABLE_NAME = os.getenv("REVIEW_TABLE_NAME")
+
+DATA_BASE_CLIPBOARD_PATH = os.getenv("DATA_BASE_CLIPBOARD_PATH")
+CLIPBOARD_TABLE_NAME = os.getenv("CLIPBOARD_TABLE_NAME")
 
 
 #获取发送任务标志位
-send_to_github = bool(int(os.getenv("SEND_TO_GITHUB")))
-send_to_jianguoyun = bool(int(os.getenv("SEND_TO_JIANGUOYUN")))
+SEND_TO_GITHUB = bool(int(os.getenv("SEND_TO_GITHUB")))
+SEND_TO_JIANGUOYUN = bool(int(os.getenv("SEND_TO_JIANGUOYUN")))
+
+
+# 默认配置项
+if GITHUB_CURRENT_SYNC_FILE_PATH == None:
+    # github repo根目录下的memoflow_sync文件夹
+    GITHUB_CURRENT_SYNC_FILE_PATH = "memoflow_sync/first_file.md"
+if GITHUB_SYNC_FILE_LIST == None:
+    GITHUB_SYNC_FILE_LIST = "memoflow_sync/first_file.md"   
+
+if SYNC_DATA_BASE_PATH == None:
+    # 当前工作目录下，db_data文件夹
+    SYNC_DATA_BASE_PATH = os.path.join("db_data", "memoflow_sync_data.db")
+if SYNC_TABLE_NAME == None:
+    SYNC_TABLE_NAME = "sync_data" 
+if REVIEW_TABLE_NAME == None:
+    REVIEW_TABLE_NAME = "review_diary_log"
+
+if DATA_BASE_CLIPBOARD_PATH == None:
+    # 当前工作目录下，db_data文件夹
+    DATA_BASE_CLIPBOARD_PATH = os.path.join("db_data",
+                                            "clipboard_data.db")
+if CLIPBOARD_TABLE_NAME == None:
+    CLIPBOARD_TABLE_NAME = "clipboard_log"
+
 
 # 声明配置项
 CONF_OPTS = [     
-    cfg.StrOpt('data_base_path',
-               default=data_base_main_path,
-               help='sqlite3数据库的路径'),
-    cfg.StrOpt('diary_log_table',
-               default='diary_log',
-               help='存储笔记的表'),
-    cfg.StrOpt('review_diary_log_table',
-               default='review_diary_log',
-               help='存储笔记的表'),
-    cfg.StrOpt('review_tags',
+    cfg.StrOpt('SYNC_DATA_BASE_PATH',
+               default=SYNC_DATA_BASE_PATH,
+               help='同步数据库的路径'),
+    cfg.StrOpt('SYNC_TABLE_NAME',
+               default=SYNC_TABLE_NAME,
+               help='同步数据库的表名'),
+    cfg.StrOpt('REVIEW_TABLE_NAME',
+               default=REVIEW_TABLE_NAME,
+               help='review表'),
+    cfg.StrOpt('REVIEW_TAGS',
                default='que,web',
-               help='存储笔记的表'),
-    cfg.StrOpt('flomo_api_url',
-            #@todo os.environ
-            default=flomo_api_url,
+               help='review 筛选标签'),
+    cfg.StrOpt('FLOMO_API_URL',
+            default=FLOMO_API_URL,
             help='flomo api url'),
-    cfg.StrOpt('database_id',
-                default=database_id,
+    cfg.StrOpt('DATABASE_ID',
+                default=DATABASE_ID,
                 help='notion db id'),
-    cfg.StrOpt('notion_api_key',
-                default=notion_api_key,
+    cfg.StrOpt('NOTION_API_KEY',
+                default=NOTION_API_KEY,
                 help='notion api key'),
-    cfg.StrOpt('github_token',
-               default=github_token,
+    cfg.StrOpt('GITHUB_TOKEN',
+               default=GITHUB_TOKEN,
                help='github access token'),
-    cfg.StrOpt("github_repo",
-               default=github_repo,
+    cfg.StrOpt("GITHUB_REPO",
+               default=GITHUB_REPO,
                help='github repo'),
-    cfg.StrOpt("github_current_sync_file_path",
-               default=github_current_sync_file_path,
-               help='github_current_sync_file_path'),
-    cfg.StrOpt("github_sync_file_list",
-                default=github_sync_file_list,
-                help='github_sync_file_list'),
-    cfg.StrOpt("clipboard_data_base_path",
-               default=data_base_clipboard_path,
+    cfg.StrOpt("GITHUB_CURRENT_SYNC_FILE_PATH",
+               default=GITHUB_CURRENT_SYNC_FILE_PATH,
+               help='GITHUB_CURRENT_SYNC_FILE_PATH'),
+    cfg.StrOpt("GITHUB_SYNC_FILE_LIST",
+                default=GITHUB_SYNC_FILE_LIST,
+                help='GITHUB_SYNC_FILE_LIST'),
+    cfg.StrOpt("DATA_BASE_CLIPBOARD_PATH",
+               default=DATA_BASE_CLIPBOARD_PATH,
                help='clipboard_log db file path'),
-    cfg.StrOpt("clipboard_log_table",
-               default='clipboard_log',
+    cfg.StrOpt("CLIPBOARD_TABLE_NAME",
+               default=CLIPBOARD_TABLE_NAME,
                help='clipboard_log table name'),
     # 发送任务标志位
-    cfg.BoolOpt("send_to_github",
-               default=send_to_github,
+    cfg.BoolOpt("SEND_TO_GITHUB",
+               default=SEND_TO_GITHUB,
                help='clipboard_log table name'),
-    cfg.BoolOpt("send_to_jianguoyun",
-            default=send_to_jianguoyun,
+    cfg.BoolOpt("SEND_TO_JIANGUOYUN",
+            default=SEND_TO_JIANGUOYUN,
             help='clipboard_log table name'),
 
 ]

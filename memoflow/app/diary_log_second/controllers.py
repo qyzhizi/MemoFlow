@@ -39,8 +39,8 @@ class DiaryLog(wsgi.Application):
         # file_path = "pages/github_cards.md"
         # commit_message = "commit by memoflow"
         # branch_name = "main"
-        # token = CONF.diary_log['github_token']
-        # repo = CONF.diary_log['github_repo']
+        # token = CONF.diary_log['GITHUB_TOKEN']
+        # repo = CONF.diary_log['GITHUB_REPO']
 
         # self.diary_log_api.celery_update_file_to_github(token,
         #                                                 repo,

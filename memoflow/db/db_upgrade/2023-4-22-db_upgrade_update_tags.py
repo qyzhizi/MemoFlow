@@ -13,11 +13,11 @@ from memoflow.conf import CONF
 from memoflow.db import diary_log as diary_log_db
 from memoflow.app.diary_log.provider import Manager
 
-DIARY_LOG_TABLE = CONF.diary_log['diary_log_table']
-DATA_BASE_PATH = CONF.diary_log['data_base_path']
+SYNC_TABLE_NAME = CONF.diary_log['SYNC_TABLE_NAME']
+SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
 #path = "data/diary_log/diary_log_test.db"
 
-conn = sqlite3.connect(DATA_BASE_PATH)
+conn = sqlite3.connect(SYNC_DATA_BASE_PATH)
 c = conn.cursor()
 
 now = datetime.now()
@@ -32,9 +32,9 @@ with open(f'{formatted_date}_dump.sql', 'w') as f:
     for line in conn.iterdump():
         f.write(f"{line}\n")
 
-rows = diary_log_db.get_all_logs(table_name=DIARY_LOG_TABLE,
+rows = diary_log_db.get_all_logs(table_name=SYNC_TABLE_NAME,
                                  columns=['id', 'content', 'tags'],
-                                 data_base_path=DATA_BASE_PATH)
+                                 data_base_path=SYNC_DATA_BASE_PATH)
 diary_log_manager = Manager()
 new_rows = []
 for row in rows:
