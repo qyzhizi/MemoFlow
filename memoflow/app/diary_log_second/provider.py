@@ -29,8 +29,8 @@ class Manager(object):
         return res        
     
     def save_log(self, diary_log_second):
-        data_base_path = CONF.diary_log_second['data_base_path']
-        conn = sqlite3.connect(data_base_path)
+        SYNC_DATA_BASE_PATH = CONF.diary_log_second['SYNC_DATA_BASE_PATH']
+        conn = sqlite3.connect(SYNC_DATA_BASE_PATH)
         c = conn.cursor()
         c.execute('INSERT INTO diary_log_second  (content) VALUES (?)', (diary_log_second,))
         conn.commit()
@@ -38,16 +38,16 @@ class Manager(object):
         conn.close()
     
     def get_logs(self):
-        data_base_path = CONF.diary_log_second['data_base_path']
-        conn = sqlite3.connect(data_base_path)
+        SYNC_DATA_BASE_PATH = CONF.diary_log_second['SYNC_DATA_BASE_PATH']
+        conn = sqlite3.connect(SYNC_DATA_BASE_PATH)
         c = conn.cursor()
         c.execute('SELECT content FROM diary_log_second')
         contents = [row[0] for row in c.fetchall()]
         return json.dumps({'logs': contents})
     
     def delete_all_log(self):
-        data_base_path = CONF.diary_log_second['data_base_path']
-        conn = sqlite3.connect(data_base_path)
+        SYNC_DATA_BASE_PATH = CONF.diary_log_second['SYNC_DATA_BASE_PATH']
+        conn = sqlite3.connect(SYNC_DATA_BASE_PATH)
         c = conn.cursor()
         # 执行DELETE语句，删除表中的所有数据
         c.execute('DELETE FROM diary_log_second')
@@ -64,11 +64,11 @@ class Manager(object):
     }
     """
     def test_post_flomo(self):
-        flomo_api_url = CONF.diary_log_second['flomo_api_url']
+        FLOMO_API_URL = CONF.diary_log_second['FLOMO_API_URL']
         post_data = { "content": "Hello, #flomo https://flomoapp.com" }
-        requests.post(flomo_api_url, json=post_data)
+        requests.post(FLOMO_API_URL, json=post_data)
 
     def send_log_flomo(self, diary_log_second):
-        flomo_api_url = CONF.diary_log_second['flomo_api_url']
+        FLOMO_API_URL = CONF.diary_log_second['FLOMO_API_URL']
         post_data = diary_log_second
-        requests.post(flomo_api_url, json=post_data)
+        requests.post(FLOMO_API_URL, json=post_data)

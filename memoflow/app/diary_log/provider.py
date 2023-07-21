@@ -16,8 +16,8 @@ from memoflow.db import diary_log as diary_log_db
 LOG = logging.getLogger(__name__)
 
 # driver_name = CONF.diary_log['driver']
-DATA_BASE_PATH = CONF.diary_log['data_base_path']
-DIARY_LOG_TABLE = CONF.diary_log['diary_log_table']
+SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
+SYNC_TABLE_NAME = CONF.diary_log['SYNC_TABLE_NAME']
 
 @dependency.provider('diary_log_api')
 class Manager(manager.Manager):
@@ -26,17 +26,17 @@ class Manager(manager.Manager):
     def __init__(self):
         super(Manager, self).__init__(CONF.diary_log.driver)
 
-    def save_log(self, content, tags, table_name=DIARY_LOG_TABLE,
-                 data_base_path=DATA_BASE_PATH):
+    def save_log(self, content, tags, table_name=SYNC_TABLE_NAME,
+                 data_base_path=SYNC_DATA_BASE_PATH):
         """save diary(content, tags) to table
 
         Args:
             content (string): 笔记内容
             tags (list): 笔记的标签，例如：[a,b,c]
-            table_name (string, optional): 表名. Defaults to DIARY_LOG_TABLE.
+            table_name (string, optional): 表名. Defaults to SYNC_TABLE_NAME.
         """
-        # data_base_path = CONF.diary_log['data_base_path']
-        # conn = sqlite3.connect(data_base_path)
+        # SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
+        # conn = sqlite3.connect(SYNC_DATA_BASE_PATH)
         # c = conn.cursor()
         # tags_string = ','.join(tags)
         # c.execute('INSERT INTO diary_log  (content, tags) VALUES (?,?)', (content,tags_string))
@@ -49,14 +49,14 @@ class Manager(manager.Manager):
                                           tags=tags_string,
                                           data_base_path=data_base_path)
     
-    def get_logs(self, table=DIARY_LOG_TABLE, columns=['content'],
-                 data_base_path=DATA_BASE_PATH):
+    def get_logs(self, table=SYNC_TABLE_NAME, columns=['content'],
+                 data_base_path=SYNC_DATA_BASE_PATH):
         """get all diary logs
 
         Args:
-            table (string, optional): _description_. Defaults to DIARY_LOG_TABLE.
+            table (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
             columns (list, optional): _description_. Defaults to ['contents'].
-            data_base_path (string, optional): _description_. Defaults to DATA_BASE_PATH.
+            data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
 
         Returns:
             string: json string
@@ -72,12 +72,12 @@ class Manager(manager.Manager):
         contents = [row[0] for row in rows]
         return json.dumps({'logs': contents})
     
-    def delete_all_log(self, data_base_path=DATA_BASE_PATH, table=DIARY_LOG_TABLE):
+    def delete_all_log(self, data_base_path=SYNC_DATA_BASE_PATH, table=SYNC_TABLE_NAME):
         """delete all diary logs of one table
 
         Args:
-            data_base_path (string, optional): 数据库地址. Defaults to DATA_BASE_PATH.
-            table (string, optional): 表名. Defaults to DIARY_LOG_TABLE.
+            data_base_path (string, optional): 数据库地址. Defaults to SYNC_DATA_BASE_PATH.
+            table (string, optional): 表名. Defaults to SYNC_TABLE_NAME.
         """
         # conn = sqlite3.connect(data_base_path)
         # c = conn.cursor()
@@ -93,9 +93,9 @@ class Manager(manager.Manager):
         """get all diary logs
 
         Args:
-            table (string, optional): _description_. Defaults to DIARY_LOG_TABLE.
+            table (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
             columns (list, optional): _description_. Defaults to ['contents'].
-            data_base_path (string, optional): _description_. Defaults to DATA_BASE_PATH.
+            data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
 
         Returns:
             string: json string
@@ -110,8 +110,8 @@ class Manager(manager.Manager):
         """delete all diary logs of one table
 
         Args:
-            data_base_path (string, optional): 数据库地址. Defaults to DATA_BASE_PATH.
-            table (string, optional): 表名. Defaults to DIARY_LOG_TABLE.
+            data_base_path (string, optional): 数据库地址. Defaults to SYNC_DATA_BASE_PATH.
+            table (string, optional): 表名. Defaults to SYNC_TABLE_NAME.
         """
         diary_log_db.delete_all_log(table_name=table, data_base_path=data_base_path)
 
@@ -378,18 +378,18 @@ class Manager(manager.Manager):
             "content": "Hello, #flomo https://flomoapp.com"
         }
         """
-        flomo_api_url = CONF.diary_log['flomo_api_url']
+        FLOMO_API_URL = CONF.diary_log['FLOMO_API_URL']
         post_data = { "content": "Hello, #flomo https://flomoapp.com" }
-        requests.post(flomo_api_url, json=post_data)
+        requests.post(FLOMO_API_URL, json=post_data)
 
     def send_log_flomo(self, flomo_post_data):
-        flomo_api_url = CONF.diary_log['flomo_api_url']
-        requests.post(flomo_api_url, json=flomo_post_data)
+        FLOMO_API_URL = CONF.diary_log['FLOMO_API_URL']
+        requests.post(FLOMO_API_URL, json=flomo_post_data)
 
     # 向notion发送信息
     def send_log_notion(self, diary_log):
-        return notion_api.create_database_page(CONF.diary_log['notion_api_key'],
-                                                CONF.diary_log['database_id'],
+        return notion_api.create_database_page(CONF.diary_log['NOTION_API_KEY'],
+                                                CONF.diary_log['DATABASE_ID'],
                                                 diary_log)
     
     # 向celery 发送异步任务

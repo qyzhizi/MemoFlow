@@ -11,7 +11,7 @@ import sqlite3
 
 from memoflow.conf import CONF
 
-path = CONF['diary_log']['data_base_path']
+path = CONF.diary_log['SYNC_DATA_BASE_PATH']
 #path = "data/diary_log/diary_log_test.db"
 
 conn = sqlite3.connect(path)
