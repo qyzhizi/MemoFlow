@@ -4,9 +4,9 @@
     <img src='https://img.shields.io/badge/Docker-Yes-brightgreen'>
     <img src='https://img.shields.io/badge/OpenStack-Architecture-orange'>
 </p>
-本项目是一个基于 Paste-WebOb-Routes 、RESTful API 风格的 python 应用服务，实现向 github 仓库或者坚果云仓库同步 logseq 风格的卡片笔记。另外有一个简陋的、未完善的网页客户端，支持提交、拉取、浏览与编辑（暂不支持）卡片笔记。
+本项目是一个基于 Paste-WebOb-Routes框架 、RESTful API 风格的 python 应用服务，实现向 github 仓库或者坚果云仓库同步 logseq 风格的卡片笔记。另外有一个简陋的、未完善的网页客户端，支持提交、拉取、浏览与编辑（暂不支持）卡片笔记。
 
-具体来说，卡片笔记内容在后台转换为 logseq 段落格式的字符串，然后同步到云端存储的文档中，配合同步工具（git或坚果云）文档可以在本地笔记应用(logseq、obsidian)中展示。
+具体来说，卡片笔记内容在后台转换为 logseq 段落格式的字符串，然后同步到云端存储的文档中。由于格式兼容，在配合同步工具（git或坚果云）的情况下，云端文档也很方便在本地笔记应用(logseq、obsidian)中使用。
 
 <div style="text-align: center; height: 500px; margin: auto;">
   <img src="https://qyzhizi.cn/img/202307202132935.png" alt="居中显示的图片">
@@ -31,7 +31,7 @@
 
 
 ## Contributing
-Feel free to dive in! pen an issue or submit PRs.
+Feel free to dive in! Open an issue or submit PRs.
 MemoFlow follows PEP 8（Python Enhancement Proposal 8）
 
 ## License

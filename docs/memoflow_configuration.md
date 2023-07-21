@@ -1,8 +1,8 @@
 # 配置
-为了实现远程文件同步，这里采用了两种方式: github仓库文件同步与坚果云文件同步。
 
 ## `.env` 配置文件
-将`.env.template` 修改 `.env` ， 然后按需要进行修改。
+这里采用了两种同步方式: github仓库同步与坚果云同步。
+将本仓库根目录中`.env.template` 复制，重命名为 `.env` ， 然后按需要进行修改。
 
 `.env` 内容：
 ```
@@ -37,19 +37,19 @@ SEND_TO_JIANGUOYUN=1
 SEND_TO_GITHUB=1
 
 
-# 以下是可选配置项
+# 以下是可选配置项，默认不配置
 # 同步文档数据库相对路径，文件不存在会自动创建，以当前工作目录为根目录
-SYNC_DATA_BASE_PATH=db_data/memoflow_sync_data.db
-SYNC_TABLE_NAME=sync_data
-REVIEW_TABLE_NAME=review_diary_log
+# SYNC_DATA_BASE_PATH=db_data/memoflow_sync_data.db
+# SYNC_TABLE_NAME=sync_data
+# REVIEW_TABLE_NAME=review_diary_log
 # 粘贴板数据库相对路径，文件不存在会自动创建，以当前工作目录为根目录
-DATA_BASE_CLIPBOARD_PATH=db_data/clipboard_data.db
-CLIPBOARD_TABLE_NAME=clipboard_log
+# DATA_BASE_CLIPBOARD_PATH=db_data/clipboard_data.db
+# CLIPBOARD_TABLE_NAME=clipboard_log
 ```
 
 注意 `非docker部署` 与 `docker部署` 是不一样的，需要注释掉不需要的
 
-## github 配置
+## github 相关配置解释
     
 github 配置配置如下
 ```
@@ -88,7 +88,7 @@ GITHUB_SYNC_FILE_LIST=xxxx/demo.md, xxxx/demo2.md
 
 (4) GITHUB_SYNC_FILE_LIST : 是 `pull` 操作对应的文件列表，使用用逗号进行分隔，`pull` 操作 可以将文件从github 仓库拉取到后台数据库，然后再客户端页面显示。 
 
-## 坚果云配置
+## 坚果云相关配置解释
 
 配置为：
 ```
@@ -116,7 +116,7 @@ JIANGUOYUN_TO_PATH=/xxxx/demo.md
 JIANGUOYUN_TO_PATH=/xxxx/demo.md
 ```
 
-## 数据库配置（可选）
+## 数据库配置解释（可选）
 ```
 # 以下是可选配置项
 # 同步文档数据库相对路径，文件不存在会自动创建，以当前工作目录为根目录
