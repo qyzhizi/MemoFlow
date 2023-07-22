@@ -8,11 +8,12 @@
 
 具体来说，卡片笔记内容在后台转换为 logseq 段落格式的字符串，然后同步到云端存储的文档中。由于格式兼容，在配合同步工具（git或坚果云）的情况下，云端文档也很方便在本地笔记应用(logseq、obsidian)中使用。
 
-<div style="text-align: center; height: 500px; margin: auto;">
-  <img src="https://qyzhizi.cn/img/202307202132935.png" alt="居中显示的图片">
+<div align="center">
+<img src=https://qyzhizi.cn/img/202307202132935.png alt="client" width="500" height="auto" />
 </div>
-<div style="text-align: center;">
-  <p>网页客户端。</p>
+
+<div align="center">
+  <p>网页客户端</p>
 </div>
 
 ## Usage
