@@ -2,18 +2,19 @@
 以本地启动为例，启动服务后，访问：`http://localhost:9000/v1/diary-log/index.html`
 ，可得到页面， 输入框中输入卡片笔记，然后点击`commit`：
 
-<div style="text-align: center; height: 500px; margin: auto;">
-  <img src="https://qyzhizi.cn/img/202307202132935.png" alt="居中显示的图片">
+<div align="center">
+<img src=https://qyzhizi.cn/img/202307202132935.png alt="client" width="500" height="auto" />
 </div>
-<div style="text-align: center;">
-  <p>网页客户端。</p>
+
+<div align="center">
+  <p>网页客户端</p>
 </div>
 
 logseq 显示的卡片笔记内容：
 
 
-<div style="text-align: center; width: 80%; margin: auto;">
-  <img src="https://qyzhizi.cn/img/202307201141747.png" alt="居中显示的图片">
+<div align="center">
+  <img src="https://qyzhizi.cn/img/202307201141747.png" width="500" height="auto" alt="logseq 显示的卡片笔记内容" >
 </div>
 
 本项目的网页客户端有一个大的输入框。输入的内容保留空格、换行符和其他空白字符，支持tab与shift+tab 缩进。当你提交输入的内容后，后台会自动添加时间戳标题，目前使用一些简单的规则实现卡片笔记的标签、子块与todo功能。未来考虑添加其他容易使用的规则。
