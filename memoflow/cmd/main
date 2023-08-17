@@ -8,7 +8,6 @@ top_dir = os.path.dirname(os.path.dirname(current_dir))
 # 将工作目录更改为当前文件的目录
 os.chdir(top_dir)
 sys.path.insert(0,top_dir)
-# import pdb; pdb.set_trace()
 from memoflow.cmd.api import main
 
 

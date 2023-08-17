@@ -10,7 +10,21 @@ from memoflow.api import notion_api
 from memoflow.api import github_api
 from memoflow.api.jianguoyun_api import JianGuoYunClient
 from memoflow.api.jianguoyun_api import jianguoyun_clients
-from memoflow.db import diary_log as diary_log_db
+
+from memoflow.driver.sqlite3_db.diary_log import DBSqliteDriver as diary_log_db
+from memoflow.driver_manager.vector_db import CeleryVectorDBManager
+
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+    Type,
+)
+
 
 SYNC_TABLE_NAME = CONF.diary_log['SYNC_TABLE_NAME']
 REVIEW_TABLE_NAME = CONF.diary_log['REVIEW_TABLE_NAME']
@@ -25,6 +39,8 @@ LOG = logging.getLogger(__name__)
 celery = Celery(__name__,
                 broker=CELERY_BROKER_URL,
                 backend=CELERY_BROKER_URL)
+
+vector_db_manager_instance = CeleryVectorDBManager()
 
 @celery.task
 def celery_send_log_notion(diary_log):
@@ -56,6 +72,17 @@ def update_file_to_janguoyun(base_url: str, acount: str, token: str,
         my_client.add_content_to_file(added_content=content, file_path=to_path)
     else:
         my_client.upload_content_to_new_file(content, to_path, overwrite)
+
+
+@celery.task
+def add_texts_to_vector_db(texts: Iterable[str], 
+                           metadatas: Optional[List[dict]]=None,
+                           ids: Optional[List[str]]=None,
+                           **kwargs: Any) -> None:
+    vector_db_manager_instance.add_texts(texts=texts,
+                                metadatas=metadatas,
+                                ids=ids,
+                                **kwargs)        
 
 @celery.task
 def time_task():

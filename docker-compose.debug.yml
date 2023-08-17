@@ -6,6 +6,7 @@ services:
       - redis
     build: ./
     # image: web_dl-main_server:latest
+    # image: web_dl-main_server:latest-no-torch
     ports:
      - "9000:9000"
      - "5678:5678"
