@@ -48,3 +48,14 @@ class Manager(object):
             res = f.read()
         return res
     
+    # vector_search
+    def get_vector_search_html(self, index_html_path):
+        with open(index_html_path, "r", encoding='UTF-8')as f:
+            res = f.read()
+        return res
+    
+    def get_vector_search_js(self, js_path):
+        with open(js_path, "r", encoding='UTF-8')as f:
+            res = f.read()
+        return res
+    

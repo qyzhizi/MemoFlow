@@ -10,8 +10,17 @@ from memoflow.core import dependency
 from memoflow.core import manager
 from memoflow.conf import CONF
 from memoflow.api import notion_api
-from memoflow.tasks import celery_task
-from memoflow.db import diary_log as diary_log_db
+
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+    Type,
+)
 
 LOG = logging.getLogger(__name__)
 
@@ -26,117 +35,6 @@ class Manager(manager.Manager):
     def __init__(self):
         super(Manager, self).__init__(CONF.diary_log.driver)
 
-    def save_log(self, content, tags, table_name=SYNC_TABLE_NAME,
-                 data_base_path=SYNC_DATA_BASE_PATH):
-        """save diary(content, tags) to table
-
-        Args:
-            content (string): 笔记内容
-            tags (list): 笔记的标签，例如：[a,b,c]
-            table_name (string, optional): 表名. Defaults to SYNC_TABLE_NAME.
-        """
-        # SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
-        # conn = sqlite3.connect(SYNC_DATA_BASE_PATH)
-        # c = conn.cursor()
-        # tags_string = ','.join(tags)
-        # c.execute('INSERT INTO diary_log  (content, tags) VALUES (?,?)', (content,tags_string))
-        # conn.commit()
-        # # 关闭数据库连接
-        # conn.close()
-        tags_string = ','.join(tags)
-        diary_log_db.inser_diary_to_table(table_name=table_name,
-                                          content=content,
-                                          tags=tags_string,
-                                          data_base_path=data_base_path)
-    
-    def get_logs(self, table=SYNC_TABLE_NAME, columns=['content'],
-                 data_base_path=SYNC_DATA_BASE_PATH):
-        """get all diary logs
-
-        Args:
-            table (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
-            columns (list, optional): _description_. Defaults to ['contents'].
-            data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
-
-        Returns:
-            string: json string
-        """
-        # conn = sqlite3.connect(data_base_path)
-        # c = conn.cursor()
-        # c.execute(f'SELECT content FROM {table}')
-        # contents = [row[0] for row in c.fetchall()]
-        # return json.dumps({'logs': contents})
-        rows = diary_log_db.get_all_logs(table_name=table,
-                                         columns=columns,
-                                         data_base_path=data_base_path)
-        contents = [row[0] for row in rows]
-        return json.dumps({'logs': contents})
-    
-    def delete_all_log(self, data_base_path=SYNC_DATA_BASE_PATH, table=SYNC_TABLE_NAME):
-        """delete all diary logs of one table
-
-        Args:
-            data_base_path (string, optional): 数据库地址. Defaults to SYNC_DATA_BASE_PATH.
-            table (string, optional): 表名. Defaults to SYNC_TABLE_NAME.
-        """
-        # conn = sqlite3.connect(data_base_path)
-        # c = conn.cursor()
-        # # 执行DELETE语句，删除表中的所有数据
-        # c.execute(f'DELETE FROM {table}')
-        # # 提交更改并关闭连接
-        # conn.commit()
-        # conn.close()
-        diary_log_db.delete_all_log(table_name=table, data_base_path=data_base_path)
-    
-    # review provider
-    def get_review_logs(self, table, columns, data_base_path):
-        """get all diary logs
-
-        Args:
-            table (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
-            columns (list, optional): _description_. Defaults to ['contents'].
-            data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
-
-        Returns:
-            string: json string
-        """
-        rows = diary_log_db.get_all_logs(table_name=table,
-                                         columns=columns,
-                                         data_base_path=data_base_path)
-        contents = [row[0] for row in rows]
-        return json.dumps({'logs': contents})
-
-    def delete_all_review_log(self, data_base_path, table):
-        """delete all diary logs of one table
-
-        Args:
-            data_base_path (string, optional): 数据库地址. Defaults to SYNC_DATA_BASE_PATH.
-            table (string, optional): 表名. Defaults to SYNC_TABLE_NAME.
-        """
-        diary_log_db.delete_all_log(table_name=table, data_base_path=data_base_path)
-
-    # clipboard
-    def get_clipboard_logs(self, table_name, columns, data_base_path):
-        """get all logs form one table columns
-
-        Args:
-            table_name (string): _description_
-            columns (tuple or list): ["content"]
-            data_base_path (tring): _description_
-
-        Returns:
-            list: [[content1], [content2], ...]
-        """
-        rows = diary_log_db.get_all_logs(table_name, columns, data_base_path)
-        contents = [row[0] for row in rows]
-        return json.dumps({'logs': contents})
-
-    def save_log_to_clipboard_table(self,table_name, columns, data, data_base_path):
-        diary_log_db.insert_columns_to_table(table_name=table_name,
-                                                  columns=columns,
-                                                  data=data,
-                                                  data_base_path=data_base_path)
-        
     def process_block(self, block_string):
         """处理子块缩进
         block_string: 使用process_content函数处理后的字符串,它在特的行
@@ -170,7 +68,7 @@ class Manager(manager.Manager):
                 因为前段的js设置了该快捷键
         ```
         """
-        
+
         """
         另外一个更复杂的例子：
 
@@ -317,7 +215,7 @@ class Manager(manager.Manager):
             if i == 0 and content.strip()[:len(title_string)] == title_string:
                 # 第一个时间戳标题需要设置为logseq最上层的子块，所以不带"\t"
                 content_list[i] = block_pre_string[0] + content_list[i]
-            
+
             # que_strings = ["#que ", "#que"]
             if content and (content.strip()[:len(que_strings[0])] == que_strings[0]
                             or content.strip()==que_strings[1]):
@@ -354,7 +252,7 @@ class Manager(manager.Manager):
 
         # 重新组成串,并去除前后的空格与换行符等空白字符
         return "\n".join(content_list).strip()
-    
+
     def get_tags_from_content(self, content):
         """get tags
 
@@ -368,7 +266,7 @@ class Manager(manager.Manager):
         matches = re.findall(r"(?<!#)#\w+(?<!#)\s", content)
         tags = [match.strip('# \n') for match in matches]
         return tags
-        
+
     def test_post_flomo(self):
         """
         flomo 笔记的api(不能泄露) ,可以向它发送内容
@@ -391,18 +289,14 @@ class Manager(manager.Manager):
         return notion_api.create_database_page(CONF.diary_log['NOTION_API_KEY'],
                                                 CONF.diary_log['DATABASE_ID'],
                                                 diary_log)
-    
-    # 向celery 发送异步任务
-    def celery_send_log_notion(self, diary_log):
-        return celery_task.celery_send_log_notion.delay(diary_log)
-    
+
     # 定义一个异步任务
     async def async_send_log_flomo(self, diary_log):
         LOG.info("*****start task async_send_log_flomo")
         # await asyncio.sleep(5)
         self.send_log_flomo(diary_log)
         LOG.info("*****end task async_send_log_flomo")
-    
+
     # # 定义一个异步任务
     async def async_send_log_notion(self, diary_log):
         LOG.info("******start task async_send_log_notion")
@@ -422,23 +316,6 @@ class Manager(manager.Manager):
 
         # 并发执行任务
         await asyncio.gather(*tasks)
-    
-    # 向celery 发送异步任务
-    def celery_update_file_to_github(self, token, repo, file_path,
-                                     added_content, commit_message,
-                                     branch_name):
-        return celery_task.celery_update_file_to_github.delay(token, repo,
-                                                              file_path,
-                                                              added_content,
-                                                              commit_message,
-                                                              branch_name)
-        
-    # 向坚果云发送异步任务，更新文件
-    def celery_update_file_to_jianguoyun(self, base_url: str, acount: str,
-                                         token: str, to_path: str, content: str,
-                                         overwrite: bool = True) -> None:
-        celery_task.update_file_to_janguoyun.delay(base_url, acount, token,
-                                                   to_path, content, overwrite)
 
     # 同步任务，批量获取 github 文件内容
     def get_contents_from_github(self, token, repo, sync_file_path_list,
@@ -447,7 +324,190 @@ class Manager(manager.Manager):
                                                     sync_file_path_list,
                                                     branch_name)
         return contents
-    
+
     # sync contents to database
     def sync_contents_to_db(self, contents, table_name, data_base_path):
         self.driver.sync_contents_to_db(contents, table_name, data_base_path)
+
+
+    # s is input text
+    def normalize_text(self, s):
+        BLOCK_SEPARATOR = r'\t+-\s'
+        s = re.sub(BLOCK_SEPARATOR, "", s).strip()
+        s = re.sub(r'@blk',  ' ', s).strip()
+        s = re.sub(r'\s+',  ' ', s).strip()
+        # s = re.sub(r". ,","",s)
+        # remove all instances of multiple spaces
+        s = s.replace("\n", "")
+        s = s.replace("..",".")
+        s = s.replace(". .",".")
+        s = s.strip()
+
+        return s
+
+    def get_que_string_from_content(self, content: str) -> List[str]:
+        """get que  content
+
+        Args:
+            content (string): diary content
+
+        Returns:
+            List[str]
+        """
+        # "#s?que" 匹配 "#que" "#sque"
+        separators = ["#s?que", "#ans"]
+        result = []
+        # 匹配标签，找到所有的标签
+        if re.search(separators[0], content):
+            content_split_0_list = re.split(f"({separators[0]})", content)
+            for i in range(2, len(content_split_0_list), 2):
+                content_split_1_list = re.split(f"({separators[1]})",
+                                                    content_split_0_list[i])
+                result.append(self.normalize_text(content_split_1_list[0]))
+        return result
+
+    def get_all_que_from_contents(self, contents: List[str]) -> List[str]:
+        """get all que string from contents
+
+        Args:
+            contents (List[str]): contents
+
+        Returns:
+            List[str]: que string list
+        """
+        que_string_list = []
+        index = []
+        for i, content in enumerate(contents):
+            ques= self.get_que_string_from_content(content)
+            for que in ques:
+                que_string_list.append(que)
+                index.append(i)
+        return index, que_string_list
+
+@dependency.provider('diary_db_api')
+class DiaryDBManager(manager.Manager):
+    driver_namespace = "memoflow.app.diary_log.driver"
+
+    def __init__(self):
+        super(DiaryDBManager, self).__init__(CONF.diary_log.DIARY_DB_DRIVER)
+
+    def save_log(self,
+                 content,
+                 tags,
+                 table_name=SYNC_TABLE_NAME,
+                 data_base_path=SYNC_DATA_BASE_PATH):
+        """save diary(content, tags) to table
+
+        Args:
+            content (string): 笔记内容
+            tags (list): 笔记的标签，例如：[a,b,c]
+            table_name (string, optional): 表名. Defaults to SYNC_TABLE_NAME.
+        """
+
+        tags_string = ','.join(tags)
+        self.driver.inser_diary_to_table(table_name=table_name,
+                                         content=content,
+                                         tags=tags_string,
+                                         data_base_path=data_base_path)
+
+    def get_all_logs(self,
+                     table=SYNC_TABLE_NAME,
+                     columns=['content'],
+                     data_base_path=SYNC_DATA_BASE_PATH):
+        """get all diary logs
+
+        Args:
+            table (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
+            columns (list, optional): _description_. Defaults to ['contents'].
+            data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
+
+        Returns:
+            string: json string
+        """
+        rows = self.driver.get_all_logs(table_name=table,
+                                        columns=columns,
+                                        data_base_path=data_base_path)
+        return rows
+
+    def get_logs(self,
+                 table=SYNC_TABLE_NAME,
+                 columns=['content'],
+                 data_base_path=SYNC_DATA_BASE_PATH):
+        """get all diary logs
+
+        Args:
+            table (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
+            columns (list, optional): _description_. Defaults to ['contents'].
+            data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
+
+        Returns:
+            string: json string
+        """
+
+        rows = self.driver.get_all_logs(table_name=table,
+                                        columns=columns,
+                                        data_base_path=data_base_path)
+        contents = [row[0] for row in rows]
+        return json.dumps({'logs': contents})
+
+    def delete_all_log(self,
+                       data_base_path=SYNC_DATA_BASE_PATH,
+                       table=SYNC_TABLE_NAME):
+        """delete all diary logs of one table
+
+        Args:
+            data_base_path (string, optional): 数据库地址. Defaults to SYNC_DATA_BASE_PATH.
+            table (string, optional): 表名. Defaults to SYNC_TABLE_NAME.
+        """
+
+        self.driver.delete_all_log(table_name=table,
+                                   data_base_path=data_base_path)
+
+    # review provider
+    def get_review_logs(self, table, columns, data_base_path):
+        """get all diary logs
+
+        Args:
+            table (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
+            columns (list, optional): _description_. Defaults to ['contents'].
+            data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
+
+        Returns:
+            string: json string
+        """
+        rows = self.driver.get_all_logs(table_name=table,
+                                         columns=columns,
+                                         data_base_path=data_base_path)
+        contents = [row[0] for row in rows]
+        return json.dumps({'logs': contents})
+
+    def delete_all_review_log(self, data_base_path, table):
+        """delete all diary logs of one table
+
+        Args:
+            data_base_path (string, optional): 数据库地址. Defaults to SYNC_DATA_BASE_PATH.
+            table (string, optional): 表名. Defaults to SYNC_TABLE_NAME.
+        """
+        self.driver.delete_all_log(table_name=table, data_base_path=data_base_path)
+
+    # clipboard
+    def get_clipboard_logs(self, table_name, columns, data_base_path):
+        """get all logs form one table columns
+
+        Args:
+            table_name (string): _description_
+            columns (tuple or list): ["content"]
+            data_base_path (tring): _description_
+
+        Returns:
+            list: [[content1], [content2], ...]
+        """
+        rows = self.driver.get_all_logs(table_name, columns, data_base_path)
+        contents = [row[0] for row in rows]
+        return json.dumps({'logs': contents})
+
+    def save_log_to_clipboard_table(self,table_name, columns, data, data_base_path):
+        self.driver.insert_columns_to_table(table_name=table_name,
+                                                  columns=columns,
+                                                  data=data,
+                                                  data_base_path=data_base_path)

@@ -1,16 +1,20 @@
 from oslo_config import cfg
-from dotenv import load_dotenv
-load_dotenv()
+from dotenv import dotenv_values, find_dotenv
+env_vars = dotenv_values(find_dotenv())
+# load_dotenv()
 import os
 
 BASE_URL = 'https://dav.jianguoyun.com/dav/'
-JIANGUOYUN_COUNT = os.getenv("JIANGUOYUN_COUNT")
-JIANGUOYUN_TOKEN = os.getenv("JIANGUOYUN_TOKEN")
-JIANGUOYUN_TO_PATH = os.getenv("JIANGUOYUN_TO_PATH")
+JIANGUOYUN_COUNT = env_vars.get("JIANGUOYUN_COUNT",  None)
+JIANGUOYUN_TOKEN = env_vars.get("JIANGUOYUN_TOKEN",  None)
+JIANGUOYUN_TO_PATH = env_vars.get("JIANGUOYUN_TO_PATH",  None)
 
-second_jianguoyun_count = os.getenv("second_JIANGUOYUN_COUNT")
-second_jianguoyun_token = os.getenv("second_JIANGUOYUN_TOKEN")
-second_jianguoyun_to_path = os.getenv("second_JIANGUOYUN_TO_PATH")
+second_jianguoyun_count = env_vars.get("SECOND_JIANGUOYUN_COUNT",  None)
+second_jianguoyun_token = env_vars.get("SECOND_JIANGUOYUN_TOKEN",  None)
+second_jianguoyun_to_path = env_vars.get("SECOND_JIANGUOYUN_TO_PATH",  None)
+
+AZURE_OPENAI_ENDPOINT = env_vars.get("AZURE_OPENAI_ENDPOINT",  None)
+AZURE_OPENAI_KEY = env_vars.get("AZURE_OPENAI_KEY",  None)
 
 # 声明配置项
 CONF_OPTS = [
@@ -36,6 +40,13 @@ CONF_OPTS = [
     cfg.StrOpt('second_jianguoyun_to_path',
                default=second_jianguoyun_to_path,
                help='second 的坚果云笔记更新文件的路径'),
+
+    cfg.StrOpt('AZURE_OPENAI_ENDPOINT',
+                default=AZURE_OPENAI_ENDPOINT,
+                help='azure openai endpoint'),
+    cfg.StrOpt('AZURE_OPENAI_KEY',
+                default=AZURE_OPENAI_KEY,
+                help='azure openai key'),
 ]
 
 def register_opts(conf):

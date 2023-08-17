@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>MemoFlow</title>
+        <title>VectorSearch</title>
         <meta charset="UTF-8">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro">
@@ -59,28 +59,18 @@
             pre {
                 white-space: pre-wrap;
                 word-wrap: break-word;
-                width: 100%;
-                font-size: 20px;
-                border: 2px solid hsl(0, 0%, 0%); /* 设置边框样式 */ 
-                margin: 0 auto 10px; /* 设置外边距 */
                 font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
-                text-rendering: geometricPrecision;
+                font-size: 15px;
                 line-height: 1.35;
                 tab-size: 2;
-                display: block; /* 设置为块级元素 */
+                display: block;
+                background-color: #131415;
+                color: #fff;
+                border: 1px solid #999;
+                padding: 0.5em;
+                margin: 0.5em 0;
             }
-            links {
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                /* margin-bottom: 50px; */
-            }
-
-            #log{
-                font-size: 20px;
-            }
-            #submit {
+            .search-button {
                 align-self: flex-end;
                 font-size: 20px;
                 color: gold;
@@ -92,36 +82,33 @@
                 margin-bottom: 5px;
                 display: flex;
                 flex-direction: row;
-                }            
-            #pull {
-                align-self: flex-end;
-                font-size: 20px;
-                color: gold;
-                background-color: #565755;
-            }
+                }    
+            #init_vector_db {
+            align-self: flex-end;
+            font-size: 20px;
+            color: gold;
+            background-color: #565755;
+            }                         
         </style>
     </head>
     <body>
         <div class="container">
-            <form>
-                <label for="log" style="font-size: 20px; color: rgb(10, 209, 10);">INPUT: </label>
-                <textarea id="log" name="log"></textarea>
-                <button id="submit">commit</button>
-            </form>
-
             <div class="links">
-            <a href="review" style="font-size: 20px; color: #c9cdd1;" >review</a>
-            <a href="clipboard.html" style="font-size: 20px; color: #c9cdd1;" >clipboard</a>
-            <a href="vector-search.html" style="font-size: 20px; color: #c9cdd1;" >vector_search</a>
-            <!-- <a href="pasteboard" style="font-size: 30px;" >pasteboard</a> -->
+                <a href="/v1/diary-log/index.html" style="font-size: 20px; color: #fff;" >Return Homepage</a>
             </div>
-
-            <h3>Logs: </h3> 
-            <div class="action"> <button id="pull">pull</button> </div>
-            <!-- <button id="delete_all" style="font-size: 20px;">删除所有</button> -->
-            <div id="logList"; ></div>
+            <form>
+                <label for="query" style="font-size: 20px; color:forestgreen;">input search text</label>
+                <textarea id="query" name="query" placeholder="输入查询内容"></textarea>
+                <input type="button" value="查询" onclick="search()" class="search-button">
+            </form>
+            <hr>
+            <h3>查询结果</h3>
+            <div class="action"> <button id="init_vector_db">init_vector_db</button> </div>
+            <div id="result"></div>
         </div>
 
-        <script src="log.js"></script>
+        <script src="vector-search.js"></script>
+            
     </body>
-</html>
+
+
