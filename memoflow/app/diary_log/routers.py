@@ -52,3 +52,43 @@ class Router(wsgi.ComposableRouter):
                        controller=diary_log_controller,
                        action='sync_contents_from_github_to_db',
                        conditions=dict(method=['GET']))
+        
+        # search contents from vecter db
+        mapper.connect('/diary-log/search-contents-from-vecter-db',
+                        controller=diary_log_controller,
+                        action='search_contents_from_vecter_db',
+                        conditions=dict(method=['POST']))
+        
+        # get logs and send all que string to vector db
+        mapper.connect('/diary-log/update_all_que_to_vector_db',
+                        controller=diary_log_controller,
+                        action='update_all_que_to_vector_db',
+                        conditions=dict(method=['PUT']))
+
+        # peek vector db
+        mapper.connect('/diary-log/peek-vector-db/{limit}',
+                       controller=diary_log_controller,
+                       action='peek_vector_db',
+                       conditions=dict(method=['GET']))      
+        
+        mapper.connect('/diary-log/get-collection-items/{limit}',
+                       controller=diary_log_controller,
+                       action='get_collection_items',
+                       conditions=dict(method=['GET']))
+        
+        mapper.connect('/diary-log/get-collection-ids',
+                       controller=diary_log_controller,
+                       action='get_collection_ids',
+                       conditions=dict(method=['GET']))
+        # delete collection items 
+        mapper.connect('/diary-log/delete-collection-items',
+                       controller=diary_log_controller,
+                       action='delete_collection_item',
+                       conditions=dict(method=['POST']))
+
+        # delete all collection items 
+        mapper.connect('/diary-log/delete-all-collection-items',
+                       controller=diary_log_controller,
+                       action='delete_all_collection_item',
+                       conditions=dict(method=['DELETE']))
+                       

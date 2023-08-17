@@ -21,6 +21,15 @@ CONF_OPTS = [
     cfg.StrOpt('clipboard_js_path',
                 default="memoflow/data/client/diary_log/clipboard/clipboard.js",
                 help='clipboard js文件路径'),
+    
+    # vector_search
+    cfg.StrOpt('vector_search_html_path',
+                default='memoflow/data/client/diary_log/vector_search/vector_search.html',
+                help='vector_search html路径'),
+    cfg.StrOpt('vector_search_js_path',
+                default="memoflow/data/client/diary_log/vector_search/vector_search.js",
+                help='vector_search js文件路径'),
+
 
 ]
 

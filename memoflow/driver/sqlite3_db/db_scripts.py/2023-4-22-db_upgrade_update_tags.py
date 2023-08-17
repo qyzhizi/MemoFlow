@@ -10,7 +10,7 @@ from datetime import datetime
 import sqlite3
 
 from memoflow.conf import CONF
-from memoflow.db import diary_log as diary_log_db
+from memoflow.driver.sqlite3_db.diary_log import DBSqliteDriver as diary_log_db
 from memoflow.app.diary_log.provider import Manager
 
 SYNC_TABLE_NAME = CONF.diary_log['SYNC_TABLE_NAME']
@@ -24,7 +24,7 @@ now = datetime.now()
 formatted_date = now.strftime("%Y%m%d%H%M%S%f")[:-5]
 
 # 表名
-table_name = "diary_log"
+# table_name = "diary_log"
 table_col = 'tags'
 
 # 导出数据, 导出表到文件
@@ -47,7 +47,7 @@ print(new_rows[1:3])
 for row in new_rows:
     id ,content, new_tags = row
     # 构造 SQL 更新语句
-    query = f"UPDATE {table_name} SET tags = '{new_tags}' WHERE id = {id}"
+    query = f"UPDATE {SYNC_TABLE_NAME} SET tags = '{new_tags}' WHERE id = {id}"
     # 执行更新操作
     c.execute(query)
     conn.commit()

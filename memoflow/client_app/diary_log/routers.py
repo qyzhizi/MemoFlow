@@ -33,3 +33,13 @@ class Router(wsgi.ComposableRouter):
                        controller=diary_log_controller,
                        action='get_clipboard_js',
                        conditions=dict(method=['GET']))                                             
+
+        # vector_search
+        mapper.connect('/diary-log/vector-search.html',
+                       controller=diary_log_controller,
+                       action='get_vector_search_html',
+                       conditions=dict(method=['GET']))
+        mapper.connect('/diary-log/vector-search.js',
+                       controller=diary_log_controller,
+                       action='get_vector_search_js',
+                       conditions=dict(method=['GET']))

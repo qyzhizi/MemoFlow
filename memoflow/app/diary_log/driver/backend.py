@@ -8,6 +8,7 @@ class DiaryLogDriver(object):
         # key is repo, value is GitHupApi instance, if instance number is too 
         # many, may cause memory leak。
         self.github_api_instance ={}
+        self.azure_openai_embedding = None
 
     def celery_update_file_to_github(self, token, repo, file_path, added_content,
                                     commit_message, branch_name):
@@ -34,4 +35,5 @@ class DiaryLogDriver(object):
         db_sync.process_file_content_2_db(contents=contents,
                                           table_name=table_name,
                                           data_base_path=data_base_path)
+
     
