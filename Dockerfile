@@ -10,7 +10,6 @@ FROM python:3.10-slim-bookworm
 
 RUN apt-get update --fix-missing && apt-get install -y --fix-missing \
     build-essential \
-    g++ \
     && rm -rf /var/lib/apt/lists/*
 
 # 将工作目录设置为 /app

@@ -4,7 +4,8 @@ services:
   main_server:
     depends_on:
       - redis
-    build: ./
+    # build: ./
+    image: memoflow:v0.1.2
     env_file:
       - .env
     ports:
