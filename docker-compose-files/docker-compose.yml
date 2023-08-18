@@ -4,13 +4,13 @@ services:
   main_server:
     depends_on:
       - redis
-    build: ./
-    # image: qyzhizi/memoflow:v0.1.2
+    # build: ./
+    image: qyzhizi/memoflow:v0.1.2
     env_file:
-      - .env
+      - ../.env
     ports:
      - "9000:9000"
     volumes:
-      - ".:/app"
+      - "../:/app"
   redis:
     image: "redis/redis-stack-server:latest"
