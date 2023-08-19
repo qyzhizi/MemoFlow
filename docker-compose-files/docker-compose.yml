@@ -11,6 +11,9 @@ services:
     ports:
      - "9000:9000"
     volumes:
-      - "../:/app"
+      # - "../:/app"
+      - "../.env:/app/.env"
+      - "../log_file:/app/log_file"
+      - "../db_data:/app/db_data"
   redis:
     image: "redis/redis-stack-server:latest"
