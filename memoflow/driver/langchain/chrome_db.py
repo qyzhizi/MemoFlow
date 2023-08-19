@@ -33,9 +33,9 @@ class ChromeDBDriver(object):
         self.azure_openai_embedding = azure_openai_embedding
         self.embedding_function = self.azure_openai_embedding.embedding
         
-        self.client = PersistentClient(path=self.persist_directory)
-        self.collection = self.client.get_or_create_collection(
-            name=COLLECTION_NAME, embedding_function=self.embedding_function)
+        # self.client = PersistentClient(path=self.persist_directory)
+        # self.collection = self.client.get_or_create_collection(
+        #     name=COLLECTION_NAME, embedding_function=self.embedding_function)
 
         self.vector_db = Chroma(
                 collection_name=COLLECTION_NAME,
@@ -51,17 +51,17 @@ class ChromeDBDriver(object):
     def delete_collection(self):
         self.vector_db.delete_collection()
     
-    def get_collection(self):
-        return self.collection
+    # def get_collection(self):
+    #     return self.collection
     
-    def peek_collection(self, limit: int=10):
-        return self.collection.peek(limit=limit)
+    # def peek_collection(self, limit: int=10):
+    #     return self.collection.peek(limit=limit)
     
-    def get_collection_size(self):
-        return self.collection.count()
+    # def get_collection_size(self):
+    #     return self.collection.count()
     
     def delete_items_by_ids(self, ids: List[str]):
-        self.collection.delete(ids=ids)
+        self.vector_db.delete(ids=ids)
     
     # def reset_collection(self):
     #     client = chromadb.PersistentClient(path=self.persist_directory)
