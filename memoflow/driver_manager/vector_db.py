@@ -52,6 +52,13 @@ class VectorDBManager(manager.Manager):
 
     def delete_items_by_ids(self, ids: List[str]):
         return self.driver.delete_items_by_ids(ids)
+    
+    def get_vector_db(self):
+        return self.driver.get_vector_db()
+
+    def get_items_by_ids(self, ids: List[str]):
+        return self.driver.vector_db.get(ids=ids)
+    
 
 
 class CeleryVectorDBManager(VectorDBManager):

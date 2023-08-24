@@ -213,6 +213,7 @@ class DiaryLog(wsgi.Application):
         ids = [str(log[0]) for log in slice_log_list]
 
         all_ids = self.vector_db_api.get_collection_ids().get('ids', None)
+        LOG.info("length of all_ids: %s" % len(all_ids))
         # delete all ids
         self.vector_db_api.delete_items_by_ids(ids=all_ids)
 
@@ -221,10 +222,7 @@ class DiaryLog(wsgi.Application):
                                          "tag": tag,
                                          "id": id
                                      } for tag, id in zip(tags, ids)])
-        # result_object = self.vector_db_api.get_collection_items(limit=10)
-        # LOG.info("result_object: %s" % result_object)
-        # no use for new chromd
-        self.vector_db_api.persist()
+
         return "success"
 
     def peek_vector_db(self, req, limit):
