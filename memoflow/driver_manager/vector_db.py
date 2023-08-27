@@ -56,8 +56,9 @@ class VectorDBManager(manager.Manager):
     def get_vector_db(self):
         return self.driver.get_vector_db()
 
-    def get_items_by_ids(self, ids: List[str]):
-        return self.driver.vector_db.get(ids=ids)
+    def get_items_by_ids(self, ids: List[str],
+                         include=["metadatas", "documents", "embeddings"]):
+        return self.driver.vector_db.get(ids=ids, include=include)
     
 
 
