@@ -17,7 +17,7 @@ def load_backends():
     if DRIVERS.get('llm_api', None) is None:
         DRIVERS['llm_api'] = llm.LLMAPIManager()
     if DRIVERS.get('vector_db_api', None) is None:
-        DRIVERS['vector_db_api'] = vector_db.VectorDBManager()
+        DRIVERS['vector_db_collection_api'] = vector_db.VectorDBCollectionManager()
     if DRIVERS.get('diary_log_client_api', None) is None:
         DRIVERS['diary_log_client_api'] = diary_log_client.provider.Manager()
     if DRIVERS.get('diary_log_second_provider_api', None) is None:

@@ -4,16 +4,41 @@ services:
   main_server:
     depends_on:
       - redis
-    # build: ./
-    image: qyzhizi/memoflow:v0.1.3
+      - chroma
+    image: qyzhizi/memoflow:v0.1.4
     env_file:
       - ../.env
     ports:
      - "9000:9000"
     volumes:
-      # - "../:/app"
       - "../.env:/app/.env"
       - "../log_file:/app/log_file"
       - "../db_data:/app/db_data"
+    networks:
+      - net    
+
   redis:
     image: "redis/redis-stack-server:latest"
+    networks:
+      - net 
+
+  chroma:
+    image: qyzhizi/chroma:latest
+    volumes:
+      - index_data:/chroma/chroma
+    command: uvicorn chromadb.app:app --reload --workers 1 --host 0.0.0.0 --port 8000 --log-config log_config.yml
+
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=False
+      - ALLOW_RESET=True
+    networks:
+      - net
+
+volumes:
+  index_data:
+    driver: local
+
+networks:
+  net:
+    driver: bridge

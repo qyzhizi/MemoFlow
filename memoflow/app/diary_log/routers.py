@@ -76,9 +76,9 @@ class Router(wsgi.ComposableRouter):
                        action='get_collection_items',
                        conditions=dict(method=['GET']))
         
-        mapper.connect('/diary-log/get-collection-ids',
+        mapper.connect('/diary-log/get-vector-db-coll-all-ids',
                        controller=diary_log_controller,
-                       action='get_collection_ids',
+                       action='get_vector_db_coll_all_ids',
                        conditions=dict(method=['GET']))
         # delete collection items 
         mapper.connect('/diary-log/delete-collection-items',

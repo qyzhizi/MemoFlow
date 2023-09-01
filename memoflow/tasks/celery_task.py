@@ -12,7 +12,7 @@ from memoflow.api.jianguoyun_api import JianGuoYunClient
 from memoflow.api.jianguoyun_api import jianguoyun_clients
 
 from memoflow.driver.sqlite3_db.diary_log import DBSqliteDriver as diary_log_db
-from memoflow.driver_manager.vector_db import CeleryVectorDBManager
+from memoflow.driver_manager.vector_db import CeleryVectorDBCollManager
 
 from typing import (
     Any,
@@ -40,7 +40,7 @@ celery = Celery(__name__,
                 broker=CELERY_BROKER_URL,
                 backend=CELERY_BROKER_URL)
 
-vector_db_manager_instance = CeleryVectorDBManager()
+vector_db_coll_manager_instance = CeleryVectorDBCollManager()
 
 @celery.task
 def celery_send_log_notion(diary_log):
@@ -75,14 +75,15 @@ def update_file_to_janguoyun(base_url: str, acount: str, token: str,
 
 
 @celery.task
-def add_texts_to_vector_db(texts: Iterable[str], 
+def add_texts_to_vector_db_coll(texts: Iterable[str],
                            metadatas: Optional[List[dict]]=None,
                            ids: Optional[List[str]]=None,
                            **kwargs: Any) -> None:
-    vector_db_manager_instance.add_texts(texts=texts,
-                                metadatas=metadatas,
-                                ids=ids,
-                                **kwargs)        
+    vector_db_coll_manager_instance.add_texts(texts=texts,
+                                              metadatas=metadatas,
+                                              ids=ids,
+                                              **kwargs)
+
 
 @celery.task
 def time_task():
@@ -95,14 +96,14 @@ def time_get_diary_log_task():
                                         tags=REVIEW_TAGS,
                                         data_base_path=SYNC_DATA_BASE_PATH)
     if not rows:
-        return 
+        return
     random_row = random.choice(rows)
     # LOG.info(f"random_row: {random_row}")
     diary_log_db.inser_diary_to_table(table_name=REVIEW_TABLE_NAME,
                                       content=random_row[1],
                                       tags=random_row[2],
                                       data_base_path=SYNC_DATA_BASE_PATH)
-    
+
 
 celery.conf.beat_schedule = {
     'run-every-12*60*60-seconds': {

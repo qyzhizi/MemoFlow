@@ -15,7 +15,7 @@ class CeleryDriver(object):
     def __init__(self) -> None:
         pass
 
-    def asyn_add_texts_to_vector_db(self, texts: List[str],
+    def asyn_add_texts_to_vector_db_coll(self, texts: List[str],
                                     metadatas: Optional[List[dict]]=None,
                                     ids: Optional[List[str]] = None):
-        celery_task.add_texts_to_vector_db.delay(texts, metadatas, ids)
+        celery_task.add_texts_to_vector_db_coll.delay(texts, metadatas, ids)

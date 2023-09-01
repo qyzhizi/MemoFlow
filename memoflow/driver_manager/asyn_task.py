@@ -24,11 +24,11 @@ class AsynTaskManager(manager.Manager):
         super(AsynTaskManager,
               self).__init__(CONF.driver_manager.ASYN_TASK_DRIVER)
 
-    def asyn_add_texts_to_vector_db(self,
+    def asyn_add_texts_to_vector_db_coll(self,
                                     texts: List[str],
                                     metadatas: Optional[List[dict]] = None,
                                     ids: Optional[List[str]] = None):
-        return self.driver.asyn_add_texts_to_vector_db(texts, metadatas, ids)
+        return self.driver.asyn_add_texts_to_vector_db_coll(texts, metadatas, ids)
 
     # 向celery 发送异步任务
     def celery_send_log_notion(self, diary_log):

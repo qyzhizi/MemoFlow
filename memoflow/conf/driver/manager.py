@@ -13,18 +13,18 @@ ASYN_TASK_DRIVER = cfg.StrOpt(
 LLM_API_DRIVER = cfg.StrOpt(
     'LLM_API_DRIVER',
     default='llm_driver',
-    help='The driver to use for manager : AsynTaskManager',
+    help='The driver to use for manager : LLMAPIManager',
 )
 
-VECTOR_DB_DRIVER = cfg.StrOpt(
-    'VECTOR_DB_DRIVER',
-    default='langchain_chrome_db_driver',
-    help='The driver to use for manager : AsynTaskManager',
+VECTOR_DB_COLLECTIION_DRIVER = cfg.StrOpt(
+    'VECTOR_DB_COLLECTIION_DRIVER',
+    default='langchain_chrome_db_collection_driver',
+    help='The driver to use for manager : VectorDBCollectionManager',
 )
 
 CONF_OPTS.extend([ASYN_TASK_DRIVER,
                  LLM_API_DRIVER,
-                 VECTOR_DB_DRIVER])
+                 VECTOR_DB_COLLECTIION_DRIVER])
 GROUP_NAME = "driver_manager"
 ALL_OPTS = CONF_OPTS
 

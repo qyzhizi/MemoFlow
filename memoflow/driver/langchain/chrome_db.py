@@ -46,5 +46,11 @@ class ChromeDBDriver(object):
     
     def delete_items_by_ids(self, ids: List[str]):
             self.vector_db.delete(ids=ids)
-    
+
+    def add_texts(self,
+                  texts: Iterable[str],
+                  metadatas: Optional[List[dict]]=None,
+                  ids: Optional[List[str]]=None,
+                  **kwargs: Any):
+        return self.vector_db.add_texts(texts, metadatas, ids, **kwargs)
         
