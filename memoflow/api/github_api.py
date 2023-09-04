@@ -29,7 +29,6 @@ class GitHupApi(object):
 
         # 获取base64解码的内容，不能直接获得源字符串吗？非要解码，有点浪费？
         existing_content = file.decoded_content.decode()
-        # print(existing_content)
         # 使用"\n"作为分隔，防止added_content不带"\n", 中间只需要写"\n"就行
         # 不能加入空格比如：" \n", 因为这会导致logseq去除该空格，引起不必要的修改
         updated_content = added_content + "\n" + existing_content

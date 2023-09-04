@@ -67,5 +67,4 @@ if __name__ == "__main__":
     # normalize content_que_list
     for id, que_item in content_que_list:
         clean_content_que_list.append((id, normalize_text(que_item)))
-    print(clean_content_que_list)
 

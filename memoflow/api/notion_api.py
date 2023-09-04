@@ -47,7 +47,7 @@ def create_database_page(notion_api_key, database_id, content=None):
         async def main():
             async with aiohttp.ClientSession() as session:
                 async with session.get('http://www.example.com') as response:
-                print(await response.text())
+                    await response.text()
         """
         start_time = time.time()
         response = requests.post(url, headers=headers, json=payload)

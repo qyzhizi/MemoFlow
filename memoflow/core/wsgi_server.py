@@ -75,7 +75,6 @@ class Server(object):
         self.running = True
         self.pgid = os.getpid()
         self.conf = conf
-        #print("self.conf:", self.conf)
         try:
             os.setpgid(self.pgid, self.pgid)
         except OSError:

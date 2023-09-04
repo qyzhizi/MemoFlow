@@ -39,7 +39,6 @@ table_info = c.fetchall()
 # 构建新表CREATE TABLE SQL语句
 col_defs = []
 pk_key = None
-print(table_info)
 for col_index, col_name, col_type, not_null, default_value, pk in table_info:
     if pk == 1:
         pk_key = col_name
@@ -47,7 +46,6 @@ for col_index, col_name, col_type, not_null, default_value, pk in table_info:
     else:
         col_defs.append(f'{col_name} {col_type}')
 create_table_sql = f'CREATE TABLE {new_table_name} ({", ".join(col_defs)})'
-print(create_table_sql)
 
 # 执行CREATE TABLE
 c.execute(create_table_sql)

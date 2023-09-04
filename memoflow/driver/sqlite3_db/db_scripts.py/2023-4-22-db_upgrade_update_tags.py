@@ -42,7 +42,6 @@ for row in rows:
     tags = diary_log_manager.get_tags_from_content(content)
     new_tags = ','.join(tags)
     new_rows.append((id, content, new_tags))
-print(new_rows[1:3])
 
 for row in new_rows:
     id ,content, new_tags = row

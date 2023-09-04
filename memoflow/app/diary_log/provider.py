@@ -153,7 +153,6 @@ class Manager(manager.Manager):
                     match = re.match(r'^\x20{0,}\t+\x20{2,}', line)
                     if match is not None:
                         #统一先删除，后面再加上
-                        # print([match[0]])
                         line = line[len(match[0]):]
 
                 #加上t_num*'\t'+ "  " 或者t_num*'\t'+ "- "
