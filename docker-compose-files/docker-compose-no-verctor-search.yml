@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  main_server:
+    depends_on:
+      - redis
+    image: qyzhizi/memoflow:v0.1.1
+    env_file:
+      - ../.env
+    ports:
+     - "9000:9000"
+    volumes:
+      - "../.env:/app/.env"
+      - "../log_file:/app/log_file"
+      - "../db_data:/app/db_data"
+    networks:
+      - net    
+
+  redis:
+    image: "redis/redis-stack-server:latest"
+    networks:
+      - net 
+
+networks:
+  net:
+    driver: bridge
