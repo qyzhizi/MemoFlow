@@ -45,14 +45,17 @@ class VectorDBCollectionManager(manager.Manager):
                              include=["embeddings", "metadatas", "documents"]):
         return self.driver.get(ids=ids, limit=limit, include=include)
 
-    def get_vector_db_coll_all_ids(self, include=[]):
-        return self.driver.get(ids=None, limit=None, include=include)
+    # def get_vector_db_coll_all_ids(self, include=[]):
+    #     return self.driver.get(ids=None, limit=None, include=include)
     
     def get_collection_size(self):
         return self.driver.collection_count()
 
-    def delete_items_by_ids(self, ids: List[str]):
-        return self.driver.delete_items_by_ids(ids)
+    # def delete_items_by_ids(self, ids: List[str]):
+    #     return self.driver.delete_items_by_ids(ids)
+
+    def rm_coll_all_itmes(self):
+        return self.driver.rm_coll_all_itmes()
 
     def get_items_by_ids(self, ids: List[str],
                          include=["metadatas", "documents", "embeddings"]):

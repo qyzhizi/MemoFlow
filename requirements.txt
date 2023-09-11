@@ -48,6 +48,8 @@ python-dotenv==1.0.0
 pytz==2023.3
 PyYAML==6.0
 pysqlite3-binary
+pinecone-client[grpc]
+protobuf==3.19.5
 redis==4.5.4
 repoze.lru==0.7
 requests==2.29.0

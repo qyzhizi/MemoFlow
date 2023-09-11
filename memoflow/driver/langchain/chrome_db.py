@@ -6,7 +6,7 @@ import logging
 from langchain.vectorstores import Chroma
 
 from memoflow.conf import CONF
-from memoflow.api.azure_openai_api import AzureOpenAIEmbedding
+from memoflow.api.azure_openai_api import LangAzureOpenAIEmbedding
 
 LOG = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ from typing import (
 )
 COLLECTION_NAME = CONF.diary_log["COLLECTION_NAME"]
 PERSIST_DIRECTORY = CONF.diary_log['CHROMA_PERSIST_DIRECTORY']
-azure_openai_embedding = AzureOpenAIEmbedding()
+azure_openai_embedding = LangAzureOpenAIEmbedding()
 
 class ChromeDBDriver(object):
     def __init__(self) -> None:

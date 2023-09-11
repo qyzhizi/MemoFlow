@@ -18,7 +18,7 @@ LLM_API_DRIVER = cfg.StrOpt(
 
 VECTOR_DB_COLLECTIION_DRIVER = cfg.StrOpt(
     'VECTOR_DB_COLLECTIION_DRIVER',
-    default='langchain_chrome_db_collection_driver',
+    default='pinecone_index_db_driver',
     help='The driver to use for manager : VectorDBCollectionManager',
 )
 

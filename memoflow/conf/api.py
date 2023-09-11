@@ -16,6 +16,10 @@ second_jianguoyun_to_path = env_vars.get("SECOND_JIANGUOYUN_TO_PATH",  None)
 AZURE_OPENAI_ENDPOINT = env_vars.get("AZURE_OPENAI_ENDPOINT",  None)
 AZURE_OPENAI_KEY = env_vars.get("AZURE_OPENAI_KEY",  None)
 
+
+PINECONE_API_KEY = env_vars.get("PINECONE_API_KEY", None)
+
+
 # 声明配置项
 CONF_OPTS = [
     cfg.StrOpt('base_url',
@@ -47,6 +51,19 @@ CONF_OPTS = [
     cfg.StrOpt('AZURE_OPENAI_KEY',
                 default=AZURE_OPENAI_KEY,
                 help='azure openai key'),
+
+    cfg.StrOpt('PINECONE_API_KEY',
+                default=PINECONE_API_KEY,
+                help='pinecone api key'),                
+    cfg.StrOpt('PINECONE_INDEX_NAME',
+               default='pinecone-memoflow',
+               help='pinecone_index_name'),
+    cfg.StrOpt('PINECONE_ENVIRONMENT',
+                default='gcp-starter',
+                help='pinecone env class'),
+    cfg.StrOpt('PINECONE_VECTOR_DIM',
+                default='1536',
+                help='pinecone env class'),                     
 ]
 
 def register_opts(conf):

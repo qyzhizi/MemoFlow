@@ -9,7 +9,7 @@ from langchain.vectorstores import Chroma
 import uuid
 
 from memoflow.conf import CONF
-from memoflow.api.azure_openai_api import AzureOpenAIEmbedding
+from memoflow.api.azure_openai_api import LangAzureOpenAIEmbedding
 
 LOG = logging.getLogger(__name__)
 DEFAULT_K = 4  # Number of Documents to return.
@@ -28,7 +28,7 @@ from typing import (
 
 COLLECTION_NAME = CONF.diary_log["COLLECTION_NAME"]
 PERSIST_DIRECTORY = CONF.diary_log['CHROMA_PERSIST_DIRECTORY']
-azure_openai_embedding = AzureOpenAIEmbedding().embedding
+azure_openai_embedding = LangAzureOpenAIEmbedding().embedding
 
 class ChromeDBCollectionHttpDriver(object):
     # TODO  need pass collection name and host name
@@ -237,4 +237,8 @@ class ChromeDBCollectionHttpDriver(object):
 
         """
         docs_and_scores = self.similarity_search_with_score(query, k, filter=filter)
-        return [doc for doc, _ in docs_and_scores]    
+        return [doc for doc, _ in docs_and_scores]
+    
+    def rm_coll_all_itmes(self):
+        all_ids = self.get(ids=None, limit=None, include=[])
+        return self.delete_items_by_ids(all_ids)

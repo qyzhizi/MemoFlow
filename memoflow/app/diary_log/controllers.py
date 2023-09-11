@@ -191,13 +191,13 @@ class DiaryLog(wsgi.Application):
         search_data = json.loads(data)['search_data']
         LOG.info("search_data json_data:, %s" % search_data)
         # search contents from vecter db
-        search_result = []
+        # search_result = []
         if search_data:
-            search_object_result = self.vector_db_api.search_texts(
+            search_result = self.vector_db_api.search_texts(
                 query=search_data, top_k=10)
-        for result in search_object_result:
-            for item in result['page_content']:
-                search_result.append(item)
+        # for result in search_object_result:
+        #     for item in result['page_content']:
+        #         search_result.append(item)
         return json.dumps({"search_result": search_result})
 
     def update_all_que_to_vector_db(self, req):
@@ -215,11 +215,14 @@ class DiaryLog(wsgi.Application):
         # convert id into str
         ids = [str(log[0]) for log in slice_log_list]
 
-        all_ids = self.vector_db_api.get_vector_db_coll_all_ids().get('ids', None)
-        LOG.info("length of all_ids: %s" % len(all_ids))
-        # delete all ids
-        if all_ids:
-            self.vector_db_api.delete_items_by_ids(ids=all_ids)
+        # all_ids = self.vector_db_api.get_vector_db_coll_all_ids().get('ids', None)
+        # LOG.info("length of all_ids: %s" % len(all_ids))
+        # # delete all ids
+        # if all_ids:
+        #     self.vector_db_api.delete_items_by_ids(ids=all_ids)
+
+        # delete vector db collection all itmes
+        self.vector_db_api.rm_coll_all_itmes()
 
         self.vector_db_api.add_texts(texts=que_list,
                                      metadatas=[{
