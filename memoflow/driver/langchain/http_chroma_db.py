@@ -241,4 +241,6 @@ class ChromeDBCollectionHttpDriver(object):
     
     def rm_coll_all_itmes(self):
         all_ids = self.get(ids=None, limit=None, include=[])
-        return self.delete_items_by_ids(all_ids["ids"])
+        # if ids is not empty, then delete
+        if all_ids["ids"]:
+            return self.delete_items_by_ids(all_ids["ids"])
