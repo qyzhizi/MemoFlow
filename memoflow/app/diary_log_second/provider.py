@@ -43,6 +43,7 @@ class Manager(object):
         c = conn.cursor()
         c.execute('SELECT content FROM diary_log_second')
         contents = [row[0] for row in c.fetchall()]
+        conn.close()  # 关闭连接
         return json.dumps({'logs': contents})
     
     def delete_all_log(self):

@@ -9,7 +9,7 @@ from langchain.vectorstores import Chroma
 import uuid
 
 from memoflow.conf import CONF
-from memoflow.api.azure_openai_api import LangAzureOpenAIEmbedding
+from memoflow.api.azure_openai_api import AzureOpenAIEmbedding
 
 LOG = logging.getLogger(__name__)
 DEFAULT_K = 4  # Number of Documents to return.
@@ -28,7 +28,7 @@ from typing import (
 
 COLLECTION_NAME = CONF.diary_log["COLLECTION_NAME"]
 PERSIST_DIRECTORY = CONF.diary_log['CHROMA_PERSIST_DIRECTORY']
-azure_openai_embedding = LangAzureOpenAIEmbedding().embedding
+azure_openai_embedding = AzureOpenAIEmbedding()
 
 class ChromeDBCollectionHttpDriver(object):
     # TODO  need pass collection name and host name
@@ -55,7 +55,7 @@ class ChromeDBCollectionHttpDriver(object):
             try:
                 self._collection = self._client.get_or_create_collection(
                     name=COLLECTION_NAME,
-                    embedding_function=self._embedding_function.embed_documents)
+                    embedding_function=self._embedding_function.get_embeddings)
                 collection_status = True
             except Exception as e:
                 pass
@@ -102,7 +102,7 @@ class ChromeDBCollectionHttpDriver(object):
         embeddings = None
         texts = list(texts)
         if self._embedding_function is not None:
-            embeddings = self._embedding_function.embed_documents(texts)
+            embeddings = self._embedding_function.get_embeddings(texts)
         if metadatas:
             # fill metadatas with empty dicts if somebody
             # did not specify metadata for all texts
@@ -214,7 +214,7 @@ class ChromeDBCollectionHttpDriver(object):
                 query_texts=[query], n_results=k, where=filter
             )
         else:
-            query_embedding = self._embedding_function.embed_query(query)
+            query_embedding = self._embedding_function.get_embedding(query)
             results = self.__query_collection(
                 query_embeddings=[query_embedding], n_results=k, where=filter
             )
@@ -237,8 +237,8 @@ class ChromeDBCollectionHttpDriver(object):
 
         """
         docs_and_scores = self.similarity_search_with_score(query, k, filter=filter)
-        return [doc for doc, _ in docs_and_scores]
+        return [doc for doc, _ in docs_and_scores][0]['page_content']
     
     def rm_coll_all_itmes(self):
         all_ids = self.get(ids=None, limit=None, include=[])
-        return self.delete_items_by_ids(all_ids)
+        return self.delete_items_by_ids(all_ids["ids"])

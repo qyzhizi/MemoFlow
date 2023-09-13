@@ -14,30 +14,30 @@ services:
       - "..:/app"
     networks:
       - net    
-    command: >
-      sh -c "bash  memoflow/cmd/run.sh"    
+    # command: >
+    #   sh -c "bash  memoflow/cmd/run.sh"    
 
   redis:
     image: "redis/redis-stack-server:latest"
     networks:
       - net 
 
-  # chroma:
-  #   image: qyzhizi/chroma:latest
-  #   volumes:
-  #     - index_data:/chroma/chroma
-  #   command: uvicorn chromadb.app:app --reload --workers 1 --host 0.0.0.0 --port 8000 --log-config log_config.yml
+  chroma:
+    image: qyzhizi/chroma:latest
+    volumes:
+      - index_data:/chroma/chroma
+    command: uvicorn chromadb.app:app --reload --workers 1 --host 0.0.0.0 --port 8000 --log-config log_config.yml
 
-  #   environment:
-  #     - IS_PERSISTENT=TRUE
-  #     - ANONYMIZED_TELEMETRY=False
-  #     - ALLOW_RESET=True
-  #   networks:
-  #     - net
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=False
+      - ALLOW_RESET=True
+    networks:
+      - net
 
-# volumes:
-#   index_data:
-#     driver: local
+volumes:
+  index_data:
+    driver: local
 
 networks:
   net:

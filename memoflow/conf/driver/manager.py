@@ -1,4 +1,11 @@
 from oslo_config import cfg
+from dotenv import dotenv_values
+
+env_vars = dotenv_values(".env")
+
+CHROMA_VECTOR_DB = bool(int(env_vars.get("CHROMA_VECTOR_DB", None)))
+PINECONE_VECTOR_DB = bool(int(env_vars.get("PINECONE_VECTOR_DB", None)))
+PINECONE_API_KEY = env_vars.get("PINECONE_API_KEY", None)
 
 # 声明配置项
 CONF_OPTS = []
@@ -16,9 +23,16 @@ LLM_API_DRIVER = cfg.StrOpt(
     help='The driver to use for manager : LLMAPIManager',
 )
 
+# online pinecone db service
+if PINECONE_VECTOR_DB and PINECONE_API_KEY:
+    vector_db_collectiion_driver = "pinecone_index_db_driver"
+# chroma db
+elif CHROMA_VECTOR_DB:
+    vector_db_collectiion_driver = "langchain_chrome_db_collection_driver"
+
 VECTOR_DB_COLLECTIION_DRIVER = cfg.StrOpt(
     'VECTOR_DB_COLLECTIION_DRIVER',
-    default='pinecone_index_db_driver',
+    default=vector_db_collectiion_driver,
     help='The driver to use for manager : VectorDBCollectionManager',
 )
 

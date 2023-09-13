@@ -191,13 +191,10 @@ class DiaryLog(wsgi.Application):
         search_data = json.loads(data)['search_data']
         LOG.info("search_data json_data:, %s" % search_data)
         # search contents from vecter db
-        # search_result = []
+        search_result = []
         if search_data:
             search_result = self.vector_db_api.search_texts(
                 query=search_data, top_k=10)
-        # for result in search_object_result:
-        #     for item in result['page_content']:
-        #         search_result.append(item)
         return json.dumps({"search_result": search_result})
 
     def update_all_que_to_vector_db(self, req):

@@ -50,4 +50,5 @@ for row in new_rows:
     # 执行更新操作
     c.execute(query)
     conn.commit()
+    conn.close()  # 关闭连接
 

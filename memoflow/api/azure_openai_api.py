@@ -60,14 +60,6 @@ class AzureOpenAIEmbedding(object):
         self.engine = "text-embedding-ada-002"
         self._chunk_size = 16
 
-        # self.embedding = OpenAIEmbeddings(
-        #     openai_api_base = azure_openai_endpoint,
-        #     openai_api_key = azure_openai_key,
-        #     openai_api_type = "azure",
-        #     chunk_size=16,
-        #     deployment="text-embedding-ada-002",
-        #     model="text-embedding-ada-002")
-
     @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
     def get_embedding(self, text: str) -> List[float]:
         """_summary_
@@ -101,18 +93,4 @@ class AzureOpenAIEmbedding(object):
             data.extend(sorted(response.data, key=lambda x: x["index"]))
             # data.extend(response.data)
 
-        # data = openai.Embedding.create(input=list_of_text,
-        #                                engine=self.engine).data
-        # data = sorted(
-        #     data,
-        #     key=lambda x: x["index"])  # maintain the same order as input.
         return [d["embedding"] for d in data]
-
-    # def get_embedding(self, text):
-    #     return self.embedding.embed_query(text)
-
-    # def get_embeddings(self, texts):
-    #     return self.embedding.get_embeddings(texts)
-
-    # def get_similarity(self, text1, text2):
-    #     return self.embedding.get_similarity(text1, text2)

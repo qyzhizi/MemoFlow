@@ -25,6 +25,7 @@ PINECONE_VECTOR_DIM = CONF.api_conf["PINECONE_VECTOR_DIM"]
 PINECONE_COSINE = 'cosine'
 PINECONE_TEXT = 'text'
 DEFAULT_K = 4  # Number of Documents to return.
+SEND_CHUNK_SIZE = 100
 
 LOG = logging.getLogger(__name__)
 
@@ -54,7 +55,20 @@ class PineconeIndexHttpDriver(object):
         # now connect to the index
         self.index = pinecone.GRPCIndex(PINECONE_INDEX_NAME)
         self.embedding = AzureOpenAIEmbedding()
-    
+        self.chunk_size = SEND_CHUNK_SIZE
+
+    def _chunker(self, seq, batch_size):
+        return (seq[pos:pos + batch_size] for pos in range(0, len(seq), batch_size))
+
+    # parallel upserts to get the best performance
+    def _send_datas_by_chunk(self, datas: List[Tuple], chunk_size: int = 100):
+        async_results = [
+            self.index.upsert(vectors=chunk, async_req=True)
+            for chunk in self._chunker(datas, chunk_size)
+        ]
+        # Wait for and retrieve responses (in case of error)
+        [async_result.result() for async_result in async_results]
+
     def add_texts(self,
                   texts: Iterable[str],
                   metadatas: Optional[List[dict]] = None,
@@ -72,7 +86,7 @@ class PineconeIndexHttpDriver(object):
         """
         if ids is None:
             ids = [str(uuid.uuid1()) for _ in texts]
-        embeddings = None      
+        embeddings = None
         texts = list(texts)
         if self.embedding is not None:
             embeddings = self.embedding.get_embeddings(texts)
@@ -105,7 +119,7 @@ class PineconeIndexHttpDriver(object):
                     pinecone_metadatas.update(item[3])
                     datas.append((item[0], item[1], pinecone_metadatas))
                 # todo 按没批量100 发生, 不要一次性发送
-                self.index.upsert(datas)
+                self._send_datas_by_chunk(datas, chunk_size=self.chunk_size)
             if empty_ids:
                 texts_without_metadatas = [texts[j] for j in empty_ids]
                 embeddings_without_metadatas = (
@@ -117,14 +131,14 @@ class PineconeIndexHttpDriver(object):
                     datas.append(
                         (item[0], item[1], {PINECONE_TEXT: item[2]})
                     )
-                self.index.upsert(datas)
+                self._send_datas_by_chunk(datas, chunk_size=self.chunk_size)
         else:
             datas = []
             for item in zip(ids, embeddings, texts):
                 datas.append(
                     (item[0], item[1], {PINECONE_TEXT: item[2]})
                 )
-            self.index.upsert(datas)
+            self._send_datas_by_chunk(datas, chunk_size=self.chunk_size)
 
     def similarity_search(
         self,
@@ -145,11 +159,11 @@ class PineconeIndexHttpDriver(object):
             embeddings = self.embedding.get_embeddings([query])
         else:
             LOG.info("self.embedding is None")
-            raise 
+            raise
         if kwargs.get("include_metadata", None) is not None:
             include_metadata = kwargs['include_metadata']
         else:
-            include_metadata = True    
+            include_metadata = True
         query_result = self.index.query(
             vector=embeddings[0],
             filter=filter,
@@ -161,7 +175,7 @@ class PineconeIndexHttpDriver(object):
             doc_result = [item.get("metadata").get(PINECONE_TEXT, None) for item in query_result_matches]
             return doc_result
         return []
-    
+
     def rm_coll_all_itmes(self):
         if PINECONE_INDEX_NAME in pinecone.list_indexes():
             # todo 是否可以不删除整个index, 而是删除其中的所有向量
@@ -172,6 +186,4 @@ class PineconeIndexHttpDriver(object):
                 metric=PINECONE_COSINE
             )
             # wait a moment for the index to be fully initialized
-            time.sleep(1)
-
-
+            time.sleep(2)
