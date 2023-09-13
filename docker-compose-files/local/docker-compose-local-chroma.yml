@@ -7,11 +7,11 @@ services:
       - chroma
     image: qyzhizi/memoflow:v0.1.5
     env_file:
-      - ../.env
+      - ../../.env
     ports:
      - "9000:9000"
     volumes:
-      - "..:/app"
+      - "../../:/app"
     networks:
       - net    
 
