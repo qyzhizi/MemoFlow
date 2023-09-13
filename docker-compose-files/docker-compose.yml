@@ -5,7 +5,7 @@ services:
     depends_on:
       - redis
       # - chroma
-    image: qyzhizi/memoflow:v0.1.5
+    image: qyzhizi/memoflow:v0.1.6
     env_file:
       - ../.env
     ports:

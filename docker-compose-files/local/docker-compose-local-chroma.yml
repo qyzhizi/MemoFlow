@@ -4,7 +4,7 @@ services:
   main_server:
     depends_on:
       - redis
-      # - chroma
+      - chroma
     image: qyzhizi/memoflow:v0.1.5
     env_file:
       - ../.env
@@ -14,8 +14,6 @@ services:
       - "..:/app"
     networks:
       - net    
-    # command: >
-    #   sh -c "bash  memoflow/cmd/run.sh"    
 
   redis:
     image: "redis/redis-stack-server:latest"
