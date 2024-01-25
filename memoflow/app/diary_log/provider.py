@@ -203,8 +203,8 @@ class Manager(manager.Manager):
         ans_flag = False
         que_condition_flag = 0
         ans_condition_flag = 0
-        que_strings = ["#que ", "\t- #que", "- #que"]
-        ans_strings = ["#ans ", "\t- #ans", "- #ans"]
+        que_strings = ["#que", "\t- #que", "- #que"]
+        ans_strings = ["#ans", "\t- #ans", "- #ans"]
         # normal_blk_strings = ["@blk ", "@blk"]
 
         todo_key = ["--todo ", "--TODO ",
@@ -248,7 +248,7 @@ class Manager(manager.Manager):
                     content_list[i] = block_pre_string[1] + content_list[i]
 
             # 这一行将视为特殊标签，并作为子块
-            # ans_strings = ["#ans ", "\t- #ans", "- #ans"]
+            # ans_strings = ["#ans", "\t- #ans", "- #ans"]
             if not ans_flag:
                 content_strip_space = content.strip(' ')
                 for item in ans_strings:
