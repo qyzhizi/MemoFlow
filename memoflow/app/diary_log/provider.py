@@ -197,9 +197,15 @@ class Manager(manager.Manager):
         title_string = "##"
         tag_string = "#"
         block_pre_string = ["- ", "\t- "]
-        que_strings = ["#que ", "#que"]
-        ans_strings = ["#ans ", "#ans"]
-        normal_blk_strings = ["@blk ", "@blk"]
+        list_pre_dict ={"1-":"- ", "2-":"@blk- "}
+        list_parse_pre_dict = {"1-":"\t\t- ", "2-":"\t\t\t- "}
+        que_flag = False
+        ans_flag = False
+        que_condition_flag = 0
+        ans_condition_flag = 0
+        que_strings = ["#que ", "\t- #que", "- #que"]
+        ans_strings = ["#ans ", "\t- #ans", "- #ans"]
+        # normal_blk_strings = ["@blk ", "@blk"]
 
         todo_key = ["--todo ", "--TODO ",
                     "--done ", "--DONE "]
@@ -215,25 +221,42 @@ class Manager(manager.Manager):
                 # 第一个时间戳标题需要设置为logseq最上层的子块，所以不带"\t"
                 content_list[i] = block_pre_string[0] + content_list[i]
 
-            # que_strings = ["#que ", "#que"]
-            if content and (content.strip()[:len(que_strings[0])] == que_strings[0]
-                            or content.strip()==que_strings[1]):
+            # que_strings = ["#que ", "\t- #que", "- #que"]
+            if not que_flag:
+                content_strip_space = content.strip(' ')
+                # match_list =[]
+                for item in que_strings:
+                    # matched = int(content_strip_space[:len(item)] == item)
+                    # match_list.append(matched)
+                    if content_strip_space[:len(item)] == item:
+                        content = que_strings[0] + content[len(item):]
+                        content_list[i] = content 
+                        que_condition_flag = True
+                        break
+
+            if not que_flag and content and que_condition_flag:
+                que_flag = True
                 up_line = i-1
-                # 排除第0行，将上一行（带标签）当做子块
+                # 将上一行（带标签）当做子块
                 up_line_list = content_list[up_line].strip()
                 if up_line != 0 and content_list[up_line].startswith(block_pre_string[1]):
                     continue
                 if up_line != 0 and up_line_list and up_line_list[0] == tag_string:
+                    #给问题的上一行（标题）添加 前缀 `block_pre_string[1]`
                     content_list[up_line] = block_pre_string[1] + content_list[up_line]
                 else:
                     content_list[i] = block_pre_string[1] + content_list[i]
 
             # 这一行将视为特殊标签，并作为子块
-            # ans_strings = ["#ans ", "#ans"]
-            if content and (content.strip()[:len(ans_strings[0])] == ans_strings[0]
-                            or content.strip()==ans_strings[1]):
-                new_content = block_pre_string[1] + content
-                content_list[i] = new_content
+            # ans_strings = ["#ans ", "\t- #ans", "- #ans"]
+            if not ans_flag:
+                content_strip_space = content.strip(' ')
+                for item in ans_strings:
+                    if content_strip_space[:len(item)] == item:
+                        content = ans_strings[1] + content[len(item):]
+                        content_list[i] = content
+                        ans_flag = True
+                        break
 
             # 解析`-todo ` 变为子块
             if content and (content.strip()[:len(todo_key[0])] in todo_map
@@ -244,10 +267,19 @@ class Manager(manager.Manager):
 
             # 解析`@blk` 变为子块
             # normal_blk_strings = ["@blk ", "@blk"]
-            if content and (content.strip()[:len(normal_blk_strings[0])]==normal_blk_strings[0]
-                            or content.strip()==normal_blk_strings[1]):
-                new_content = block_pre_string[1] + content
-                content_list[i] = new_content
+            # if content and (content.strip()[:len(normal_blk_strings[0])]==normal_blk_strings[0]):
+            #     new_content = block_pre_string[1] + content[normal_blk_strings[0]:]
+            #     content_list[i] = new_content
+
+            # 解析`- ` 变为子块, ans_flag = True, ensure right place. "\t- #ans" will not match this condition
+            if ans_flag and content:
+                for key in list_pre_dict.keys():
+                    list_pre_flag = content.lstrip(' ')[:len(list_pre_dict[key])] == list_pre_dict[key]
+                    if list_pre_flag:
+                        new_content = list_parse_pre_dict[key] + content[len(list_pre_dict[key]):]
+                    # new_content = list_parse_pre_dict["2-"] + content[len(list_pre_dict["2-"]):]
+                        content_list[i] = new_content
+                        break
 
         # 重新组成串,并去除前后的空格与换行符等空白字符
         return "\n".join(content_list).strip()
