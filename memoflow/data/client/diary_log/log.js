@@ -42,6 +42,9 @@ $(function() {
         $.ajax({
             url: '/v1/diary-log/sync-contents-from-github-to-db',
             type: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+            },
             success: function(response) {
                 console.log(response);
                 // pop up a dialog
@@ -59,6 +62,9 @@ $(function() {
     $.ajax({
         url: '/v1/diary-log/getlogs',
         type: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+        },
         success: function(response) {
             // console.log(response);
             response = JSON.parse(response)
@@ -69,8 +75,17 @@ $(function() {
                 $('#logList').prepend(pre);
             }
         },
-        error: function(error) {
-            console.log(error);
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR);
+    
+            if (jqXHR.status === 401) {
+                // HTTPUnauthorized error
+                console.log("Unauthorized - Redirecting to login page");
+                window.location.href = '/v1/diary-log/login.html';
+            } else {
+                // Handle other error types as needed
+                console.log("Other error:", textStatus, errorThrown);
+            }
         }
     });
 
@@ -80,6 +95,9 @@ $(function() {
         $.ajax({
             url: '/v1/diary-log/delete_all_log',
             type: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+            },
             success: function(response) {
                 var logList= $('#logList');
                 logList.html("");

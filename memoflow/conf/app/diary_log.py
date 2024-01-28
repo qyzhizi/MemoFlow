@@ -22,6 +22,8 @@ REVIEW_TABLE_NAME = env_vars.get("REVIEW_TABLE_NAME", None)
 
 DATA_BASE_CLIPBOARD_PATH = env_vars.get("DATA_BASE_CLIPBOARD_PATH", None)
 CLIPBOARD_TABLE_NAME = env_vars.get("CLIPBOARD_TABLE_NAME", None)
+DIARY_LOG_LOGIN_USER = env_vars.get("DIARY_LOG_LOGIN_USER", None)
+DIARY_LOG_LOGIN_PASSWORD = env_vars.get("DIARY_LOG_LOGIN_PASSWORD", None)
 
 #获取发送任务标志位
 SEND_TO_GITHUB = bool(int(env_vars.get("SEND_TO_GITHUB", 0)))
@@ -60,6 +62,8 @@ CONF_OPTS = [
     cfg.StrOpt('SYNC_DATA_BASE_PATH',
                default=SYNC_DATA_BASE_PATH,
                help='同步数据库的路径'),
+    cfg.StrOpt('DIARY_LOG_LOGIN_USER', default=DIARY_LOG_LOGIN_USER, help='用户名'),
+    cfg.StrOpt('DIARY_LOG_LOGIN_PASSWORD', default=DIARY_LOG_LOGIN_PASSWORD, help='密码'),
     cfg.StrOpt('SYNC_TABLE_NAME', default=SYNC_TABLE_NAME, help='同步数据库的表名'),
     cfg.StrOpt('REVIEW_TABLE_NAME', default=REVIEW_TABLE_NAME, help='review表'),
     cfg.StrOpt('REVIEW_TAGS', default='que,web', help='review 筛选标签'),

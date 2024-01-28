@@ -21,6 +21,9 @@ CLIPBOARD_JS_PATH = CONF.diary_log_client['clipboard_js_path']
 
 @dependency.requires('diary_log_client_api')
 class DiaryLog(wsgi.Application):
+    def get_login_html(self, req):
+        return self.diary_log_client_api.get_login_html()
+
     def get_html(self, req):
         return self.diary_log_client_api.get_html()
 

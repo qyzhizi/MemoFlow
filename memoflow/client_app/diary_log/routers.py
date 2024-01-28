@@ -43,3 +43,9 @@ class Router(wsgi.ComposableRouter):
                        controller=diary_log_controller,
                        action='get_vector_search_js',
                        conditions=dict(method=['GET']))
+        
+        # login
+        mapper.connect('/diary-log/login.html',
+                        controller=diary_log_controller,
+                        action='get_login_html',
+                        conditions=dict(method=['GET']))

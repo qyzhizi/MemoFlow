@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+</head>
+<body>
+
+    <h2>Login</h2>
+    
+    <form id="loginForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <button type="button" onclick="login()">Login</button>
+    </form>
+
+    <script>
+        function login() {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+
+            // Make a POST request to the login endpoint
+            fetch('/v1/diary-log/login', {
+                method: 'POST',
+                // mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json; charset=UTF-8',
+                },
+                body: JSON.stringify({ username: username, password: password }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error("Login failed:", data.error);
+                } else {
+                    console.log("Login successful! Token:", data.token);
+
+                    // Save the token to localStorage
+                    localStorage.setItem('jwtToken', data.token);
+
+                    // Call a function to send protected requests
+                    // sendProtectedRequest();
+
+                    // Redirect to the main page after successful login
+                    window.location.href = '/v1/diary-log/index.html';
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+    </script>
+
+</body>
+</html>

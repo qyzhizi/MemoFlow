@@ -10,6 +10,7 @@ from memoflow.core import dependency
 from memoflow.core import manager
 from memoflow.conf import CONF
 from memoflow.api import notion_api
+from memoflow.utils.jwt import TokenManager
 
 from typing import (
     Any,
@@ -34,6 +35,12 @@ class Manager(manager.Manager):
 
     def __init__(self):
         super(Manager, self).__init__(CONF.diary_log.driver)
+    
+    def generate_token(self, user_id):
+        return TokenManager.generate_token(user_id)
+
+    def verify_token(self, token):
+        return TokenManager.verify_token(token)
 
     def process_block(self, block_string):
         """处理子块缩进

@@ -3,11 +3,13 @@
 # import asyncio
 import logging
 import json
+from webob.exc import HTTPUnauthorized
 # import time
 
 from memoflow.conf import CONF
 from memoflow.core import wsgi
 from memoflow.core import dependency
+from memoflow.utils.jwt import token_required
 
 from typing import (
     Any,
@@ -38,6 +40,22 @@ CLIPBOARD_DATA_BASE_PATH = CONF.diary_log[
 @dependency.requires('diary_db_api')
 @dependency.requires('asyn_task_api')
 class DiaryLog(wsgi.Application):
+    def login(self, req):
+        # 从请求中获取POST数据, 并转换为JSON格式
+        data = json.loads(req.body)
+        username = data.get('username')
+        password = data.get('password')
+        LOG.info(f"username: { username} password: *******")
+        # 在这个简单例子中，用户名和密码匹配即可
+        if (username == CONF.diary_log['DIARY_LOG_LOGIN_USER'] and
+        password == CONF.diary_log['DIARY_LOG_LOGIN_PASSWORD']):
+            user_id = 1  # 这里可以是从数据库中获取的用户ID1
+            token = self.diary_log_api.generate_token(user_id)
+            return json.dumps({"token": token})
+
+        return json.dumps({"error": "Invalid credentials"}), 401     
+        # return json.dumps({"content": processed_content})
+
     def add_log(self, req):
         # 从请求中获取POST数据
         data = req.body
@@ -108,6 +126,7 @@ class DiaryLog(wsgi.Application):
         return json.dumps({"content": processed_content})
         # return Response(json_data)
 
+    @token_required
     def get_logs(self, req):
         return self.diary_db_api.get_logs()
 
@@ -119,17 +138,20 @@ class DiaryLog(wsgi.Application):
         return "sucess"
 
     # review
+    @token_required
     def get_review_logs(self, req):
         return self.diary_db_api.get_review_logs(
             table=REVIEW_TABLE_NAME,
             columns=['content'],
             data_base_path=SYNC_DATA_BASE_PATH)
 
+    @token_required
     def delete_all_review_log(self, req):
         return self.diary_db_api.delete_all_review_log(
             data_base_path=SYNC_DATA_BASE_PATH, table=REVIEW_TABLE_NAME)
 
     # clipboard
+    @token_required
     def get_clipboard_logs(self, req):
         return self.diary_db_api.get_clipboard_logs(
             table_name=CLIPBOARD_TABLE_NAME,
@@ -150,6 +172,7 @@ class DiaryLog(wsgi.Application):
             data_base_path=CLIPBOARD_DATA_BASE_PATH)
         return json.dumps(diary_log)  # data 是否可行？
 
+    @token_required
     def get_contents_from_github(self, req):
 
         # get_contents_from_github
@@ -162,6 +185,7 @@ class DiaryLog(wsgi.Application):
             token, repo, sync_file_path_list, branch_name)
         return json.dumps({"contents": contents})
 
+    @token_required
     def sync_contents_from_github_to_db(self, req):
         sync_file_path_list = CONF.diary_log['GITHUB_SYNC_FILE_LIST']
         sync_file_path_list = sync_file_path_list.split(",")
@@ -197,6 +221,7 @@ class DiaryLog(wsgi.Application):
                 query=search_data, top_k=10)
         return json.dumps({"search_result": search_result})
 
+    @token_required
     def update_all_que_to_vector_db(self, req):
         # get logs and send all que string to vector db
         log_list = self.diary_db_api.get_all_logs(
@@ -258,6 +283,7 @@ class DiaryLog(wsgi.Application):
         }
         return json.dumps(result)
 
+    @token_required
     def delete_collection_item(self, req):
         data = req.body
         # 将POST数据转换为JSON格式, ids 是列表
@@ -267,6 +293,7 @@ class DiaryLog(wsgi.Application):
         self.vector_db_api.delete_items_by_ids(ids=ids)
         return "success"
 
+    @token_required
     def delete_all_collection_item(self, req):
         all_collection_ids: List = self.vector_db_api.get_vector_db_coll_all_ids().get(
             'ids', None)

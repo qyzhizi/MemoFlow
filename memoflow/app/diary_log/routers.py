@@ -6,6 +6,10 @@ from memoflow.app.diary_log import controllers
 class Router(wsgi.ComposableRouter):
     def add_routes(self, mapper):
         diary_log_controller = controllers.DiaryLog()
+        mapper.connect('/diary-log/login',
+                       controller=diary_log_controller,
+                       action='login',
+                       conditions=dict(method=['POST']))
         mapper.connect('/diary-log/getlogs',
                        controller=diary_log_controller,
                        action='get_logs',
