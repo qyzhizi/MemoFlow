@@ -18,3 +18,4 @@ db_data/
 *.sql
 *.back
 celerybeat*
+log_file
