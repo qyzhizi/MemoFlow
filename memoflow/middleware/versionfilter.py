@@ -16,19 +16,6 @@ class VersionController(object):
 
     @webob.dec.wsgify
     def __call__(self, req):
-        if req.path_info_peek() in ("favicon.ico", ):
-            try:
-                # 打开文件并读取内容
-                with open('favicon.ico', 'rb') as f:
-                    favicon_data = f.read()
-                # 创建 Response 对象并设置 MIME 类型
-                response = Response(body=favicon_data, content_type='image/vnd.microsoft.icon')
-                # 返回响应
-                return response
-            except Exception as e:
-                # 如果发生异常，返回错误信息
-                response = Response(body=str(e), content_type='text/plain', status=500)
-                return response
         version_obj = {
             "version": "v1",
             "author": "qyzhizi",
@@ -66,6 +53,22 @@ class VersionFilter(Middleware):
             LOG.info("req.path_info_peek()")
             LOG.info(req.path_info_peek())
             return self.version
+        
+        # return web ico
+        if req.path_info_peek() in ("favicon.ico", ):
+            try:
+                # 打开文件并读取内容
+                with open('favicon.ico', 'rb') as f:
+                    favicon_data = f.read()
+                # 创建 Response 对象并设置 MIME 类型
+                response = Response(body=favicon_data, content_type='image/vnd.microsoft.icon')
+                # 返回响应
+                return response
+            except Exception as e:
+                # 如果发生异常，返回错误信息
+                response = Response(body=str(e), content_type='text/plain', status=500)
+                return response
+          
         match = self.match_version_string(req.path_info_peek(), req)
         if match:
             LOG.info("matched")
