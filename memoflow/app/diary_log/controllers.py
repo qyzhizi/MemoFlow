@@ -9,7 +9,7 @@ from webob.exc import HTTPUnauthorized
 from memoflow.conf import CONF
 from memoflow.core import wsgi
 from memoflow.core import dependency
-from memoflow.utils.jwt import token_required
+from memoflow.utils.token_jwt import token_required
 
 from typing import (
     Any,
@@ -85,7 +85,7 @@ class DiaryLog(wsgi.Application):
             #                              metadatas=[{"tags": ','.join(tags) }])
 
         # 保存到本地数据库
-        self.diary_db_api.save_log(processed_content, tags)
+        record_id = self.diary_db_api.save_log(processed_block_content, tags)
 
         # # 发送到浮墨笔记
         # flomo_post_data = {"content": processed_content}
@@ -123,12 +123,84 @@ class DiaryLog(wsgi.Application):
                 added_content,
                 overwrite=True)
 
-        return json.dumps({"content": processed_content})
+        return json.dumps({"record_id": record_id, "content": processed_content})
         # return Response(json_data)
 
     @token_required
     def get_logs(self, req):
-        return self.diary_db_api.get_logs()
+        rows = self.diary_db_api.get_logs(columns=['content','id'])
+        contents = [row[0] for row in rows]
+        ids = [row[1] for row in rows]
+        return json.dumps({'logs': contents, 'ids': ids})
+    
+    @token_required
+    def update_log(self, req):
+        # 从请求中获取POST数据
+        data = req.body
+
+        # 将POST数据转换为JSON格式
+        diary_log = json.loads(data)
+        LOG.info("diary_log json_data:, %s" % diary_log["content"][:70])
+
+        # get tags
+        tags = self.diary_log_api.get_tags_from_content(diary_log['content'])
+        # 处理卡片笔记
+        processed_content = self.diary_log_api.process_content(
+            diary_log['content'])
+        processed_block_content = self.diary_log_api.process_block(
+            processed_content)
+        diary_of_id = self.diary_db_api.get_log_by_id(diary_log["record_id"])
+        que_string: List[str] = self.diary_log_api.get_que_string_from_content(
+            processed_block_content)
+        if que_string and que_string[0] not in diary_of_id[0]:
+            self.asyn_task_api.asyn_add_texts_to_vector_db_coll(texts=que_string,
+                                                           metadatas=[{
+                                                               "tags":
+                                                               ','.join(tags)
+                                                           }])
+        # 保存到本地数据库
+        self.diary_db_api.update_log(diary_log["record_id"], 
+                                     processed_block_content, tags)
+
+        # 向github仓库（logseq 笔记软件）发送更新后的数据
+        if CONF.diary_log['SEND_TO_GITHUB'] == True:
+            rows = self.diary_db_api.get_logs()
+            updated_contents = [row[0] for row in rows]
+            updated_contents.reverse()
+            updated_content = "\n".join(updated_contents)
+
+            file_path = CONF.diary_log['GITHUB_CURRENT_SYNC_FILE_PATH']
+            commit_message = "commit by memoflow"
+            branch_name = "main"
+            token = CONF.diary_log['GITHUB_TOKEN']
+            repo = CONF.diary_log['GITHUB_REPO']
+
+            self.asyn_task_api.celery_push_updatedfile_to_github(
+                token, repo, file_path, updated_content, commit_message,
+                branch_name)
+                                                        
+    @token_required
+    def delete_log(self, req, record_id):
+        res = self.diary_db_api.delete_log(record_id)
+        if res:
+            LOG.info(f"delete diary log success, id: {record_id}")
+        rows = self.diary_db_api.get_logs()
+        updated_contents = [row[0] for row in rows]
+        updated_contents.reverse()
+
+        # 向github仓库（logseq 笔记软件）发送更新后的数据
+        if CONF.diary_log['SEND_TO_GITHUB'] == True:
+            updated_content = "\n".join(updated_contents)
+
+            file_path = CONF.diary_log['GITHUB_CURRENT_SYNC_FILE_PATH']
+            commit_message = "commit by memoflow"
+            branch_name = "main"
+            token = CONF.diary_log['GITHUB_TOKEN']
+            repo = CONF.diary_log['GITHUB_REPO']
+
+            self.asyn_task_api.celery_push_updatedfile_to_github(
+                token, repo, file_path, updated_content, commit_message,
+                branch_name)
 
     def delete_all_log(self, req):
         return self.diary_db_api.delete_all_log()

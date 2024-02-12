@@ -14,8 +14,8 @@ class GitHupApi(object):
         # 获取要上传文件的仓库
         self.repo = self.g.get_repo(repo)
 
-    def update_file(self, file_path, added_content, commit_message,
-                    branch_name):
+    def update_file(self, file_path, commit_message, branch_name,
+                    added_content=None, updated_content=None):
         # 获取要更新的文件
         try:
             file = self.repo.get_contents(file_path)
@@ -26,12 +26,14 @@ class GitHupApi(object):
             self.repo.create_file(file_path,
                                   commit_message, added_content, branch_name)
             return
-
-        # 获取base64解码的内容，不能直接获得源字符串吗？非要解码，有点浪费？
-        existing_content = file.decoded_content.decode()
-        # 使用"\n"作为分隔，防止added_content不带"\n", 中间只需要写"\n"就行
-        # 不能加入空格比如：" \n", 因为这会导致logseq去除该空格，引起不必要的修改
-        updated_content = added_content + "\n" + existing_content
+        if added_content and not updated_content:
+            # 获取base64解码的内容，不能直接获得源字符串吗？非要解码，有点浪费？
+            existing_content = file.decoded_content.decode()
+            # 使用"\n"作为分隔，防止added_content不带"\n", 中间只需要写"\n"就行
+            # 不能加入空格比如：" \n", 因为这会导致logseq去除该空格，引起不必要的修改
+            updated_content = added_content + "\n" + existing_content
+        if not added_content and updated_content:
+            updated_content = updated_content
         # 提交文件更新
         self.repo.update_file(file_path, commit_message, updated_content,
                               file.sha, branch_name)

@@ -1,6 +1,7 @@
 import os
 import logging
 import sqlite3
+import uuid
 
 LOG = logging.getLogger(__name__)
 
@@ -17,7 +18,7 @@ class DBSqliteDriver(object):
         LOG.info("初始化diary_log数据库路径: %s", data_base_path)
         conn = sqlite3.connect(data_base_path)
         c = conn.cursor()
-        c.execute(f'CREATE TABLE IF NOT EXISTS {table_name} (id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT, tags TEXT)')
+        c.execute(f'CREATE TABLE IF NOT EXISTS {table_name} (id TEXT PRIMARY KEY, content TEXT, tags TEXT)')
         conn.commit()
         conn.close()
 
@@ -28,7 +29,7 @@ class DBSqliteDriver(object):
         LOG.info("初始化数据库路径: %s", data_base_path)
         conn = sqlite3.connect(data_base_path)
         c = conn.cursor()
-        c.execute(f'CREATE TABLE IF NOT EXISTS {table_name} (id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT,  tags TEXT)')
+        c.execute(f'CREATE TABLE IF NOT EXISTS {table_name} (id TEXT PRIMARY KEY, content TEXT,  tags TEXT)')
         conn.commit()
         conn.close()
 
@@ -45,7 +46,7 @@ class DBSqliteDriver(object):
         LOG.info("初始化clipboard_log数据库路径: %s", data_base_path)
         conn = sqlite3.connect(data_base_path)
         c = conn.cursor()
-        c.execute(f'CREATE TABLE IF NOT EXISTS {table_name} (id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT)')
+        c.execute(f'CREATE TABLE IF NOT EXISTS {table_name} (id TEXT PRIMARY KEY, content TEXT)')
         conn.commit()
         conn.close()
 
@@ -68,6 +69,50 @@ class DBSqliteDriver(object):
         conn.commit()
         conn.close()
         return rows
+    
+    @classmethod
+    def get_log_by_id(cls, table_name, id, columns, data_base_path):
+        """get log by id
+
+        Args:
+            table_name (string): _description_
+            id (string): _description_
+            columns (tuple or list): (content, tags)
+
+        Returns:
+            list: [content, tags]
+        """
+        conn = sqlite3.connect(data_base_path)
+        c = conn.cursor()
+        query = f"SELECT {', '.join(columns)} FROM {table_name} WHERE id = ?"
+        row = c.execute(query, (id,)).fetchone()
+        conn.commit()
+        conn.close()
+        return row if row else None
+    
+    @classmethod
+    def update_diary_to_table(cls, table_name, id, content, tags, data_base_path):
+        conn = sqlite3.connect(data_base_path)
+        c = conn.cursor()
+        # 执行UPDATE语句，更新表中的数据
+        c.execute(f'UPDATE {table_name} SET content = ?, tags = ? WHERE id = ?', (content, tags, id))
+        # 提交更改并关闭连接
+        conn.commit()
+        conn.close()
+        return True if c.rowcount > 0 else False
+    
+    @classmethod
+    def delete_log(cls, table_name, id, data_base_path):
+        conn = sqlite3.connect(data_base_path)
+        c = conn.cursor()
+        # 执行DELETE语句，删除表中的数据
+        c.execute(f'DELETE FROM {table_name} WHERE id = ?', (id,))
+        # 提交更改并关闭连接
+        conn.commit()
+        conn.close()
+        return True if c.rowcount > 0 else False
+
+
 
     @classmethod
     def delete_all_log(cls, table_name, data_base_path):
@@ -117,13 +162,21 @@ class DBSqliteDriver(object):
             table_name (string): table name
             content (string): 笔记内容
             tags (string): 逗号分割的字符串
+            data_base_path (string): 数据库路径
+
+        Returns:
+            string: record id 
         """
-        LOG.info(f"插入笔记, diary_log数据库: {data_base_path}, 数据表: {table_name}")
+        record_id = str(uuid.uuid4())
+        LOG.info(f"插入笔记, diary_log数据库: {data_base_path}, \
+            数据表: {table_name}, record_id: {record_id}")
         conn = sqlite3.connect(data_base_path)
         c = conn.cursor()
-        c.execute(f'INSERT INTO {table_name}  (content, tags) VALUES (?, ?)', (content, tags))
+        c.execute(f'INSERT INTO {table_name}  (id, content, tags) VALUES (?, ?, ?)',
+                    (record_id, content, tags))
         conn.commit()
         conn.close()
+        return record_id 
 
     @classmethod
     def insert_columns_to_table(cls, table_name, columns, data, data_base_path):

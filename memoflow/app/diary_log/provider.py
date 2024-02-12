@@ -10,7 +10,7 @@ from memoflow.core import dependency
 from memoflow.core import manager
 from memoflow.conf import CONF
 from memoflow.api import notion_api
-from memoflow.utils.jwt import TokenManager
+from memoflow.utils.token_jwt import TokenManager
 
 from typing import (
     Any,
@@ -157,7 +157,7 @@ class Manager(manager.Manager):
                     # 软回车标识
                     pre_str = t_num*'\t'+ "  "
                     # 匹配开头“\t\t  ”, 多个"\t", 至少两个空格
-                    match = re.match(r'^\x20{0,}\t+\x20{2,}', line)
+                    match = re.match(r'^\x20{0,}\t+\x20\x20', line)
                     if match is not None:
                         #统一先删除，后面再加上
                         line = line[len(match[0]):]
@@ -443,10 +443,54 @@ class DiaryDBManager(manager.Manager):
         """
 
         tags_string = ','.join(tags)
-        self.driver.inser_diary_to_table(table_name=table_name,
+        record_id = self.driver.inser_diary_to_table(table_name=table_name,
                                          content=content,
                                          tags=tags_string,
                                          data_base_path=data_base_path)
+        return record_id
+    
+    def update_log(self,
+                   id,
+                   content,
+                   tags,
+                   table_name=SYNC_TABLE_NAME,
+                   data_base_path=SYNC_DATA_BASE_PATH):
+        """update diary log
+
+        Args:
+            id (int): diary log id
+            content (string): diary log content
+            tags (list): diary log tags
+            table_name (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
+            data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
+        """
+        tags_string = ','.join(tags)
+        self.driver.update_diary_to_table(id=id,
+                                          table_name=table_name,
+                                          content=content,
+                                          tags=tags_string,
+                                          data_base_path=data_base_path)
+        return id
+    
+    def get_log_by_id(self,
+                      id,
+                      table_name=SYNC_TABLE_NAME,
+                      columns=['content'],
+                      data_base_path=SYNC_DATA_BASE_PATH):
+        """get diary log by id
+
+        Args:
+            id (int): diary log id
+            table_name (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
+            columns (list, optional): _description_. Defaults to ['contents'].
+            data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
+
+        """
+        row = self.driver.get_log_by_id(id=id,
+                                        table_name=table_name,
+                                        columns=columns,
+                                        data_base_path=data_base_path)
+        return row
 
     def get_all_logs(self,
                      table=SYNC_TABLE_NAME,
@@ -478,15 +522,29 @@ class DiaryDBManager(manager.Manager):
             columns (list, optional): _description_. Defaults to ['contents'].
             data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
 
-        Returns:
-            string: json string
         """
 
         rows = self.driver.get_all_logs(table_name=table,
                                         columns=columns,
                                         data_base_path=data_base_path)
-        contents = [row[0] for row in rows]
-        return json.dumps({'logs': contents})
+        # return [row[0] for row in rows]
+        return rows
+    def delete_log(self,
+                  id,
+                  table=SYNC_TABLE_NAME,
+                  data_base_path=SYNC_DATA_BASE_PATH):
+        """delete one diary log
+
+        Args:
+            id (int): diary log id
+            table (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
+            data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
+        """
+
+        return self.driver.delete_log(id=id,
+                               table_name=table,
+                               data_base_path=data_base_path)
+        # return json.dumps({'status': 'success'})
 
     def delete_all_log(self,
                        data_base_path=SYNC_DATA_BASE_PATH,

@@ -18,6 +18,14 @@ class Router(wsgi.ComposableRouter):
                        controller=diary_log_controller,
                        action='add_log',
                        conditions=dict(method=['POST']))
+        mapper.connect('/diary-log/updatelog',
+                       controller=diary_log_controller,
+                       action='update_log',
+                       conditions=dict(method=['POST']))
+        mapper.connect('/diary-log/deletelog/{record_id}',
+                       controller=diary_log_controller,
+                       action='delete_log',
+                       conditions=dict(method=['DELETE']))
         mapper.connect('/diary-log/delete_all_log',
                        controller=diary_log_controller,
                        action='delete_all_log',

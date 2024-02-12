@@ -1,3 +1,213 @@
+function addLogEntry(logText, record_id) {
+    var pre = $('<pre class="log-entry"></pre>'); // 添加一个类以便样式控制
+    // 将 pre 元素的内容添加到 pre 中
+    pre.text(logText);
+    // 创建一个包含下拉菜单的容器
+    var logEntryContainer = $('<div class="log-entry-container"></div>');
+    // 下拉菜单图标容器
+    var dropdownContainer = $('<div class="dropdown-container"></div>');
+    // 下拉菜单图标
+    var dropdownIcon = $(
+        '<span class="btn more-action-btn">' +
+        '   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-more-vertical icon-img">' +
+        '       <circle cx="12" cy="12" r="1"></circle>' +
+        '       <circle cx="12" cy="5" r="1"></circle>' +
+        '       <circle cx="12" cy="19" r="1"></circle>' +
+        '   </svg>' +
+        '</span>'
+    );
+    // 下拉菜单
+    var dropdownMenu = $('<div class="dropdown-menu"></div>');
+
+    // 将 record_id 添加到 dropdownMenu 作为属性
+    dropdownMenu.data('record_id', record_id);
+    // dropdownMenu.attr('record_id', record_id);
+
+    // 添加复制选项
+    var copyOption = $('<div class="dropdown-option copy-option">复制</div>');
+    // 添加编辑选项
+    var editOption = $('<div class="dropdown-option edit-option">编辑</div>');
+    // 添加删除选项
+    var deleteOption = $('<div class="dropdown-option delete-option">删除</div>');
+
+    // 将下拉菜单图标添加到 dropdownContainer 中
+    dropdownContainer.append(dropdownIcon);
+    // 将下拉菜单添加到 dropdownContainer 中
+    dropdownContainer.append(dropdownMenu);
+    // 将 dropdownContainer 添加到 logEntryContainer 中
+    logEntryContainer.append(dropdownContainer);
+    // 将 pre 添加到 logEntryContainer 中
+    logEntryContainer.append(pre);
+    // 将 logEntryContainer 添加到 logList 中
+    var logList= $('#logList');
+    logList.prepend(logEntryContainer);
+
+    // 点击下拉菜单图标时触发事件
+    dropdownIcon.click(function(event) {
+        // 阻止事件冒泡
+        event.stopPropagation();
+        // 显示或隐藏下拉菜单
+        dropdownMenu.toggle();
+    });
+
+    // 在文档的其他位置点击时隐藏下拉菜单
+    $(document).click(function() {
+        dropdownMenu.hide();
+    });
+
+    // 添加复制选项点击事件处理程序
+    copyOption.click(function() {
+        // 复制日志文本到剪贴板
+        copyToClipboard(logText);
+        // 隐藏下拉菜单
+        dropdownMenu.hide();
+    });
+
+    // 添加编辑选项点击事件处理程序
+    editOption.click(function() {
+        record_id = dropdownMenu.data('record_id')
+        console.log("record_id : ", record_id)
+        // 编辑日志条目
+        editLogEntry(pre, record_id);
+        // 隐藏下拉菜单
+        dropdownMenu.hide();
+    });
+
+    // 添加删除选项点击事件处理程序
+    deleteOption.click(function() {
+        record_id = dropdownMenu.data('record_id')
+        console.log("record_id : ", record_id)
+        deleteLogEntry(record_id)
+        // 删除日志条目
+        logEntryContainer.remove();
+        // 隐藏下拉菜单
+        dropdownMenu.hide();
+    });
+
+    // 将复制、编辑和删除选项添加到下拉菜单中
+    dropdownMenu.append(copyOption);
+    dropdownMenu.append(editOption);
+    dropdownMenu.append(deleteOption);
+}
+
+// 复制到剪贴板函数
+function copyToClipboard(text) {
+    // 创建一个新的 ClipboardItem 对象
+    const clipboardItem = new ClipboardItem({ "text/plain": new Blob([text], { type: "text/plain" }) });
+  
+    // 将文本添加到剪贴板
+    navigator.clipboard.write([clipboardItem]).then(function() {
+      console.log('文本已成功复制到剪贴板');
+    }).catch(function(err) {
+      console.error('复制失败:', err);
+    });
+  }
+  
+function editLogEntry(pre, record_id) {
+    // 获取编辑框元素
+    var modal = document.getElementById('editLogModal');
+
+    // 获取编辑框中的文本域
+    var editedLog = document.getElementById('editedLog');
+
+    // 显示模态框
+    modal.style.display = "block";
+
+    // 将原始日志内容填充到编辑框中
+    editedLog.value = pre.text();
+
+    // 获取保存按钮
+    var saveChangesBtn = document.getElementById('saveChangesBtn');
+
+    // 当用户点击保存按钮时
+    saveChangesBtn.onclick = function() {
+        // 获取编辑后的日志内容
+        var editedText = editedLog.value;
+
+        // 这里可以发送请求到后端，保存编辑后的日志内容
+        if (editedText === '') {
+            console.log("log is none")
+            return; // 退出函数
+        }
+
+        $.ajax({
+            url: '/v1/diary-log/updatelog',
+            type: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+            },
+            contentType: 'application/json',
+            data: JSON.stringify({content: editedText, record_id: record_id}),
+            success: function(response) {
+                console.log("edited success")
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+        // 然后根据后端返回的结果进行相应的处理，比如更新界面等
+
+        // 更新原始的日志内容
+        pre.text(editedText);
+
+        // 关闭模态框
+        modal.style.display = "none";
+
+        // 在控制台输出提示信息
+        console.log('日志已成功编辑并保存');
+    }
+
+    // 获取关闭按钮，并为其添加点击事件处理程序
+    var closeBtn = document.getElementsByClassName("close")[0];
+    closeBtn.onclick = function() {
+        // 关闭模态框
+        modal.style.display = "none";
+    }
+
+    // 当用户点击模态框外部区域时，关闭模态框
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+}
+
+// 删除日志条目函数
+function deleteLogEntry(record_id) {
+    // 删除日志条目的具体逻辑
+    $.ajax({
+        url: '/v1/diary-log/deletelog/' + record_id,
+        type: 'DELETE',
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+        },
+        success: function(response) {
+            // 请求成功时的处理
+            console.log('Logs deleted successfully.');
+            // 可以在这里执行其他操作，如刷新页面或更新UI等
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR);
+    
+            if (jqXHR.status === 401) {
+                // HTTPUnauthorized error
+                console.log("Unauthorized - Redirecting to login page");
+                window.location.href = '/v1/diary-log/login.html';
+            } else {
+                // Handle other error types as needed
+                console.log("Other error:", textStatus, errorThrown);
+            }
+        }
+    });
+}
+
+
+// 使用示例：
+// 假设有一个 id 为 logList 的容器，你可以调用 addLogEntry 函数来添加日志条目。
+// 例如：
+// addLogEntry('这是一条日志信息');
+
+
 $(function() {
     $('#submit').on('click', function(event) {
         event.preventDefault();
@@ -9,20 +219,15 @@ $(function() {
             console.log("log is none")
             return; // 退出函数
         }
-        // console.log($('#log').val())
-        // console.log(log)
+
         $.ajax({
             url: '/v1/diary-log/addlog',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({content: log}),
             success: function(response) {
-
-                var logList= $('#logList');
                 response = JSON.parse(response)
-                var pre = $('<pre></pre>');
-                pre.text(response.content);
-                logList.prepend(pre);
+                addLogEntry(response.content, response.record_id)
                 
                 // 清空 输入框
                 $('#log').val('');
@@ -69,10 +274,7 @@ $(function() {
             // console.log(response);
             response = JSON.parse(response)
             for (var i = 0; i < response.logs.length; i++) {
-                var log = response.logs[i];
-                var pre = $('<pre></pre>');
-                pre.text(log);
-                $('#logList').prepend(pre);
+                addLogEntry(response.logs[i], response.ids[i]);
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {

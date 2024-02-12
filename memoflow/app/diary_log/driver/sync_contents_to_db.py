@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import re
+import uuid
 
 
 def find_matching_lines(contents: list):
@@ -60,10 +61,12 @@ def get_tags_from_content(content):
 
 def get_new_card_content(all_card_content):
     new_all_card_content = []
-    for id, content in enumerate(all_card_content):
+    for content in all_card_content:
+        # Generate UUID for the new record
+        record_id = str(uuid.uuid4())
         tags = get_tags_from_content(content)
         new_tags = ','.join(tags)
-        new_all_card_content.append((id, content, new_tags))
+        new_all_card_content.append((record_id, content, new_tags))
     return new_all_card_content
 
 
@@ -73,7 +76,7 @@ def init_db_diary_log(data_base_path, table_name):
         # 初始化数据库
         conn = sqlite3.connect(data_base_path)
         c = conn.cursor()
-        c.execute(f'CREATE TABLE IF NOT EXISTS {table_name} (id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT, tags TEXT)')
+        c.execute(f'CREATE TABLE IF NOT EXISTS {table_name} (id TEXT PRIMARY KEY, content TEXT, tags TEXT)')
         conn.commit()
         conn.close()
     else:
@@ -92,8 +95,8 @@ def crate_table(table_name, data_base_path, new_all_card_content):
         id ,content, tags = row
         # 构造 SQL 更新语句
         # 构造INSERT语句，并将数据绑定到占位符
-        insert_sql = f"INSERT INTO {table_name} (content, tags) VALUES (?, ?)"
-        cursor.execute(insert_sql, (content, tags))
+        insert_sql = f"INSERT INTO {table_name} (id, content, tags) VALUES (?, ?, ?)"
+        cursor.execute(insert_sql, (id, content, tags))
         conn.commit()
     # 关闭数据库连接
     conn.close()

@@ -40,6 +40,12 @@ class AsynTaskManager(manager.Manager):
                                      branch_name):
         return celery_task.celery_update_file_to_github.delay(
             token, repo, file_path, added_content, commit_message, branch_name)
+    
+    def celery_push_updatedfile_to_github(self, token, repo, file_path,
+                                          updated_content, commit_message,
+                                          branch_name):
+        return celery_task.celery_push_updatedfile_to_github.delay(
+            token, repo, file_path, updated_content, commit_message, branch_name)
 
     # 向坚果云发送异步任务，更新文件
     def celery_update_file_to_jianguoyun(self,

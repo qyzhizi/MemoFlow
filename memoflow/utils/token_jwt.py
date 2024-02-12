@@ -4,6 +4,7 @@ import secrets
 import json
 from functools import wraps
 from webob.exc import HTTPUnauthorized
+from webob import Request 
 
 
 class TokenManager:
@@ -28,7 +29,10 @@ class TokenManager:
 
 def token_required(func):
     @wraps(func)
-    def decorated_func(self, req):
+    def decorated_func(*args, **kwargs):
+        if args and isinstance(args[1], Request):
+            req = args[1]
+
         token = req.headers.get('Authorization')
 
         if not token:
@@ -38,7 +42,7 @@ def token_required(func):
 
         decoded_data = TokenManager.verify_token(token[7:])
         if decoded_data:
-            return func(self, req)
+            return func(*args, **kwargs)
         else:
             raise HTTPUnauthorized(json.dumps({"error": "Invalid credentials"}))
 
