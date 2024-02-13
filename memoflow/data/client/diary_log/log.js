@@ -92,11 +92,36 @@ function addLogEntry(logText, record_id) {
 
 // 取消 Logseq 格式
 function removeLogseqMatches(inputString) {
-    // 创建正则表达式模式
+    // 匹配 ”\t  “ "\t\t  " ”\t\t\t  “等等, 替换为空串
     const pattern = /^[\x20]{0,}\t+[\x20]{2}|^[\x20]{0,}\t/gm;
-    // 使用正则表达式删除匹配内容, 并去除行首的 “- ”
-    const result = inputString.replace(pattern, '').substring(2);
-    return result;
+    String1 = inputString.replace(pattern, '')
+
+    // 使用正则表达式进行划分
+    var regex = /-[\x20]#ans/;
+    var splittedParts = String1.split(regex);
+    // 判断splittedParts 的长度是否大于 2
+    if (splittedParts.length > 2) {
+        console.log("输入字符串中包含多个 #ans");
+        // 报错，解析错误
+        throw new Error("字符串中包含多个 #ans");
+    }
+    // 如果长度为 1，说明字符串中没有包含 #ans
+    if (splittedParts.length === 1) {
+        console.log("输入字符串中没有包含 #ans");
+        return String1.substring(2);
+    }
+    // 如果长度为 2，说明字符串中包含了 #ans
+    if (splittedParts.length === 2) {
+        console.log("输入字符串中包含了 #ans");
+        part1 = splittedParts[0];
+        part2 = splittedParts[1];
+        const pattern2_1 = /^[\x20]{0,}\t-[\x20]/gm; 
+        const pattern2_2 = /^[\x20]{0,}\t\t-[\x20]/gm; 
+        part2 = part2.replace(pattern2_1, '- ');
+        part2 = part2.replace(pattern2_2, '@blk- ');
+        result = part1 +"- #ans"+ part2;
+        return result.substring(2);
+    }
 }
 
 // 复制到剪贴板函数
@@ -329,8 +354,8 @@ $(function() {
             console.log(jqXHR);
     
             if (jqXHR.status === 401) {
-                // 提示登录已过期
-                alert("登录已过期，请重新登录");
+                // 不该提示，不然每开一个页面浏览器插件会不停弹窗提示
+                // alert("登录已过期，请重新登录");
                 // HTTPUnauthorized error
                 console.log("Unauthorized - Redirecting to login page");
                 window.location.href = '/v1/diary-log/login.html';
