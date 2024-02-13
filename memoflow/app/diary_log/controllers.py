@@ -178,6 +178,7 @@ class DiaryLog(wsgi.Application):
             self.asyn_task_api.celery_push_updatedfile_to_github(
                 token, repo, file_path, updated_content, commit_message,
                 branch_name)
+        return json.dumps({"content": processed_block_content})
                                                         
     @token_required
     def delete_log(self, req, record_id):

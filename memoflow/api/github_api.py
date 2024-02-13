@@ -29,11 +29,17 @@ class GitHupApi(object):
         if added_content and not updated_content:
             # 获取base64解码的内容，不能直接获得源字符串吗？非要解码，有点浪费？
             existing_content = file.decoded_content.decode()
+            # 添加行首 “- ” 与 logseq 保持一致
+            if not existing_content.startswith("- "):
+                existing_content = "- " + existing_content
             # 使用"\n"作为分隔，防止added_content不带"\n", 中间只需要写"\n"就行
             # 不能加入空格比如：" \n", 因为这会导致logseq去除该空格，引起不必要的修改
-            updated_content = added_content + "\n" + existing_content
+            # added_content[2:] 去除行首 “- ” 与 logseq 保持一致
+            updated_content = added_content[2:] + "\n" + existing_content
         if not added_content and updated_content:
-            updated_content = updated_content
+            # added_content[2:] 去除行首 “- ” 与 logseq 保持一致
+            if updated_content.startswith("- "):
+                updated_content = updated_content[2:]
         # 提交文件更新
         self.repo.update_file(file_path, commit_message, updated_content,
                               file.sha, branch_name)

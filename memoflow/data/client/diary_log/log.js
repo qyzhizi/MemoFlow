@@ -58,9 +58,9 @@ function addLogEntry(logText, record_id) {
     // 添加复制选项点击事件处理程序
     copyOption.click(function() {
         // 复制日志文本到剪贴板
-        copyToClipboard(logText);
+        copyToClipboard(removeLogseqMatches(logText));
         // 隐藏下拉菜单
-        dropdownMenu.hide();
+        dropdownMenu.hide()
     });
 
     // 添加编辑选项点击事件处理程序
@@ -90,6 +90,15 @@ function addLogEntry(logText, record_id) {
     dropdownMenu.append(deleteOption);
 }
 
+// 取消 Logseq 格式
+function removeLogseqMatches(inputString) {
+    // 创建正则表达式模式
+    const pattern = /^[\x20]{0,}\t+[\x20]{2}|^[\x20]{0,}\t/gm;
+    // 使用正则表达式删除匹配内容, 并去除行首的 “- ”
+    const result = inputString.replace(pattern, '').substring(2);
+    return result;
+}
+
 // 复制到剪贴板函数
 function copyToClipboard(text) {
     // 创建一个新的 ClipboardItem 对象
@@ -102,19 +111,19 @@ function copyToClipboard(text) {
       console.error('复制失败:', err);
     });
   }
-  
+
 function editLogEntry(pre, record_id) {
     // 获取编辑框元素
     var modal = document.getElementById('editLogModal');
 
     // 获取编辑框中的文本域
-    var editedLog = document.getElementById('editedLog');
+    var editLog = document.getElementById('editLog');
 
     // 显示模态框
     modal.style.display = "block";
 
     // 将原始日志内容填充到编辑框中
-    editedLog.value = pre.text();
+    editLog.value = removeLogseqMatches(pre.text());
 
     // 获取保存按钮
     var saveChangesBtn = document.getElementById('saveChangesBtn');
@@ -122,7 +131,7 @@ function editLogEntry(pre, record_id) {
     // 当用户点击保存按钮时
     saveChangesBtn.onclick = function() {
         // 获取编辑后的日志内容
-        var editedText = editedLog.value;
+        var editedText = editLog.value;
 
         // 这里可以发送请求到后端，保存编辑后的日志内容
         if (editedText === '') {
@@ -139,19 +148,30 @@ function editLogEntry(pre, record_id) {
             contentType: 'application/json',
             data: JSON.stringify({content: editedText, record_id: record_id}),
             success: function(response) {
-                console.log("edited success")
+                response = JSON.parse(response)
+                reponseText = response.content
+                // 更新原始的日志内容
+                pre.text(reponseText);
+                // 关闭模态框
+                modal.style.display = "none";
             },
-            error: function(error) {
-                console.log(error);
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+                // 出错，但保留内容
+                pre.text(editedText)
+
+                if (jqXHR.status === 401) {
+                    // 提示登录已过期
+                    alert("登录已过期，请重新登录");
+                    // HTTPUnauthorized error
+                    console.log("Unauthorized - Redirecting to login page");
+                    window.location.href = '/v1/diary-log/login.html';
+                } else {
+                    // Handle other error types as needed
+                    console.log("Other error:", textStatus, errorThrown);
+                }
             }
         });
-        // 然后根据后端返回的结果进行相应的处理，比如更新界面等
-
-        // 更新原始的日志内容
-        pre.text(editedText);
-
-        // 关闭模态框
-        modal.style.display = "none";
 
         // 在控制台输出提示信息
         console.log('日志已成功编辑并保存');
@@ -160,14 +180,31 @@ function editLogEntry(pre, record_id) {
     // 获取关闭按钮，并为其添加点击事件处理程序
     var closeBtn = document.getElementsByClassName("close")[0];
     closeBtn.onclick = function() {
-        // 关闭模态框
-        modal.style.display = "none";
+        // 弹出窗口提示是否提交
+        var confirmation = confirm("是否关闭编辑页面？");
+
+        // 如果用户点击确定按钮
+        if (confirmation) {
+            // 关闭模态框
+            modal.style.display = "none";
+        } 
+
     }
 
     // 当用户点击模态框外部区域时，关闭模态框
     window.onclick = function(event) {
         if (event.target == modal) {
-            modal.style.display = "none";
+            // 弹出窗口提示是否提交
+            var confirmation = confirm("是否关闭编辑页面？");
+
+            // 如果用户点击确定按钮
+            if (confirmation) {
+                // 关闭模态框
+                modal.style.display = "none";
+            } else {
+                // 如果用户点击取消按钮，则什么也不做
+                // 用户选择不保存，取消关闭操作
+            }
         }
     }
 }
@@ -190,6 +227,8 @@ function deleteLogEntry(record_id) {
             console.log(jqXHR);
     
             if (jqXHR.status === 401) {
+                // 提示登录已过期
+                alert("登录已过期，请重新登录");
                 // HTTPUnauthorized error
                 console.log("Unauthorized - Redirecting to login page");
                 window.location.href = '/v1/diary-log/login.html';
@@ -257,10 +296,19 @@ $(function() {
                 // reload the page
                 window.location.reload();
             },
-            error: function(error) {
-                // pop up a dialog
-                alert(error);
-                console.log(error);
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+        
+                if (jqXHR.status === 401) {
+                    // 提示登录已过期
+                    alert("登录已过期，请重新登录");
+                    // HTTPUnauthorized error
+                    console.log("Unauthorized - Redirecting to login page");
+                    window.location.href = '/v1/diary-log/login.html';
+                } else {
+                    // Handle other error types as needed
+                    console.log("Other error:", textStatus, errorThrown);
+                }
             }
         });
     });
@@ -281,6 +329,8 @@ $(function() {
             console.log(jqXHR);
     
             if (jqXHR.status === 401) {
+                // 提示登录已过期
+                alert("登录已过期，请重新登录");
                 // HTTPUnauthorized error
                 console.log("Unauthorized - Redirecting to login page");
                 window.location.href = '/v1/diary-log/login.html';
@@ -311,95 +361,106 @@ $(function() {
         });
     });
     
-    var txtInput = document.getElementById('log');
-    txtInput.addEventListener('keydown', function(event) {
+    function alt_q(event) {
         if (event.altKey && event.key === "q") {
           console.log("alt+q was pressed.");
+          var textarea = event.target; // 获取事件的目标元素
           // 在这里编写按下alt+q 后要执行的代码
-            var start = this.selectionStart;
-            var end = this.selectionEnd;
-            var value = this.value;
+            var start = textarea.selectionStart;
+            var end = textarea.selectionEnd;
+            var value = textarea.value;
             var selectedText = value.substring(start, end);
             var indentedText = selectedText.split('\n').map(function(line) {
                 const leading_t = '\t'
                 return leading_t + line; // 将生成的空格字符串和剩余的字符串拼接返回
             }).join('\n');
-            this.value = value.substring(0, start) + indentedText + value.substring(end);
+            textarea.value = value.substring(0, start) + indentedText + value.substring(end);
             if (selectedText.length){
-                this.selectionStart = start;
-                this.selectionEnd = end + (indentedText.length - selectedText.length);
+                textarea.selectionStart = start;
+                textarea.selectionEnd = end + (indentedText.length - selectedText.length);
             } else {
-                this.selectionEnd = end + (indentedText.length - selectedText.length);
-                this.selectionStart = this.selectionEnd;
+                textarea.selectionEnd = end + (indentedText.length - selectedText.length);
+                textarea.selectionStart = textarea.selectionEnd;
             }                
         }
-      });
+      };
+    function tab_to_space(event) {
+            if (event.key === "Tab") { // 按下Tab键或Shift+Tab键
+                console.log("tab was pressed.");
+                var textarea = event.target; // 获取事件的目标元素
+                var start = textarea.selectionStart;
+                var end = textarea.selectionEnd;
+                var value = textarea.value;
+                var selectedText = value.substring(start, end);
+                var tab_to_space_num = 2
 
-    txtInput.addEventListener('keydown', function(e) {
-        if (e.key === "Tab") { // 按下Tab键或Shift+Tab键
-            var start = this.selectionStart;
-            var end = this.selectionEnd;
-            var value = this.value;
-            var selectedText = value.substring(start, end);
+                if (event.shiftKey) { // 按下Shift键 需要反缩进
 
-            if (e.shiftKey) { // 按下Shift键 需要反缩进
+                    // 获取选中文本所在行的起始位置和结束位置
+                    var lineStart = value.lastIndexOf('\n', start - 1) + 1;
+                    var lineEnd = value.indexOf('\n', end);
+                    // 如果选中文本所在行是最后一行，需要特殊处理
+                    if (lineEnd === -1) {
+                    lineEnd = value.length;
+                    }
+                    // 获取选中文本所在行的所有字符串
+                    selectedText = value.substring(lineStart, lineEnd);
 
-                // 获取选中文本所在行的起始位置和结束位置
-                var lineStart = value.lastIndexOf('\n', start - 1) + 1;
-                var lineEnd = value.indexOf('\n', end);
-                // 如果选中文本所在行是最后一行，需要特殊处理
-                if (lineEnd === -1) {
-                lineEnd = value.length;
-                }
-                // 获取选中文本所在行的所有字符串
-                selectedText = value.substring(lineStart, lineEnd);
-
-                var unindentedText = selectedText.split('\n').map(function(line) {
-                    var leadingTabs = line.match(/^\t+/); // 匹配行首的制表符
-                    if (leadingTabs) { // 存在制表符
-                        // 将制表符替换为四个空格，然后去掉前四个空格或制表符
+                    var unindentedText = selectedText.split('\n').map(function(line) {
+                        var leadingTabs = line.match(/^\t+/); // 匹配行首的制表符
+                        if (leadingTabs) { // 存在制表符
+                            // 将制表符替换为四个空格，然后去掉前四个空格或制表符
+                            let i = 0;
+                            while (line[i] === '\t') {i++;}
+                            // const leadingSpaces = '    '.repeat(i); // 生成 i 个空格的字符串
+                            const leadingSpaces = ' '.repeat(tab_to_space_num).repeat(i); // 生成 i 个空格的字符串
+                            line = leadingSpaces + line.substring(i); // 将生成的空格字符串和剩余的字符串拼接返回
+                            return line.substring(4);
+                        } else if (line.match(/^ {1}/)) { // 前面至少有一个空格时
+                            const leadingSpaces = line.match(/^\x20/)[0];
+                        return line.substring(leadingSpaces.length)
+                        } else {
+                            return line;
+                        }
+                    }).join('\n');
+                    textarea.value = value.substring(0, lineStart) + unindentedText + value.substring(lineEnd);
+                    var length_d = selectedText.length - unindentedText.length;
+                    if ((start - length_d) < lineStart){textarea.selectionStart = lineStart}
+                    else {textarea.selectionStart = start - length_d;}
+                    textarea.selectionEnd = end - length_d;
+                } else { // 没有按下Shift键
+                    var indentedText = selectedText.split('\n').map(function(line) {
                         let i = 0;
                         while (line[i] === '\t') {i++;}
-                        const leadingSpaces = '    '.repeat(i); // 生成 i 个空格的字符串
-                        line = leadingSpaces + line.substring(i); // 将生成的空格字符串和剩余的字符串拼接返回
-                        return line.substring(4);
-                    } else if (line.match(/^ {1}/)) { // 前面至少有一个空格时
-                        const leadingSpaces = line.match(/^\x20/)[0];
-                    return line.substring(leadingSpaces.length)
+                        j = i+1 // 使用4个空格进行正向缩进
+                        const leadingSpaces = ' '.repeat(tab_to_space_num).repeat(j); // 生成 i 个空格的字符串
+                        return leadingSpaces + line.substring(i); // 将生成的空格字符串和剩余的字符串拼接返回
+                    }).join('\n');
+                    textarea.value = value.substring(0, start) + indentedText + value.substring(end);
+                    if (selectedText.length){
+                        textarea.selectionStart = start;
+                        textarea.selectionEnd = end + (indentedText.length - selectedText.length);
                     } else {
-                        return line;
+                        textarea.selectionEnd = end + (indentedText.length - selectedText.length);
+                        textarea.selectionStart = textarea.selectionEnd;
                     }
-                }).join('\n');
-                this.value = value.substring(0, lineStart) + unindentedText + value.substring(lineEnd);
-                var length_d = selectedText.length - unindentedText.length;
-                if ((start - length_d) < lineStart){this.selectionStart = lineStart}
-                else {this.selectionStart = start - length_d;}
-                this.selectionEnd = end - length_d;
-            } else { // 没有按下Shift键
-                var indentedText = selectedText.split('\n').map(function(line) {
-                    let i = 0;
-                    while (line[i] === '\t') {i++;}
-                    j = i+1 // 使用4个空格进行正向缩进
-                    const leadingSpaces = '    '.repeat(j); // 生成 i 个空格的字符串
-                    return leadingSpaces + line.substring(i); // 将生成的空格字符串和剩余的字符串拼接返回
-                }).join('\n');
-                this.value = value.substring(0, start) + indentedText + value.substring(end);
-                if (selectedText.length){
-                    this.selectionStart = start;
-                    this.selectionEnd = end + (indentedText.length - selectedText.length);
-                } else {
-                    this.selectionEnd = end + (indentedText.length - selectedText.length);
-                    this.selectionStart = this.selectionEnd;
                 }
+                event.preventDefault();
             }
-            e.preventDefault();
-        }
-    });   
+    };
+
+    var txtInput = document.getElementById('log');
+    txtInput.addEventListener('keydown', alt_q);
+    txtInput.addEventListener('keydown', tab_to_space);
+
+    var editTxtInput = document.getElementById('editLog');
+    editTxtInput.addEventListener('keydown', alt_q);
+    editTxtInput.addEventListener('keydown', tab_to_space);
 
     // 监听窗口关闭事件
     window.addEventListener("beforeunload", function (event) {
         var inputBox = document.getElementById("log");
-        // 检测输入框内容是否为空
+                // 检测输入框内容是否为空
         if (inputBox.value.trim().length > 0) {
             // 显示提示框
             event.preventDefault();
@@ -407,4 +468,17 @@ $(function() {
             event.returnValue = " ";
         }
     });
+    // 监听窗口关闭事件，当编辑窗口未关闭时给出提示
+    window.addEventListener("beforeunload", function (event) {
+        // 获取编辑框元素
+        var modal = document.getElementById('editLogModal');
+        // 检测编辑框是否为打开状态
+        if (modal.style.display === "block") {
+            // 显示提示框
+            event.preventDefault();
+            // beforeunload 事件的返回值
+            event.returnValue = " ";
+        }
+    });
+
 });

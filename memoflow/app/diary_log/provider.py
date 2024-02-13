@@ -156,7 +156,7 @@ class Manager(manager.Manager):
                 else:
                     # 软回车标识
                     pre_str = t_num*'\t'+ "  "
-                    # 匹配开头“\t\t  ”, 多个"\t", 至少两个空格
+                    # 匹配开头“\t\t  ”, 多个"\t", 两个空格
                     match = re.match(r'^\x20{0,}\t+\x20\x20', line)
                     if match is not None:
                         #统一先删除，后面再加上
@@ -247,6 +247,10 @@ class Manager(manager.Manager):
                 # 将上一行（带标签）当做子块
                 up_line_list = content_list[up_line].strip()
                 if up_line != 0 and content_list[up_line].startswith(block_pre_string[1]):
+                    continue
+                # 当遇到 ”- # tag1“
+                if up_line != 0 and content_list[up_line].startswith(block_pre_string[0]):
+                    content_list[up_line] = "\t" + content_list[up_line]
                     continue
                 if up_line != 0 and up_line_list and up_line_list[0] == tag_string:
                     #给问题的上一行（标题）添加 前缀 `block_pre_string[1]`
