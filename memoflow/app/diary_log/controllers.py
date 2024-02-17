@@ -123,7 +123,7 @@ class DiaryLog(wsgi.Application):
                 added_content,
                 overwrite=True)
 
-        return json.dumps({"record_id": record_id, "content": processed_content})
+        return json.dumps({"record_id": record_id, "content": processed_block_content})
         # return Response(json_data)
 
     @token_required

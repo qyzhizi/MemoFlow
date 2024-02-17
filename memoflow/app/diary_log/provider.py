@@ -188,16 +188,12 @@ class Manager(manager.Manager):
         ```
         ## 2023/5/14 07:11:00:
         --todo sdfjslfjds
-        @blk djfslfjs
-        @blk
         djfsfjsfjds;
         ```
         生成效果：
         ```
         - ## 2023/5/14 07:11:00:
         \t- TODO sdfjslfjds
-        \t- @blk djfslfjs
-        \t- @blk
         djfsfjsfjds;
         ```        
         """
@@ -276,19 +272,12 @@ class Manager(manager.Manager):
                     len(todo_key[0]):]
                 content_list[i] = new_content
 
-            # 解析`@blk` 变为子块
-            # normal_blk_strings = ["@blk ", "@blk"]
-            # if content and (content.strip()[:len(normal_blk_strings[0])]==normal_blk_strings[0]):
-            #     new_content = block_pre_string[1] + content[normal_blk_strings[0]:]
-            #     content_list[i] = new_content
-
             # 解析`- ` 变为子块, ans_flag = True, ensure right place. "\t- #ans" will not match this condition
             if ans_flag and content:
                 for key in list_pre_dict.keys():
-                    list_pre_flag = content.lstrip(' ')[:len(list_pre_dict[key])] == list_pre_dict[key]
+                    list_pre_flag = content[:len(list_pre_dict[key])] == list_pre_dict[key]
                     if list_pre_flag:
                         new_content = list_parse_pre_dict[key] + content[len(list_pre_dict[key]):]
-                    # new_content = list_parse_pre_dict["2-"] + content[len(list_pre_dict["2-"]):]
                         content_list[i] = new_content
                         break
 

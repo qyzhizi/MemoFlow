@@ -92,13 +92,13 @@ function addLogEntry(logText, record_id) {
 
 // 取消 Logseq 格式
 function removeLogseqMatches(inputString) {
-    // 匹配 ”\t  “ "\t\t  " ”\t\t\t  “等等, 替换为空串
-    const pattern = /^[\x20]{0,}\t+[\x20]{2}/gm;
+    // 匹配行首的 "  " "\t  " "\t\t  " "\t\t\t  " 等等, 替换为空串
+    const pattern = /^[\x20]{0,}\t{0,}[\x20]{2}/gm;
     String1 = inputString.replace(pattern, '')
 
     // 使用正则表达式进行划分
     var regex = /^\t-[\x20]#ans/gm;
-    const pattern_t = /^\t/gm;
+    const pattern_t = /^\t- /gm;
     var splittedParts = String1.split(regex);
     // 判断splittedParts 的长度是否大于 2
     if (splittedParts.length > 2) {
@@ -121,11 +121,11 @@ function removeLogseqMatches(inputString) {
 
         part1 = splittedParts[0];
         part2 = splittedParts[1];
-        const pattern2_1 = /^[\x20]{0,}\t-[\x20]/gm; 
-        const pattern2_2 = /^[\x20]{0,}\t\t-[\x20]/gm; 
+        const pattern2_1 = /^[\x20]{0,}\t\t-[\x20]/gm; 
+        const pattern2_2 = /^[\x20]{0,}\t\t\t-[\x20]/gm; 
         part2 = part2.replace(pattern2_1, '- ');
         part2 = part2.replace(pattern2_2, '@blk- ');
-        result = part1 +"- #ans"+ part2;
+        result = part1 +"#ans"+ part2;
         return result.substring(2);
     }
 }
@@ -214,19 +214,17 @@ function editLogEntry(pre, record_id) {
                 reponseText = response.content
                 // 更新原始的日志内容
                 pre.text(reponseText);
+                // 清空编辑框
+                editLog.value = '';
                 // 关闭模态框
                 modal.style.display = "none";
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 console.log(jqXHR);
-                // 出错，但保留内容
-                pre.text(editedText)
 
                 if (jqXHR.status === 401) {
                     // 提示登录已过期
                     alert("登录已过期，请重新登录");
-                    // 清空编辑框
-                    editLog.value = '';
                     // HTTPUnauthorized error
                     console.log("Unauthorized - Redirecting to login page");
                     window.location.href = '/v1/diary-log/login.html';
@@ -237,10 +235,6 @@ function editLogEntry(pre, record_id) {
             }
         });
 
-        // 清空编辑框
-        editLog.value = '';
-        // 在控制台输出提示信息
-        console.log('日志已成功编辑并保存');
     }
 
     // 将原始日志内容填充到编辑框中
