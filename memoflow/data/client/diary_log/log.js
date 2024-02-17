@@ -93,26 +93,32 @@ function addLogEntry(logText, record_id) {
 // 取消 Logseq 格式
 function removeLogseqMatches(inputString) {
     // 匹配 ”\t  “ "\t\t  " ”\t\t\t  “等等, 替换为空串
-    const pattern = /^[\x20]{0,}\t+[\x20]{2}|^[\x20]{0,}\t/gm;
+    const pattern = /^[\x20]{0,}\t+[\x20]{2}/gm;
     String1 = inputString.replace(pattern, '')
 
     // 使用正则表达式进行划分
-    var regex = /-[\x20]#ans/;
+    var regex = /^\t-[\x20]#ans/gm;
+    const pattern_t = /^\t/gm;
     var splittedParts = String1.split(regex);
     // 判断splittedParts 的长度是否大于 2
     if (splittedParts.length > 2) {
         console.log("输入字符串中包含多个 #ans");
+        // 使用alert()函数进行错误提示
+        alert("字符串中包含多个 #ans, 编辑失败");
         // 报错，解析错误
-        throw new Error("字符串中包含多个 #ans");
+        // throw new Error("字符串中包含多个 #ans");
     }
     // 如果长度为 1，说明字符串中没有包含 #ans
     if (splittedParts.length === 1) {
+        result = splittedParts[0].replace(pattern_t, '')
         console.log("输入字符串中没有包含 #ans");
-        return String1.substring(2);
+        return result.substring(2);
     }
     // 如果长度为 2，说明字符串中包含了 #ans
     if (splittedParts.length === 2) {
         console.log("输入字符串中包含了 #ans");
+        splittedParts[0] = splittedParts[0].replace(pattern_t, '')
+
         part1 = splittedParts[0];
         part2 = splittedParts[1];
         const pattern2_1 = /^[\x20]{0,}\t-[\x20]/gm; 
@@ -147,12 +153,43 @@ function editLogEntry(pre, record_id) {
     // 显示模态框
     modal.style.display = "block";
 
-    // 将原始日志内容填充到编辑框中
-    editLog.value = removeLogseqMatches(pre.text());
-
     // 获取保存按钮
     var saveChangesBtn = document.getElementById('saveChangesBtn');
 
+    // 获取关闭按钮，并为其添加点击事件处理程序
+    var closeBtn = document.getElementsByClassName("close")[0];
+    closeBtn.onclick = function() {
+        // 弹出窗口提示是否提交
+        var confirmation = confirm("是否关闭编辑页面？");
+
+        // 如果用户点击确定按钮
+        if (confirmation) {
+            // 清空编辑框
+            editLog.value = '';
+            // 关闭模态框
+            modal.style.display = "none";
+        } 
+
+    }
+
+    // 当用户点击模态框外部区域时，关闭模态框
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            // 弹出窗口提示是否提交
+            var confirmation = confirm("是否关闭编辑页面？");
+
+            // 如果用户点击确定按钮
+            if (confirmation) {
+                // 清空编辑框
+                editLog.value = '';
+                // 关闭模态框
+                modal.style.display = "none";
+            } else {
+                // 如果用户点击取消按钮，则什么也不做
+                // 用户选择不保存，取消关闭操作
+            }
+        }
+    }
     // 当用户点击保存按钮时
     saveChangesBtn.onclick = function() {
         // 获取编辑后的日志内容
@@ -188,6 +225,8 @@ function editLogEntry(pre, record_id) {
                 if (jqXHR.status === 401) {
                     // 提示登录已过期
                     alert("登录已过期，请重新登录");
+                    // 清空编辑框
+                    editLog.value = '';
                     // HTTPUnauthorized error
                     console.log("Unauthorized - Redirecting to login page");
                     window.location.href = '/v1/diary-log/login.html';
@@ -198,40 +237,14 @@ function editLogEntry(pre, record_id) {
             }
         });
 
+        // 清空编辑框
+        editLog.value = '';
         // 在控制台输出提示信息
         console.log('日志已成功编辑并保存');
     }
 
-    // 获取关闭按钮，并为其添加点击事件处理程序
-    var closeBtn = document.getElementsByClassName("close")[0];
-    closeBtn.onclick = function() {
-        // 弹出窗口提示是否提交
-        var confirmation = confirm("是否关闭编辑页面？");
-
-        // 如果用户点击确定按钮
-        if (confirmation) {
-            // 关闭模态框
-            modal.style.display = "none";
-        } 
-
-    }
-
-    // 当用户点击模态框外部区域时，关闭模态框
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            // 弹出窗口提示是否提交
-            var confirmation = confirm("是否关闭编辑页面？");
-
-            // 如果用户点击确定按钮
-            if (confirmation) {
-                // 关闭模态框
-                modal.style.display = "none";
-            } else {
-                // 如果用户点击取消按钮，则什么也不做
-                // 用户选择不保存，取消关闭操作
-            }
-        }
-    }
+    // 将原始日志内容填充到编辑框中
+    editLog.value = removeLogseqMatches(pre.text());
 }
 
 // 删除日志条目函数
