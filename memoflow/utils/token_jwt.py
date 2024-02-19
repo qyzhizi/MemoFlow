@@ -12,7 +12,7 @@ class TokenManager:
 
     @classmethod
     def generate_token(cls, user_id):
-        expiration_time = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+        expiration_time = datetime.datetime.utcnow() + datetime.timedelta(hours=6)
         token = jwt.encode({"user_id": user_id, "exp": expiration_time}, cls.secret_key, algorithm="HS256")
         return token
 
