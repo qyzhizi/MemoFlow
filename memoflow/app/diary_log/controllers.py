@@ -138,7 +138,8 @@ class DiaryLog(wsgi.Application):
         for table_name in sync_table_names:
             temp_rows = self.diary_db_api.get_logs(
                 table=table_name, columns=['content','id'])
-            pages.append(temp_rows)
+            if temp_rows:
+                pages.append(temp_rows)
         # rows = self.diary_db_api.get_logs(columns=['content','id'])
         pages.reverse()
         for page in pages:

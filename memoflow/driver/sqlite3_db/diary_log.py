@@ -61,14 +61,17 @@ class DBSqliteDriver(object):
         Returns:
             list: [[content1, tags1], [content2, tags2], ...]
         """
-        conn = sqlite3.connect(data_base_path)
-        c = conn.cursor()
-        query = f"SELECT {', '.join(columns)} FROM {table_name}"
-        rows = c.execute(query).fetchall()
-        # res = [[row[0], row[1]] for row in rows]
-        conn.commit()
-        conn.close()
-        return rows
+        try:
+            conn = sqlite3.connect(data_base_path)
+            c = conn.cursor()
+            query = f"SELECT {', '.join(columns)} FROM {table_name}"
+            rows = c.execute(query).fetchall()
+            conn.commit()
+            conn.close()
+            return rows
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+            return None
     
     @classmethod
     def get_log_by_id(cls, table_name, id, columns, data_base_path):
