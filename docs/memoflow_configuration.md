@@ -21,7 +21,7 @@ GITHUB_REPO=xxxx/xxxx
 # commit 对应的仓库文件路径,相对仓库的根目录，例如：xxxx/demo.md
 GITHUB_CURRENT_SYNC_FILE_PATH=xxxx/demo.md
 # pull 对应的仓库文件路径，可配置多个文件，文件之间用逗号分隔
-GITHUB_SYNC_FILE_LIST=xxxx/demo.md, xxxx/demo2.md
+GITHUB_OTHER_SYNC_FILE_LIST=xxxx/demo.md, xxxx/demo2.md
 
 
 # 坚果云账号，例如：你的坚果云邮箱
@@ -60,7 +60,7 @@ GITHUB_REPO=xxxx/xxxx
 # commit 对应的仓库文件路径,相对仓库的根目录，例如：xxxx/demo.md
 GITHUB_CURRENT_SYNC_FILE_PATH=xxxx/demo.md
 # pull 对应的仓库文件路径，可配置多个文件，文件之间用逗号分隔
-GITHUB_SYNC_FILE_LIST=xxxx/demo.md, xxxx/demo2.md
+GITHUB_OTHER_SYNC_FILE_LIST=xxxx/demo.md, xxxx/demo2.md
 ```
 (1) GITHUB_TOKEN 是 GitHub API 的一个安全令牌。以下是创建步骤：
 
@@ -86,7 +86,7 @@ GITHUB_SYNC_FILE_LIST=xxxx/demo.md, xxxx/demo2.md
 
 (3) GITHUB_CURRENT_SYNC_FILE_PATH: 是存在 githhub 仓库的文件，例如：`pages/demo.md`。 `pages` 是仓库根目录下一个文件夹。它对应 `commit` 操作，将卡片笔记保存到该文件。
 
-(4) GITHUB_SYNC_FILE_LIST : 是 `pull` 操作对应的文件列表，使用用逗号进行分隔，`pull` 操作 可以将文件从github 仓库拉取到后台数据库，然后再客户端页面显示。 
+(4) GITHUB_OTHER_SYNC_FILE_LIST : 是额外对应的文件列表，使用用逗号进行分隔，`pull` 操作 可以将GITHUB_CURRENT_SYNC_FILE_PATH 与 GITHUB_OTHER_SYNC_FILE_LIST 对应的文件从github 仓库拉取到后台数据库，然后再客户端页面显示。 
 
 ## 坚果云相关配置解释
 

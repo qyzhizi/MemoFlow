@@ -14,7 +14,7 @@ GITHUB_REPO = env_vars.get("GITHUB_REPO", None)
 
 GITHUB_CURRENT_SYNC_FILE_PATH = env_vars.get("GITHUB_CURRENT_SYNC_FILE_PATH",
                                              None)
-GITHUB_SYNC_FILE_LIST = env_vars.get("GITHUB_SYNC_FILE_LIST", None)
+GITHUB_OTHER_SYNC_FILE_LIST = env_vars.get("GITHUB_OTHER_SYNC_FILE_LIST", None)
 
 SYNC_DATA_BASE_PATH = env_vars.get("SYNC_DATA_BASE_PATH", None)
 SYNC_TABLE_NAME = env_vars.get("SYNC_TABLE_NAME", None)
@@ -33,15 +33,13 @@ SEND_TO_JIANGUOYUN = bool(int(env_vars.get("SEND_TO_JIANGUOYUN", 0)))
 if GITHUB_CURRENT_SYNC_FILE_PATH == None:
     # github repo根目录下的memoflow_sync文件夹
     GITHUB_CURRENT_SYNC_FILE_PATH = "memoflow_sync/first_file.md"
-if GITHUB_SYNC_FILE_LIST == None:
-    GITHUB_SYNC_FILE_LIST = "memoflow_sync/first_file.md"
 
 if SYNC_DATA_BASE_PATH == None:
     # 当前工作目录下，db_data文件夹
     SYNC_DATA_BASE_PATH = os.path.join("db_data", "memoflow_sync_data.db")
 if SYNC_TABLE_NAME == None:
     # get GITHUB_CURRENT_SYNC_FILE_PATH file name
-    file_name = os.path.basename(GITHUB_CURRENT_SYNC_FILE_PATH)
+    file_name = os.path.basename(GITHUB_CURRENT_SYNC_FILE_PATH).strip()
     if file_name == "":
         file_name = "sync_data"
     file_name = file_name.split(".")[0]
@@ -78,9 +76,9 @@ CONF_OPTS = [
     cfg.StrOpt("GITHUB_CURRENT_SYNC_FILE_PATH",
                default=GITHUB_CURRENT_SYNC_FILE_PATH,
                help='GITHUB_CURRENT_SYNC_FILE_PATH'),
-    cfg.StrOpt("GITHUB_SYNC_FILE_LIST",
-               default=GITHUB_SYNC_FILE_LIST,
-               help='GITHUB_SYNC_FILE_LIST'),
+    cfg.StrOpt("GITHUB_OTHER_SYNC_FILE_LIST",
+               default=GITHUB_OTHER_SYNC_FILE_LIST,
+               help='GITHUB_OTHER_SYNC_FILE_LIST'),
     cfg.StrOpt("DATA_BASE_CLIPBOARD_PATH",
                default=DATA_BASE_CLIPBOARD_PATH,
                help='clipboard_log db file path'),

@@ -10,6 +10,7 @@ from memoflow.conf import CONF
 from memoflow.core import wsgi
 from memoflow.core import dependency
 from memoflow.utils.token_jwt import token_required
+from memoflow.utils import common
 
 from typing import (
     Any,
@@ -33,6 +34,9 @@ CLIPBOARD_TABLE_NAME = CONF.diary_log['CLIPBOARD_TABLE_NAME']  #clipboard数据�
 CLIPBOARD_DATA_BASE_PATH = CONF.diary_log[
     'DATA_BASE_CLIPBOARD_PATH']  #clipboard数据库路径
 
+FILE_LIST = CONF.diary_log['GITHUB_CURRENT_SYNC_FILE_PATH'] + ',' \
+            + CONF.diary_log['GITHUB_OTHER_SYNC_FILE_LIST']
+sync_file_paths, sync_table_names = common.paths_to_table_names(FILE_LIST)
 
 @dependency.requires('diary_log_api')
 # @dependency.requires('llm_api')
@@ -128,9 +132,18 @@ class DiaryLog(wsgi.Application):
 
     @token_required
     def get_logs(self, req):
-        rows = self.diary_db_api.get_logs(columns=['content','id'])
-        contents = [row[0] for row in rows]
-        ids = [row[1] for row in rows]
+        pages = []
+        contents = []
+        ids = []
+        for table_name in sync_table_names:
+            temp_rows = self.diary_db_api.get_logs(
+                table=table_name, columns=['content','id'])
+            pages.append(temp_rows)
+        # rows = self.diary_db_api.get_logs(columns=['content','id'])
+        pages.reverse()
+        for page in pages:
+            contents.extend([row[0] for row in page])
+            ids.extend([row[1] for row in page])
         return json.dumps({'logs': contents, 'ids': ids})
     
     @token_required
@@ -247,39 +260,38 @@ class DiaryLog(wsgi.Application):
 
     @token_required
     def get_contents_from_github(self, req):
-
-        # get_contents_from_github
-        sync_file_path_list = CONF.diary_log['GITHUB_SYNC_FILE_LIST']
-        sync_file_path_list = sync_file_path_list.split(",")
-        token = CONF.diary_log['GITHUB_TOKEN']
-        repo = CONF.diary_log['GITHUB_REPO']
-        branch_name = "main"
-        contents = self.diary_db_api.get_contents_from_github(
-            token, repo, sync_file_path_list, branch_name)
-        return json.dumps({"contents": contents})
-
-    @token_required
-    def sync_contents_from_github_to_db(self, req):
-        sync_file_path_list = CONF.diary_log['GITHUB_SYNC_FILE_LIST']
-        sync_file_path_list = sync_file_path_list.split(",")
-        # remove empty string, and strip space
-        for idx, file_path in enumerate(sync_file_path_list):
-            file_path = file_path.strip()
-            if file_path == "":
-                sync_file_path_list.remove(file_path)
-            else:
-                sync_file_path_list[idx] = file_path
-
+        if len(sync_file_paths) != len(sync_table_names):
+            raise Exception("sync_file_paths and sync_table_names length not equal")
         token = CONF.diary_log['GITHUB_TOKEN']
         repo = CONF.diary_log['GITHUB_REPO']
         branch_name = "main"
         contents = self.diary_log_api.get_contents_from_github(
-            token, repo, sync_file_path_list, branch_name)
+            token, repo, sync_file_paths, branch_name)
+        if len(contents) != len(sync_file_paths):
+            raise Exception("contents length and len(sync_file_paths) not equal")
+        result = []
+        for content in contents:
+            result.extend(content)
+        # return contents
+        return json.dumps({"contents": result})
+
+    @token_required
+    def sync_contents_from_github_to_db(self, req):
+        if len(sync_file_paths) != len(sync_table_names):
+            raise Exception("sync_file_paths and sync_table_names length not equal")
+        token = CONF.diary_log['GITHUB_TOKEN']
+        repo = CONF.diary_log['GITHUB_REPO']
+        branch_name = "main"
+        contents = self.diary_log_api.get_contents_from_github(
+            token, repo, sync_file_paths, branch_name)
+        if len(contents) != len(sync_file_paths):
+            raise Exception("contents length and len(sync_file_paths) not equal")
         # sync contents to db
-        self.diary_log_api.sync_contents_to_db(
-            contents,
-            table_name=SYNC_TABLE_NAME,
-            data_base_path=SYNC_DATA_BASE_PATH)
+        for index, table_name in enumerate(sync_table_names):
+            self.diary_log_api.sync_contents_to_db(
+                [contents[index]],
+                table_name=table_name,
+                data_base_path=SYNC_DATA_BASE_PATH)
         return "success"
 
     def search_contents_from_vecter_db(self, req):
