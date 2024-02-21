@@ -98,7 +98,7 @@ function removeLogseqMatches(inputString) {
 
     // 使用正则表达式进行划分
     var regex = /^\t-[\x20]#ans/gm;
-    const pattern_t = /^\t- /gm;
+    const pattern_t = /^\t- #/gm;
     var splittedParts = String1.split(regex);
     // 判断splittedParts 的长度是否大于 2
     if (splittedParts.length > 2) {
@@ -110,14 +110,14 @@ function removeLogseqMatches(inputString) {
     }
     // 如果长度为 1，说明字符串中没有包含 #ans
     if (splittedParts.length === 1) {
-        result = splittedParts[0].replace(pattern_t, '')
+        result = splittedParts[0].replace(pattern_t, '#');
         console.log("输入字符串中没有包含 #ans");
         return result.substring(2);
     }
     // 如果长度为 2，说明字符串中包含了 #ans
     if (splittedParts.length === 2) {
         console.log("输入字符串中包含了 #ans");
-        splittedParts[0] = splittedParts[0].replace(pattern_t, '')
+        splittedParts[0] = splittedParts[0].replace(pattern_t, '#');
 
         part1 = splittedParts[0];
         part2 = splittedParts[1];

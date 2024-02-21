@@ -286,7 +286,7 @@ class DiaryLog(wsgi.Application):
         contents = self.diary_log_api.get_contents_from_github(
             token, repo, sync_file_paths, branch_name)
         if len(contents) != len(sync_file_paths):
-            raise Exception("contents length and len(sync_file_paths) not equal")
+            LOG.warn("contents length and len(sync_file_paths) not equal")
         # sync contents to db
         for index, table_name in enumerate(sync_table_names):
             self.diary_log_api.sync_contents_to_db(

@@ -10,7 +10,7 @@ services:
     ports:
      - "9000:9000"
      - "5678:5678"
-    restart: always
+    # restart: always
     volumes:
       - "..:/app"
     networks:
