@@ -10,7 +10,7 @@ from memoflow.conf import CONF
 from memoflow.core import wsgi
 from memoflow.core import dependency
 from memoflow.utils.token_jwt import token_required
-from memoflow.utils import common
+from memoflow.app.diary_log.common import TablePathMap
 
 from typing import (
     Any,
@@ -34,9 +34,8 @@ CLIPBOARD_TABLE_NAME = CONF.diary_log['CLIPBOARD_TABLE_NAME']  #clipboard数据�
 CLIPBOARD_DATA_BASE_PATH = CONF.diary_log[
     'DATA_BASE_CLIPBOARD_PATH']  #clipboard数据库路径
 
-FILE_LIST = CONF.diary_log['GITHUB_CURRENT_SYNC_FILE_PATH'] + ',' \
-            + CONF.diary_log['GITHUB_OTHER_SYNC_FILE_LIST']
-sync_file_paths, sync_table_names = common.paths_to_table_names(FILE_LIST)
+sync_file_paths = TablePathMap.sync_file_paths
+sync_table_names = TablePathMap.sync_table_names
 
 @dependency.requires('diary_log_api')
 # @dependency.requires('llm_api')
@@ -164,6 +163,20 @@ class DiaryLog(wsgi.Application):
         processed_block_content = self.diary_log_api.process_block(
             processed_content)
         diary_of_id = self.diary_db_api.get_log_by_id(diary_log["record_id"])
+        table_name = TablePathMap.current_table_name
+        table_path_of_github = TablePathMap.current_table_path
+        if not diary_of_id:
+            other_table_path_map = TablePathMap.other_table_path_map
+            for other_table_name in other_table_path_map.keys():
+                diary_of_id = self.diary_db_api.get_log_by_id(
+                                        diary_log["record_id"],
+                                        table_name=other_table_name)
+                if diary_of_id:
+                    table_name = other_table_name
+                    table_path_of_github = other_table_path_map[other_table_name]
+                    break
+            if not diary_of_id:
+                return json.dumps({"error": "diary not found in database"})
         que_string: List[str] = self.diary_log_api.get_que_string_from_content(
             processed_block_content)
         if que_string and que_string[0] not in diary_of_id[0]:
@@ -174,16 +187,18 @@ class DiaryLog(wsgi.Application):
                                                            }])
         # 保存到本地数据库
         self.diary_db_api.update_log(diary_log["record_id"], 
-                                     processed_block_content, tags)
+                                     processed_block_content,
+                                     tags,
+                                     table_name=table_name)
 
         # 向github仓库（logseq 笔记软件）发送更新后的数据
         if CONF.diary_log['SEND_TO_GITHUB'] == True:
-            rows = self.diary_db_api.get_logs()
+            rows = self.diary_db_api.get_logs(table=table_name)
             updated_contents = [row[0] for row in rows]
             updated_contents.reverse()
             updated_content = "\n".join(updated_contents)
 
-            file_path = CONF.diary_log['GITHUB_CURRENT_SYNC_FILE_PATH']
+            file_path = table_path_of_github
             commit_message = "commit by memoflow"
             branch_name = "main"
             token = CONF.diary_log['GITHUB_TOKEN']
@@ -285,13 +300,15 @@ class DiaryLog(wsgi.Application):
         branch_name = "main"
         contents = self.diary_log_api.get_contents_from_github(
             token, repo, sync_file_paths, branch_name)
-        if len(contents) != len(sync_file_paths):
+        if len(contents.keys()) != len(sync_file_paths):
             LOG.warn("contents length and len(sync_file_paths) not equal")
         # sync contents to db
-        for index, table_name in enumerate(sync_table_names):
+        path_table_map = TablePathMap.path_table_map
+        # sync_table_names = [path_table_map[file_path] for file_path in contents]
+        for file_path in contents:
             self.diary_log_api.sync_contents_to_db(
-                [contents[index]],
-                table_name=table_name,
+                [contents[file_path]],
+                table_name=path_table_map[file_path],
                 data_base_path=SYNC_DATA_BASE_PATH)
         return "success"
 

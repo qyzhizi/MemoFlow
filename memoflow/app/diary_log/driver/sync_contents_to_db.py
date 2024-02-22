@@ -107,9 +107,9 @@ def process_file_content_2_db(contents: list, table_name, data_base_path):
     # 正则匹配，根据时间标题，找到所有的标题的位置
     # 调用函数并输出匹配到的行号和内容
     # filename = FILENAME
-    for content in contents:
+    for idx, content in enumerate(contents):
         if not content.startswith('- '):
-            content = '- ' + content
+            contents[idx] = '- ' + content
     matches, all_lines = find_matching_lines(contents)
 
     # 获取笔记的间隔点

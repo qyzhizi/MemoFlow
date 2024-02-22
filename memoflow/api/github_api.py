@@ -45,7 +45,7 @@ class GitHupApi(object):
                               file.sha, branch_name)
 
     def get_contents(self, sync_file_path_list, branch_name):
-        contents = []
+        contents = {}
         for file_path in sync_file_path_list:
             # pull file from github
             try:
@@ -55,9 +55,11 @@ class GitHupApi(object):
                 LOG.info(f"File {file_path} not found, skip it.")
                 continue
             if isinstance(files, list):
-                for file in files:
-                    contents.append(file.decoded_content.decode())
+                contents = dict(zip(sync_file_path_list,
+                                    [file.decoded_content.decode() for file in files]))
+                # for file in files:
+                #     contents.append(file.decoded_content.decode())
             else:
-                contents.append(files.decoded_content.decode())
+                contents[file_path]=files.decoded_content.decode()
 
         return contents

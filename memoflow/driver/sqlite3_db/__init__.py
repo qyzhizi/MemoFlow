@@ -1,6 +1,6 @@
 from memoflow.driver.sqlite3_db.diary_log import DBSqliteDriver as diary_log_db
 from memoflow.conf import CONF
-from memoflow.utils import common
+from memoflow.app.diary_log.common import TablePathMap
 
 SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
 SYNC_TABLE_NAME = CONF.diary_log['SYNC_TABLE_NAME']
@@ -14,10 +14,6 @@ CLIPBOARD_TABLE_NAME = CONF.diary_log['CLIPBOARD_TABLE_NAME']
 #clipboard数据库路径
 CLIPBOARD_DATA_BASE_PATH = CONF.diary_log['DATA_BASE_CLIPBOARD_PATH'] 
 
-FILE_LIST = CONF.diary_log['GITHUB_CURRENT_SYNC_FILE_PATH'] + ',' \
-            + CONF.diary_log['GITHUB_OTHER_SYNC_FILE_LIST']
-_, sync_table_names = common.paths_to_table_names(FILE_LIST)
-
 def init_db():
     diary_log_db.init_db_diary_log(data_base_path=SYNC_DATA_BASE_PATH,
                                 table_name=SYNC_TABLE_NAME)
@@ -27,7 +23,7 @@ def init_db():
                                 table_name=SECOND_SYNC_TABLE_NAME)
     diary_log_db.create_table(data_base_path=SYNC_DATA_BASE_PATH,
                            table_name=REVIEW_TABLE_NAME)
-    for table_name in sync_table_names:
+    for table_name in TablePathMap.sync_table_names:
         diary_log_db.create_table(data_base_path=SYNC_DATA_BASE_PATH,
                                  table_name=table_name)
     diary_log_db.init_db_clipboard_log(
