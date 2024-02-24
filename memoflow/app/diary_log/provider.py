@@ -355,6 +355,46 @@ class Manager(manager.Manager):
                                                     sync_file_path_list,
                                                     branch_name)
         return contents
+    
+    def sync_contents_from_github_to_db(self, sync_file_paths, sync_table_names):
+        if len(sync_file_paths) != len(sync_table_names):
+            raise Exception("sync_file_paths and sync_table_names length not equal")
+        token = CONF.diary_log['GITHUB_TOKEN']
+        repo = CONF.diary_log['GITHUB_REPO']
+        branch_name = "main"
+        contents = self.get_contents_from_github(
+            token, repo, sync_file_paths, branch_name)
+        if len(contents.keys()) != len(sync_file_paths):
+            LOG.warn("contents length and len(sync_file_paths) not equal")
+        # sync contents to db
+        path_table_map = dict(zip(sync_file_paths, sync_table_names))
+        # sync_table_names = [path_table_map[file_path] for file_path in contents]
+        for file_path in contents:
+            self.sync_contents_to_db(
+                [contents[file_path]],
+                table_name=path_table_map[file_path],
+                data_base_path=SYNC_DATA_BASE_PATH)
+
+    def sync_contents_from_jianguoyun_to_db(self, sync_file_paths, sync_table_names):
+        if len(sync_file_paths) != len(sync_table_names):
+            raise Exception("sync_file_paths and sync_table_names length not equal")
+        JIANGUOYUN_COUNT = CONF.api_conf.JIANGUOYUN_COUNT
+        JIANGUOYUN_TOKEN = CONF.api_conf.JIANGUOYUN_TOKEN
+        base_url = CONF.api_conf.base_url
+
+
+        contents = self.get_contents_from_jianguoyun(
+            base_url, JIANGUOYUN_COUNT, JIANGUOYUN_TOKEN, sync_file_paths)
+        if len(contents.keys()) != len(sync_file_paths):
+            LOG.warn("contents length and len(sync_file_paths) not equal")
+        # sync contents to db
+        path_table_map = dict(zip(sync_file_paths, sync_table_names))
+        # sync_table_names = [path_table_map[file_path] for file_path in contents]
+        for file_path in contents:
+            self.sync_contents_to_db(
+                [contents[file_path]],
+                table_name=path_table_map[file_path],
+                data_base_path=SYNC_DATA_BASE_PATH)
 
     # sync contents to database
     def sync_contents_to_db(self, contents, table_name, data_base_path):

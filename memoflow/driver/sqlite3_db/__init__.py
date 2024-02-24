@@ -1,6 +1,7 @@
 from memoflow.driver.sqlite3_db.diary_log import DBSqliteDriver as diary_log_db
 from memoflow.conf import CONF
-from memoflow.app.diary_log.common import TablePathMap
+from memoflow.app.diary_log.common import GithubTablePathMap
+from memoflow.app.diary_log.common import JianguoyunTablePathMap
 
 SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
 SYNC_TABLE_NAME = CONF.diary_log['SYNC_TABLE_NAME']
@@ -23,9 +24,14 @@ def init_db():
                                 table_name=SECOND_SYNC_TABLE_NAME)
     diary_log_db.create_table(data_base_path=SYNC_DATA_BASE_PATH,
                            table_name=REVIEW_TABLE_NAME)
-    for table_name in TablePathMap.sync_table_names:
-        diary_log_db.create_table(data_base_path=SYNC_DATA_BASE_PATH,
-                                 table_name=table_name)
+    if CONF.diary_log['SEND_TO_GITHUB'] == True:
+        for table_name in GithubTablePathMap.sync_table_names:
+            diary_log_db.create_table(data_base_path=SYNC_DATA_BASE_PATH,
+                                    table_name=table_name)
+    elif CONF.diary_log['SEND_TO_JIANGUOYUN'] == True:
+        for table_name in JianguoyunTablePathMap.sync_table_names:
+            diary_log_db.create_table(data_base_path=SYNC_DATA_BASE_PATH,
+                                    table_name=table_name)
     diary_log_db.init_db_clipboard_log(
         data_base_path=CLIPBOARD_DATA_BASE_PATH,
         table_name=CLIPBOARD_TABLE_NAME)

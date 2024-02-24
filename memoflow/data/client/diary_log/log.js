@@ -316,7 +316,7 @@ $(function() {
             return;
         }
         $.ajax({
-            url: '/v1/diary-log/sync-contents-from-github-to-db',
+            url: '/v1/diary-log/sync-contents-from-repo-to-db',
             type: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')

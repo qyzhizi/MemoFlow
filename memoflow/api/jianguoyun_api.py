@@ -3,7 +3,16 @@ import io
 from webdav4.client import Client
 
 from memoflow.conf import CONF
-
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+    Type,
+)
 jianguoyun_clients = {}
 
 
@@ -38,4 +47,28 @@ class JianGuoYunClient(object):
             updated_content = added_content + "\n" + content
         updated_file_obj = io.BytesIO(updated_content.encode(encoding))
         self.client.upload_fileobj(updated_file_obj, file_path, overwrite=True)
+    
+    def update_whole_file(self, updated_content: str, file_path: str,
+                          encoding='utf-8'):
+        file_obj = io.BytesIO(updated_content.encode(encoding))
+        self.client.upload_fileobj(file_obj, file_path, overwrite=True)
+    
+    def get_file_content(self, path: str, encoding='utf-8'):
+        if self.exists(path):
+            with self.client.open(path=path, mode='r', encoding=encoding) as file:
+                return file.read()
+
+    def get_contents(self, paths: List[str], encoding='utf-8'):
+        """
+        获取文件内容，返回字典，key为文件路径，value为文件内容
+        :param paths: 文件路径列表
+        :param encoding: 文件编码
+        :return: {path: content}
+        """
+        contents = {}
+        for path in paths:
+            content = self.get_file_content(path, encoding)
+            if content:
+                contents[path] = content
+        return contents
     

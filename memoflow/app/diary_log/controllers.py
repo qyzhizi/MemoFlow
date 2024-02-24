@@ -10,7 +10,8 @@ from memoflow.conf import CONF
 from memoflow.core import wsgi
 from memoflow.core import dependency
 from memoflow.utils.token_jwt import token_required
-from memoflow.app.diary_log.common import TablePathMap
+from memoflow.app.diary_log.common import GithubTablePathMap
+from memoflow.app.diary_log.common import JianguoyunTablePathMap
 
 from typing import (
     Any,
@@ -34,8 +35,12 @@ CLIPBOARD_TABLE_NAME = CONF.diary_log['CLIPBOARD_TABLE_NAME']  #clipboard数据�
 CLIPBOARD_DATA_BASE_PATH = CONF.diary_log[
     'DATA_BASE_CLIPBOARD_PATH']  #clipboard数据库路径
 
-sync_file_paths = TablePathMap.sync_file_paths
-sync_table_names = TablePathMap.sync_table_names
+if CONF.diary_log['SEND_TO_GITHUB'] == True:
+    sync_file_paths = GithubTablePathMap.sync_file_paths
+    sync_table_names = GithubTablePathMap.sync_table_names
+elif CONF.diary_log['SEND_TO_JIANGUOYUN'] == True:
+    sync_file_paths = JianguoyunTablePathMap.sync_file_paths
+    sync_table_names = JianguoyunTablePathMap.sync_table_names
 
 @dependency.requires('diary_log_api')
 # @dependency.requires('llm_api')
@@ -116,7 +121,7 @@ class DiaryLog(wsgi.Application):
             JIANGUOYUN_COUNT = CONF.api_conf.JIANGUOYUN_COUNT
             JIANGUOYUN_TOKEN = CONF.api_conf.JIANGUOYUN_TOKEN
             base_url = CONF.api_conf.base_url
-            to_path = CONF.api_conf.JIANGUOYUN_TO_PATH
+            to_path = CONF.api_conf.JIANGUOYUN_CURRENT_SYNC_FILE_PATH
             added_content = processed_block_content
             self.asyn_task_api.celery_update_file_to_jianguoyun(
                 base_url,
@@ -163,17 +168,24 @@ class DiaryLog(wsgi.Application):
         processed_block_content = self.diary_log_api.process_block(
             processed_content)
         diary_of_id = self.diary_db_api.get_log_by_id(diary_log["record_id"])
-        table_name = TablePathMap.current_table_name
-        table_path_of_github = TablePathMap.current_table_path
+
+        if CONF.diary_log['SEND_TO_GITHUB'] == True:
+            table_name = GithubTablePathMap.current_table_name
+            table_path_of_repo = GithubTablePathMap.current_table_path
+            other_table_path_map = GithubTablePathMap.other_table_path_map
+        elif CONF.diary_log['SEND_TO_JIANGUOYUN'] == True:
+            table_name = JianguoyunTablePathMap.current_table_name
+            table_path_of_repo = JianguoyunTablePathMap.current_table_path
+            other_table_path_map = JianguoyunTablePathMap.other_table_path_map
+
         if not diary_of_id:
-            other_table_path_map = TablePathMap.other_table_path_map
             for other_table_name in other_table_path_map.keys():
                 diary_of_id = self.diary_db_api.get_log_by_id(
                                         diary_log["record_id"],
                                         table_name=other_table_name)
                 if diary_of_id:
                     table_name = other_table_name
-                    table_path_of_github = other_table_path_map[other_table_name]
+                    table_path_of_repo = other_table_path_map[other_table_name]
                     break
             if not diary_of_id:
                 return json.dumps({"error": "diary not found in database"})
@@ -191,14 +203,14 @@ class DiaryLog(wsgi.Application):
                                      tags,
                                      table_name=table_name)
 
+        rows = self.diary_db_api.get_logs(table=table_name)
+        updated_contents = [row[0] for row in rows]
+        updated_contents.reverse()
+        updated_content = "\n".join(updated_contents)
+
         # 向github仓库（logseq 笔记软件）发送更新后的数据
         if CONF.diary_log['SEND_TO_GITHUB'] == True:
-            rows = self.diary_db_api.get_logs(table=table_name)
-            updated_contents = [row[0] for row in rows]
-            updated_contents.reverse()
-            updated_content = "\n".join(updated_contents)
-
-            file_path = table_path_of_github
+            file_path = table_path_of_repo
             commit_message = "commit by memoflow"
             branch_name = "main"
             token = CONF.diary_log['GITHUB_TOKEN']
@@ -207,6 +219,19 @@ class DiaryLog(wsgi.Application):
             self.asyn_task_api.celery_push_updatedfile_to_github(
                 token, repo, file_path, updated_content, commit_message,
                 branch_name)
+        elif CONF.diary_log['SEND_TO_JIANGUOYUN'] == True:
+            JIANGUOYUN_COUNT = CONF.api_conf.JIANGUOYUN_COUNT
+            JIANGUOYUN_TOKEN = CONF.api_conf.JIANGUOYUN_TOKEN
+            base_url = CONF.api_conf.base_url
+            to_path = table_path_of_repo
+            # added_content = processed_block_content
+            self.asyn_task_api.celery_push_updatedfile_to_jianguoyun(
+                base_url,
+                JIANGUOYUN_COUNT,
+                JIANGUOYUN_TOKEN,
+                to_path,
+                updated_content,
+                overwrite=True)
         return json.dumps({"content": processed_block_content})
                                                         
     @token_required
@@ -276,6 +301,8 @@ class DiaryLog(wsgi.Application):
 
     @token_required
     def get_contents_from_github(self, req):
+        if CONF.diary_log['SEND_TO_GITHUB'] != True:
+            return json.dumps({"error": "CONF SEND_TO_GITHUB != True"})
         if len(sync_file_paths) != len(sync_table_names):
             raise Exception("sync_file_paths and sync_table_names length not equal")
         token = CONF.diary_log['GITHUB_TOKEN']
@@ -292,24 +319,18 @@ class DiaryLog(wsgi.Application):
         return json.dumps({"contents": result})
 
     @token_required
-    def sync_contents_from_github_to_db(self, req):
-        if len(sync_file_paths) != len(sync_table_names):
-            raise Exception("sync_file_paths and sync_table_names length not equal")
-        token = CONF.diary_log['GITHUB_TOKEN']
-        repo = CONF.diary_log['GITHUB_REPO']
-        branch_name = "main"
-        contents = self.diary_log_api.get_contents_from_github(
-            token, repo, sync_file_paths, branch_name)
-        if len(contents.keys()) != len(sync_file_paths):
-            LOG.warn("contents length and len(sync_file_paths) not equal")
-        # sync contents to db
-        path_table_map = TablePathMap.path_table_map
-        # sync_table_names = [path_table_map[file_path] for file_path in contents]
-        for file_path in contents:
-            self.diary_log_api.sync_contents_to_db(
-                [contents[file_path]],
-                table_name=path_table_map[file_path],
-                data_base_path=SYNC_DATA_BASE_PATH)
+    def sync_contents_from_repo_to_db(self, req):
+        if CONF.diary_log['SEND_TO_GITHUB'] == True:
+            sync_file_paths = GithubTablePathMap.sync_file_paths
+            sync_table_names = GithubTablePathMap.sync_table_names
+            self.diary_log_api.sync_contents_from_github_to_db(
+                sync_file_paths=sync_file_paths,
+                sync_table_names=sync_table_names)
+        elif CONF.diary_log['SEND_TO_JIANGUOYUN'] == True:
+            self.diary_log_api.sync_contents_from_jianguoyun_to_db(
+                sync_file_paths=JianguoyunTablePathMap.sync_file_paths,
+                sync_table_names=JianguoyunTablePathMap.sync_table_names)
+
         return "success"
 
     def search_contents_from_vecter_db(self, req):

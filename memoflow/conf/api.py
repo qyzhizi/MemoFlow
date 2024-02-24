@@ -7,7 +7,8 @@ import os
 BASE_URL = 'https://dav.jianguoyun.com/dav/'
 JIANGUOYUN_COUNT = env_vars.get("JIANGUOYUN_COUNT",  None)
 JIANGUOYUN_TOKEN = env_vars.get("JIANGUOYUN_TOKEN",  None)
-JIANGUOYUN_TO_PATH = env_vars.get("JIANGUOYUN_TO_PATH",  None)
+JIANGUOYUN_CURRENT_SYNC_FILE_PATH = env_vars.get("JIANGUOYUN_CURRENT_SYNC_FILE_PATH",  None)
+JIANGUOYUN__OTHER_SYNC_FILE_LIST = env_vars.get("JIANGUOYUN__OTHER_SYNC_FILE_LIST", None)
 
 second_jianguoyun_count = env_vars.get("SECOND_JIANGUOYUN_COUNT",  None)
 second_jianguoyun_token = env_vars.get("SECOND_JIANGUOYUN_TOKEN",  None)
@@ -31,10 +32,12 @@ CONF_OPTS = [
     cfg.StrOpt('JIANGUOYUN_TOKEN',
                default=JIANGUOYUN_TOKEN,
                help='坚果云token'),
-    cfg.StrOpt('JIANGUOYUN_TO_PATH',
-               default=JIANGUOYUN_TO_PATH,
+    cfg.StrOpt('JIANGUOYUN_CURRENT_SYNC_FILE_PATH',
+               default=JIANGUOYUN_CURRENT_SYNC_FILE_PATH,
                help='坚果云笔记更新文件的路径'),
-
+    cfg.StrOpt('JIANGUOYUN__OTHER_SYNC_FILE_LIST',
+               default=JIANGUOYUN__OTHER_SYNC_FILE_LIST,
+               help='坚果云笔记其他更新文件的路径'),
     cfg.StrOpt('second_jianguoyun_count',
                 default=second_jianguoyun_count,
                 help='second 的坚果云账号'),

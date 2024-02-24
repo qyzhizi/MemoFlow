@@ -1,6 +1,7 @@
 import os
 from oslo_config import cfg
 from dotenv import dotenv_values
+from memoflow.utils.common import filename_to_table_name
 
 env_vars = dotenv_values(".env")
 
@@ -14,6 +15,7 @@ GITHUB_REPO = env_vars.get("GITHUB_REPO", None)
 
 GITHUB_CURRENT_SYNC_FILE_PATH = env_vars.get("GITHUB_CURRENT_SYNC_FILE_PATH",
                                              None)
+JIANGUOYUN_CURRENT_SYNC_FILE_PATH = env_vars.get("JIANGUOYUN_CURRENT_SYNC_FILE_PATH",  None)                                             
 GITHUB_OTHER_SYNC_FILE_LIST = env_vars.get("GITHUB_OTHER_SYNC_FILE_LIST", None)
 
 SYNC_DATA_BASE_PATH = env_vars.get("SYNC_DATA_BASE_PATH", None)
@@ -39,12 +41,16 @@ if SYNC_DATA_BASE_PATH == None:
     SYNC_DATA_BASE_PATH = os.path.join("db_data", "memoflow_sync_data.db")
 if SYNC_TABLE_NAME == None:
     # get GITHUB_CURRENT_SYNC_FILE_PATH file name
-    file_name = os.path.basename(GITHUB_CURRENT_SYNC_FILE_PATH).strip()
+    if SEND_TO_GITHUB:
+        file_name = os.path.basename(GITHUB_CURRENT_SYNC_FILE_PATH).strip()
+    elif SEND_TO_JIANGUOYUN:
+        file_name = os.path.basename(JIANGUOYUN_CURRENT_SYNC_FILE_PATH).strip()
+
     if file_name == "":
         file_name = "sync_data"
     file_name = file_name.split(".")[0]
     # 当前工作目录下，db_data文件夹
-    SYNC_TABLE_NAME = file_name
+    SYNC_TABLE_NAME = filename_to_table_name(file_name)
 
 if REVIEW_TABLE_NAME == None:
     REVIEW_TABLE_NAME = "review_diary_log"

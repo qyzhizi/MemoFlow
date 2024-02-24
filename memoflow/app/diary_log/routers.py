@@ -60,9 +60,9 @@ class Router(wsgi.ComposableRouter):
                        action='get_contents_from_github',
                        conditions=dict(method=['GET']))
         # sync contents from github to db
-        mapper.connect('/diary-log/sync-contents-from-github-to-db',
+        mapper.connect('/diary-log/sync-contents-from-repo-to-db',
                        controller=diary_log_controller,
-                       action='sync_contents_from_github_to_db',
+                       action='sync_contents_from_repo_to_db',
                        conditions=dict(method=['GET']))
         
         # search contents from vecter db

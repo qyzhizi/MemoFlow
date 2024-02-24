@@ -86,6 +86,15 @@ def update_file_to_janguoyun(base_url: str, acount: str, token: str,
     else:
         my_client.upload_content_to_new_file(content, to_path, overwrite)
 
+@celery.task
+def celery_push_updatedfile_to_jianguoyun(base_url: str, acount: str, token: str,
+                                          to_path: str, content: str,
+                                          overwrite: bool = True) -> None:
+    if jianguoyun_clients.get(acount, None) is None:
+        jianguoyun_clients[acount] = JianGuoYunClient(base_url, acount, token)
+    my_client = jianguoyun_clients[acount]
+    if my_client.exists(to_path):
+        my_client.update_whole_file(updated_content=content, file_path=to_path)
 
 @celery.task
 def add_texts_to_vector_db_coll(texts: Iterable[str],
