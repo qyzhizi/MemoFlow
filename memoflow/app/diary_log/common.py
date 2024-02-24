@@ -1,10 +1,13 @@
 from memoflow.conf import CONF
 from memoflow.utils import common
 
+GITHUB_OTHER_SYNC_FILE_LIST = CONF.diary_log['GITHUB_OTHER_SYNC_FILE_LIST'] or ""
 GITHUB_FILE_LIST = CONF.diary_log['GITHUB_CURRENT_SYNC_FILE_PATH'] + ',' \
-            + CONF.diary_log['GITHUB_OTHER_SYNC_FILE_LIST']
+            + GITHUB_OTHER_SYNC_FILE_LIST
+
+JIANGUOYUN__OTHER_SYNC_FILE_LIST = CONF.api_conf['JIANGUOYUN__OTHER_SYNC_FILE_LIST'] or ""            
 JIANGUOYUN_FILE_LIST = CONF.api_conf['JIANGUOYUN_CURRENT_SYNC_FILE_PATH'] + ',' \
-            + CONF.api_conf['JIANGUOYUN__OTHER_SYNC_FILE_LIST'] 
+            + JIANGUOYUN__OTHER_SYNC_FILE_LIST 
 
 class GithubTablePathMap():
     sync_file_paths, sync_table_names = common.paths_to_table_names(GITHUB_FILE_LIST)
