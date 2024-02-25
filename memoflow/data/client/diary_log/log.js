@@ -240,7 +240,7 @@ function editLogEntry(pre, record_id) {
     }
 
     // 将原始日志内容填充到编辑框中
-    pre_text = removeLinksAndRestoreText(pre);
+    pre_text = getOriginTextFromPre(pre);
     editLog.value = removeLogseqMatches(pre_text);
 }
 
@@ -280,17 +280,19 @@ function replaceURLsWithLinks(pre_element) {
     // Get the text content of the <pre> element
     var content = pre_element.html();
     // Regular expression to find URLs within the text
-    var urlRegex = /(https?:\/\/[^\s]+)/g;
+    var urlRegex = /(?<=^|\s)(https?:\/\/[^\s]+)/g;
     // Replace URLs with hyperlinks
     content = content.replace(urlRegex, function(url) {
       return '<a href="' + url + '">' + url + '</a>';
     });
     // Set the HTML content of the <pre> element with the replaced content
     pre_element.html(content);
-  }
+}
 
 
-function removeLinksText(element) {
+
+
+function getOriginTextFromPre(element) {
     // 使用clone()方法创建元素的副本
     var elementCopy = element.clone();
     // 选择所有超链接元素并替换为其文本内容
