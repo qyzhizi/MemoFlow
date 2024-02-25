@@ -2,6 +2,7 @@ function addLogEntry(logText, record_id) {
     var pre = $('<pre class="log-entry"></pre>'); // 添加一个类以便样式控制
     // 将 pre 元素的内容添加到 pre 中
     pre.text(logText);
+    replaceURLsWithLinks(pre);
     // 创建一个包含下拉菜单的容器
     var logEntryContainer = $('<div class="log-entry-container"></div>');
     // 下拉菜单图标容器
@@ -214,6 +215,7 @@ function editLogEntry(pre, record_id) {
                 reponseText = response.content
                 // 更新原始的日志内容
                 pre.text(reponseText);
+                replaceURLsWithLinks(pre)
                 // 清空编辑框
                 editLog.value = '';
                 // 关闭模态框
@@ -238,7 +240,8 @@ function editLogEntry(pre, record_id) {
     }
 
     // 将原始日志内容填充到编辑框中
-    editLog.value = removeLogseqMatches(pre.text());
+    pre_text = removeLinksAndRestoreText(pre);
+    editLog.value = removeLogseqMatches(pre_text);
 }
 
 // 删除日志条目函数
@@ -253,7 +256,6 @@ function deleteLogEntry(record_id) {
         success: function(response) {
             // 请求成功时的处理
             console.log('Logs deleted successfully.');
-            // 可以在这里执行其他操作，如刷新页面或更新UI等
         },
         error: function(jqXHR, textStatus, errorThrown) {
             console.log(jqXHR);
@@ -270,6 +272,34 @@ function deleteLogEntry(record_id) {
             }
         }
     });
+}
+
+
+// Function to replace URLs with hyperlinks within a <pre> element
+function replaceURLsWithLinks(pre_element) {
+    // Get the text content of the <pre> element
+    var content = pre_element.html();
+    // Regular expression to find URLs within the text
+    var urlRegex = /(https?:\/\/[^\s]+)/g;
+    // Replace URLs with hyperlinks
+    content = content.replace(urlRegex, function(url) {
+      return '<a href="' + url + '">' + url + '</a>';
+    });
+    // Set the HTML content of the <pre> element with the replaced content
+    pre_element.html(content);
+  }
+
+
+function removeLinksText(element) {
+    // 使用clone()方法创建元素的副本
+    var elementCopy = element.clone();
+    // 选择所有超链接元素并替换为其文本内容
+    elementCopy.find('a').replaceWith(function() {
+        // 返回超链接的文本内容
+        return this.textContent;
+    });
+    // 返回修改后的文本内容
+    return elementCopy.text();
 }
 
 
