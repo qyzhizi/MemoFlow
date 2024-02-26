@@ -113,7 +113,8 @@ class Manager(manager.Manager):
         """
         processed_result = []
 
-        items = re.split(r'(\t+-\s+)', block_string)
+        pattern = r'(\t+-[\x20]|\t-@ans[\x20])'
+        items = re.split(pattern, block_string)
 
         # 假设block_string以`- ## 2023-5-10`开头，
         # 开头是第一个block,但该block不带"\t", 额外做处理，变为0个"\t"
@@ -131,11 +132,21 @@ class Manager(manager.Manager):
         for i in range(0, len(items), 2):
             if i+1 < len(items):
                 t_list = items[i].split("-")
-                t_num = len(t_list[0])
+                if len(t_list) > 1 and t_list[1] == "@ans ":
+                    # norm ans child block
+                    t_num = (1, "@ans ")
+                else:
+                    t_num = len(t_list[0])
                 child_block_list.append((t_num, items[i+1]))
 
         # 处理每个子块
         for i, (t_num, item) in enumerate(child_block_list):
+            if t_num == (1, "@ans "):
+                t_num = 1
+                child_block_list[i] = (t_num, item)
+                ans_child_block = True
+            else:
+                ans_child_block = False
             #得到每一行，相当于logseq的软回车的行
             lines = item.split('\n')
             # split('\n')操作会可能会多得到一个空字符串, 去除最后一个空字符串
@@ -150,10 +161,8 @@ class Manager(manager.Manager):
                 # 当前子块如果比上个子块多2个、2个以上的"\t"，进行现在，最多只能多一个"\t"
                 if i-1 >= 0 and t_num >= child_block_list[i-1][0] +1:
                     t_num = child_block_list[i-1][0] +1
-                # 判断是否为block开头标识：t_num*'\t'+ "- "
-                if line_index == 0:
-                    pre_str = t_num*'\t'+ "- "
-                else:
+                # 判断是否为block开头标识：t_num*'\t'+ "- "                    
+                if line_index > 0 or ans_child_block:
                     # 软回车标识
                     pre_str = t_num*'\t'+ "  "
                     # 匹配开头“\t\t  ”, 多个"\t", 两个空格
@@ -161,6 +170,8 @@ class Manager(manager.Manager):
                     if match is not None:
                         #统一先删除，后面再加上
                         line = line[len(match[0]):]
+                elif line_index == 0:
+                    pre_str = t_num*'\t'+ "- "
 
                 #加上t_num*'\t'+ "  " 或者t_num*'\t'+ "- "
                 processed_result.append(pre_str + line)
@@ -200,8 +211,16 @@ class Manager(manager.Manager):
         title_string = "##"
         tag_string = "#"
         block_pre_string = ["- ", "\t- "]
-        list_pre_dict ={"1-":"- ", "2-":"@blk- "}
-        list_parse_pre_dict = {"1-":"\t\t- ", "2-":"\t\t\t- "}
+        # 替换规则, 类似的字符串上下顺序有要求，复杂的放上面
+        list_parse_pre_dict = [
+            ('- ', '\t\t- '),
+            ('@blk ', '\t- '),
+            ('@blk- ', '\t\t\t- '),
+            ('@blk-', '\t\t\t- '),
+            ('@blk', '\t- '),
+            ('@ans ', '\t-@ans '),
+            ('@ans', '\t-@ans '),
+        ]
         que_flag = False
         ans_flag = False
         que_condition_flag = 0
@@ -274,11 +293,10 @@ class Manager(manager.Manager):
 
             # 解析`- ` 变为子块, ans_flag = True, ensure right place. "\t- #ans" will not match this condition
             if ans_flag and content:
-                for key in list_pre_dict.keys():
-                    list_pre_flag = content[:len(list_pre_dict[key])] == list_pre_dict[key]
-                    if list_pre_flag:
-                        new_content = list_parse_pre_dict[key] + content[len(list_pre_dict[key]):]
-                        content_list[i] = new_content
+                for old, new in  list_parse_pre_dict:
+                    if content.startswith(old):
+                        content = new + content[len(old):]
+                        content_list[i] = content
                         break
 
         # 重新组成串,并去除前后的空格与换行符等空白字符

@@ -91,8 +91,68 @@ function addLogEntry(logText, record_id) {
     dropdownMenu.append(deleteOption);
 }
 
+
+/**
+ * 将字符串根据给定的模式分割，并返回匹配项和分隔符的列表
+ * @param {string} inputString - 要分割的字符串
+ * @param {RegExp} pattern_t - 用于分割字符串的正则表达式模式
+ * @returns {string[]} - 包含匹配项和分隔符的列表
+ */
+function splitStringWithPattern(inputString, pattern_t) {
+    let match;
+    let match_list = [];
+    let old_index = 0;
+
+    while ((match = pattern_t.exec(inputString)) !== null) {
+        match_list.push(inputString.substring(old_index, match.index));
+        match_list.push(match[0]);
+        old_index = pattern_t.lastIndex;
+    }
+    if (old_index != 0){
+        match_list.push(inputString.substring(old_index));}
+    return match_list;
+}
+
+
+/**
+ * 对给定的 process_input 数组进行处理，根据匹配项进行相应操作，并返回处理后的字符串。
+ * @param {Array} process_input 包含待处理数据的数组。
+ * @param {RegExp} pattern_logseq_child - 用于分割字符串的正则表达式模式
+ * @returns {String} 处理后的字符串。
+ */
+function processInputAndReturnString(process_input, pattern_logseq_child) {
+    // 遍历 process_input 数组，只输出 匹配项
+    for (let i = 1; i < process_input.length; i += 2) {
+        index = i
+        strings_index = i +1
+        pattern_logseq = process_input[i]
+        child_string = process_input[strings_index]
+        // 将pattern_logseq 按 “-” 分割
+        pattern_logseq = pattern_logseq.split("-")
+        num_t_logseq = pattern_logseq[0].length
+
+        let child_block_list;
+        child_block_list = splitStringWithPattern(child_string, pattern_logseq_child)
+        for (let i = 1; i < child_block_list.length; i += 2) {
+            if (child_block_list[i].split(' ')[0].length < num_t_logseq){
+                child_block_list[i+1] = "@ans " + child_block_list[i+1]
+                var combinedString = child_block_list.join(""); // 使用空串作为分隔符
+                process_input[strings_index] = combinedString;
+                break
+            }
+        }
+    }    
+    return process_input.join("");
+}
+
+
 // 取消 Logseq 格式
 function removeLogseqMatches(inputString) {
+    pattern_logseq_mian = /^[\x20]{0,}\t{0,}-[\x20]/gm
+    pattern_logseq_child = /^[\x20]{0,}\t{0,}[\x20]{2}/gm;
+    var result1 = splitStringWithPattern(inputString, pattern_logseq_mian);
+    inputString = processInputAndReturnString(result1, pattern_logseq_child)
+
     // 匹配行首的 "  " "\t  " "\t\t  " "\t\t\t  " 等等, 替换为空串
     const pattern = /^[\x20]{0,}\t{0,}[\x20]{2}/gm;
     String1 = inputString.replace(pattern, '')
@@ -122,8 +182,10 @@ function removeLogseqMatches(inputString) {
 
         part1 = splittedParts[0];
         part2 = splittedParts[1];
-        const pattern2_1 = /^[\x20]{0,}\t\t-[\x20]/gm; 
-        const pattern2_2 = /^[\x20]{0,}\t\t\t-[\x20]/gm; 
+        const pattern2_0 = /^[\x20]{0,}\t-[\x20]/gm;
+        const pattern2_1 = /^[\x20]{0,}\t\t-[\x20]/gm;
+        const pattern2_2 = /^[\x20]{0,}\t\t\t-[\x20]/gm;
+        part2 = part2.replace(pattern2_0, '@blk ');
         part2 = part2.replace(pattern2_1, '- ');
         part2 = part2.replace(pattern2_2, '@blk- ');
         result = part1 +"#ans"+ part2;
@@ -277,6 +339,7 @@ function deleteLogEntry(record_id) {
 
 // Function to replace URLs with hyperlinks within a <pre> element
 function replaceURLsWithLinks(pre_element) {
+    // element 是 jQuery 对象
     // Get the text content of the <pre> element
     var content = pre_element.html();
     // Regular expression to find URLs within the text
@@ -290,9 +353,8 @@ function replaceURLsWithLinks(pre_element) {
 }
 
 
-
-
 function getOriginTextFromPre(element) {
+    // element 是 jQuery 对象
     // 使用clone()方法创建元素的副本
     var elementCopy = element.clone();
     // 选择所有超链接元素并替换为其文本内容
