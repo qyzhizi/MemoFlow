@@ -147,11 +147,15 @@ class Manager(manager.Manager):
                 ans_child_block = True
             else:
                 ans_child_block = False
+            # 去除子块最后一行末尾的空白字符(包括\t \n), logseq 格式
+            item = item.rstrip()
             #得到每一行，相当于logseq的软回车的行
             lines = item.split('\n')
             # split('\n')操作会可能会多得到一个空字符串, 去除最后一个空字符串
             if lines[-1].strip(" ") == "":
                 lines = lines[:-1]
+            # 去除子块最后一行末尾的空白字符串
+            # lines[-1] = lines[-1].rstrip()
             for line_index, line in enumerate(lines):
                 # 子块第一行，比较特殊，最多给一个"\t"，或者不给"\t"
                 # 因为已经把最上层的子块考虑进来了，例如：`- ## 2023-5-10`
@@ -211,6 +215,9 @@ class Manager(manager.Manager):
         title_string = "##"
         tag_string = "#"
         block_pre_string = ["- ", "\t- "]
+        normal_parse_list = [
+            ('- ', '\t- ')
+        ]
         # 替换规则, 类似的字符串上下顺序有要求，复杂的放上面
         list_parse_pre_dict = [
             ('- ', '\t\t- '),
@@ -282,6 +289,11 @@ class Manager(manager.Manager):
                         content = ans_strings[1] + content[len(item):]
                         content_list[i] = content
                         ans_flag = True
+                        break
+                for old, new in normal_parse_list:
+                    if content.startswith(old):
+                        content = new + content[len(old):]
+                        content_list[i] = content
                         break
 
             # 解析`-todo ` 变为子块

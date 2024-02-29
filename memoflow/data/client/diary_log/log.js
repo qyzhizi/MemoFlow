@@ -187,7 +187,9 @@ function removeLogseqMatches(inputString) {
     }
     // 如果长度为 1，说明字符串中没有包含 #ans
     if (splittedParts.length === 1) {
+        const pattern1_0 = /^[\x20]{0,}\t-[\x20]/gm;
         result = splittedParts[0].replace(pattern_t, '#');
+        result = result.replace(pattern1_0, '- ');
         console.log("输入字符串中没有包含 #ans");
         return result.substring(2);
     }
@@ -198,6 +200,8 @@ function removeLogseqMatches(inputString) {
 
         part1 = splittedParts[0];
         part2 = splittedParts[1];
+        const pattern1_0 = /^[\x20]{0,}\t-[\x20]/gm;
+        part1 = part1.replace(pattern1_0, '- ');
         const pattern2_0 = /^[\x20]{0,}\t-[\x20]/gm;
         const pattern2_1 = /^[\x20]{0,}\t\t-[\x20]/gm;
         const pattern2_2 = /^[\x20]{0,}\t\t\t-[\x20]/gm;
