@@ -162,7 +162,7 @@ function processInputAndReturnString(process_input, pattern_logseq_child) {
 }
 
 
-// 取消 Logseq 格式
+// Cancel Logseq format
 function removeLogseqMatches(inputString) {
     pattern_logseq_mian = /^[\x20]{0,}\t{0,}-[\x20]/gm
     pattern_logseq_child = /^[\x20]{0,}\t{0,}[\x20]{2}/gm;
@@ -176,14 +176,15 @@ function removeLogseqMatches(inputString) {
     // 使用正则表达式进行划分
     var regex = /^\t-[\x20]#ans/gm;
     const pattern_t = /^\t- #/gm;
-    var splittedParts = String1.split(regex);
-    // 判断splittedParts 的长度是否大于 2
-    if (splittedParts.length > 2) {
-        console.log("输入字符串中包含多个 #ans");
-        // 使用alert()函数进行错误提示
-        alert("字符串中包含多个 #ans, 编辑失败");
-        // 报错，解析错误
-        // throw new Error("字符串中包含多个 #ans");
+    var splittedParts = [];
+    var match = regex.exec(String1); // 使用 exec 方法进行匹配
+    if (match) {
+        var index = match.index;
+        var firstPart = String1.substring(0, index); // 第一个部分是匹配之前的字符串
+        var secondPart = String1.substring(index); // 第二个部分是匹配之后的字符串
+        splittedParts.push(firstPart, secondPart);
+    } else {
+        splittedParts.push(String1); // 如果没有匹配到，直接将整个字符串加入列表
     }
     // 如果长度为 1，说明字符串中没有包含 #ans
     if (splittedParts.length === 1) {
@@ -193,8 +194,8 @@ function removeLogseqMatches(inputString) {
         console.log("输入字符串中没有包含 #ans");
         return result.substring(2);
     }
-    // 如果长度为 2，说明字符串中包含了 #ans
-    if (splittedParts.length === 2) {
+    // 如果长度等于 2，说明字符串中包含了 #ans
+    if (splittedParts.length == 2) {
         console.log("输入字符串中包含了 #ans");
         splittedParts[0] = splittedParts[0].replace(pattern_t, '#');
 
