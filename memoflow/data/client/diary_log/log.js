@@ -109,19 +109,26 @@ function addLogEntry(logText, record_id) {
 
 
 /**
- * 将字符串根据给定的模式分割，并返回匹配项和分隔符的列表
- * @param {string} inputString - 要分割的字符串
- * @param {RegExp} pattern_t - 用于分割字符串的正则表达式模式
- * @returns {string[]} - 包含匹配项和分隔符的列表
- */
+* 将字符串根据给定的模式分割，并返回匹配项和分隔符的列表
+* @param {string} inputString - 要分割的字符串
+* @param {RegExp} pattern_t - 用于分割字符串,带有 g (global) 标志的正则表达式
+* @returns {string[]} - 包含匹配项和分隔符的列表
+*/
 function splitStringWithPattern(inputString, pattern_t) {
+    // 检查 pattern_t 是否是带有全局标志的正则表达式
+    if (!pattern_t.global) {
+    console.error("Error: pattern_t must have the global (g) flag.");
+    return;
+    }
     let match;
     let match_list = [];
     let old_index = 0;
-
+    
     while ((match = pattern_t.exec(inputString)) !== null) {
         match_list.push(inputString.substring(old_index, match.index));
         match_list.push(match[0]);
+        // pattern_t.lastIndex 用于记录正则表达式匹配的最后一个字符的位置
+        // 这要求pattern_t 是带有 g (global) 标志的正则表达式，否则一直是 0
         old_index = pattern_t.lastIndex;
     }
     if (old_index != 0){
@@ -170,18 +177,24 @@ function removeLogseqMatches(inputString) {
     inputString = processInputAndReturnString(result1, pattern_logseq_child)
 
     // 匹配行首的 "  " "\t  " "\t\t  " "\t\t\t  " 等等, 替换为空串
-    const pattern = /^[\x20]{0,}\t{0,}[\x20]{2}/gm;
+    // ^[\x20]{2} ：表示行首两个空格，匹配 `#ans` 之前的行
+    const pattern = /^[\x20]{0,}\t{1,}[\x20]{2}|^[\x20]{2}/gm;
     String1 = inputString.replace(pattern, '')
 
     // 使用正则表达式进行划分
     var regex = /^\t-[\x20]#ans/gm;
     const pattern_t = /^\t- #/gm;
     var splittedParts = [];
+    // 检查 regex 是否是带有全局标志的正则表达式
+    if (!regex.global) {
+    console.error("Error: #ans regex must have the global (g) flag.");
+    return;
+    }
     var match = regex.exec(String1); // 使用 exec 方法进行匹配
     if (match) {
         var index = match.index;
         var firstPart = String1.substring(0, index); // 第一个部分是匹配之前的字符串
-        var secondPart = String1.substring(index); // 第二个部分是匹配之后的字符串
+        var secondPart = String1.substring(regex.lastIndex); // 第二个部分是匹配之后的字符串
         splittedParts.push(firstPart, secondPart);
     } else {
         splittedParts.push(String1); // 如果没有匹配到，直接将整个字符串加入列表

@@ -144,9 +144,9 @@ class Manager(manager.Manager):
             if t_num == (1, "@ans "):
                 t_num = 1
                 child_block_list[i] = (t_num, item)
-                ans_child_block = True
+                ans_normal_block = True
             else:
-                ans_child_block = False
+                ans_normal_block = False
             # 去除子块最后一行末尾的空白字符(包括\t \n), logseq 格式
             item = item.rstrip()
             #得到每一行，相当于logseq的软回车的行
@@ -166,7 +166,7 @@ class Manager(manager.Manager):
                 if i-1 >= 0 and t_num >= child_block_list[i-1][0] +1:
                     t_num = child_block_list[i-1][0] +1
                 # 判断是否为block开头标识：t_num*'\t'+ "- "                    
-                if line_index > 0 or ans_child_block:
+                if line_index > 0 or ans_normal_block:
                     # 软回车标识
                     pre_str = t_num*'\t'+ "  "
                     # 匹配开头“\t\t  ”, 多个"\t", 两个空格
@@ -218,8 +218,8 @@ class Manager(manager.Manager):
         normal_parse_list = [
             ('- ', '\t- ')
         ]
-        # 替换规则, 类似的字符串上下顺序有要求，复杂的放上面
-        list_parse_pre_dict = [
+        # 替换规则, 类似的字符串上下顺序有要求，优先匹配的放上面
+        list_parse_pre = [
             ('- ', '\t\t- '),
             ('@blk ', '\t- '),
             ('@blk- ', '\t\t\t- '),
@@ -305,7 +305,7 @@ class Manager(manager.Manager):
 
             # 解析`- ` 变为子块, ans_flag = True, ensure right place. "\t- #ans" will not match this condition
             if ans_flag and content:
-                for old, new in  list_parse_pre_dict:
+                for old, new in  list_parse_pre:
                     if content.startswith(old):
                         content = new + content[len(old):]
                         content_list[i] = content
