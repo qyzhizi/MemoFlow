@@ -30,6 +30,8 @@ function addLogEntry(logText, record_id) {
     var editOption = $('<div class="dropdown-option edit-option">编辑</div>');
     // 添加删除选项
     var deleteOption = $('<div class="dropdown-option delete-option">删除</div>');
+    // 添加LatexView选项
+    var latexView = $('<div class="dropdown-option delete-option">latexView</div>');
 
     // 将下拉菜单图标添加到 dropdownContainer 中
     dropdownContainer.append(dropdownIcon);
@@ -59,7 +61,7 @@ function addLogEntry(logText, record_id) {
     // 添加复制选项点击事件处理程序
     copyOption.click(function() {
         // 复制日志文本到剪贴板
-        copyToClipboard(removeLogseqMatches(logText));
+        copyToClipboard(removeLogseqMatches(pre.text()));
         // 隐藏下拉菜单
         dropdownMenu.hide()
     });
@@ -78,17 +80,31 @@ function addLogEntry(logText, record_id) {
     deleteOption.click(function() {
         record_id = dropdownMenu.data('record_id')
         console.log("record_id : ", record_id)
-        deleteLogEntry(record_id)
-        // 删除日志条目
-        logEntryContainer.remove();
+        // 弹窗提示，是否删除
+        if (confirm('确定要删除该条日志吗？')) {
+            // 删除日志条目
+            deleteLogEntry(record_id);
+            // 删除日志条目
+            logEntryContainer.remove();
+            // 隐藏下拉菜单
+            dropdownMenu.hide();
+        }
+    });
+
+    // latexView 选项点击事件处理程序
+    latexView.click(function() {
+        // 渲染当前笔记中出现的公式
+        renderLatexInLog(pre);
         // 隐藏下拉菜单
         dropdownMenu.hide();
     });
+
 
     // 将复制、编辑和删除选项添加到下拉菜单中
     dropdownMenu.append(copyOption);
     dropdownMenu.append(editOption);
     dropdownMenu.append(deleteOption);
+    dropdownMenu.append(latexView);
 }
 
 
@@ -303,6 +319,7 @@ function editLogEntry(pre, record_id) {
 
     // 将原始日志内容填充到编辑框中
     pre_text = getOriginTextFromPre(pre);
+    pre_text = restoreLatexFromRendered(pre)
     editLog.value = removeLogseqMatches(pre_text);
 }
 
@@ -334,6 +351,48 @@ function deleteLogEntry(record_id) {
             }
         }
     });
+}
+
+
+// 渲染 Latex 公式
+function renderLatexInLog(pre){
+    // 获取原始的 LaTeX 公式内容
+    var latexContent = pre.html();
+    // 提取 LaTeX 公式
+    var latexEquations = latexContent.match(
+        /(\s\$\$[\s\S]*?\$\$|\s\$[\s\S]*?\$)/g);
+    // 判断 latexEquations 是否为 null
+    if (latexEquations === null) {
+        return;
+    }
+    // 渲染 LaTeX 公式
+    latexEquations.forEach(function(eq) {
+        var equation = eq.substring(1, eq.length); // 去除开头的空白符号
+        equation = equation.replace(/^(\$+)|(\$+)$/g, '');// 去除 "$$" 符号
+        equation = equation.trim(); // 去除前后空白字符
+        var span = document.createElement('span');
+        katex.render(equation, span);
+        span.className = 'katex';
+        // 为 span 元素添加 data-latex 属性以存储原始的 LaTeX 代码
+        span.setAttribute('data-latex', equation);
+        latexContent = latexContent.replace(eq, span.outerHTML);
+    });
+    // 将替换后的内容放回原始元素中
+    pre.html(latexContent);
+}
+
+
+function restoreLatexFromRendered(element) {
+    // 使用clone()方法创建元素的副本
+    var elementCopy = element.clone();
+    // 选择所有超链接元素并替换为其文本内容
+    elementCopy.find('.katex').replaceWith(function() {
+        // 获取 .katex 元素的 data-latex 属性的值
+        var latexCode = $(this).attr('data-latex');
+        return ' $$' + latexCode + '$$';
+    });
+    // 返回修改后的文本内容
+    return elementCopy.text();
 }
 
 
