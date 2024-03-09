@@ -148,6 +148,78 @@ class ChromeDBCollectionHttpDriver(object):
             )
         return ids
 
+    def update_texts(
+        self,
+        ids: List[str],
+        texts: Iterable[str],
+        metadatas: Optional[List[dict]] = None,
+        **kwargs: Any,
+        ) -> List[str]:
+        """
+
+        Args:
+            texts (Iterable[str]): Texts to add to the vectorstore.
+            metadatas (Optional[List[dict]], optional): Optional list of metadatas.
+            ids (Optional[List[str]], optional): Optional list of IDs.
+
+        Returns:
+            List[str]: List of IDs of the updated texts.
+        """
+        if ids is None:
+            raise ValueError("ids must be specified for update_texts")
+        if len(ids) != len(texts):
+            raise ValueError("ids and texts must have the same length")
+        if len(texts) < len(metadatas):
+            raise ValueError("texts length must greater than metadatas length")
+        embeddings = None
+        texts = list(texts)
+        if self._embedding_function is not None:
+            embeddings = self._embedding_function.get_embeddings(texts)
+        if metadatas:
+            # fill metadatas with empty dicts if somebody
+            # did not specify metadata for all texts
+            length_diff = len(texts) - len(metadatas)
+            metadatas = metadatas + [{}] * length_diff
+            empty_ids = []
+            non_empty_ids = []
+            for idx, m in enumerate(metadatas):
+                if m:
+                    non_empty_ids.append(idx)
+                else:
+                    empty_ids.append(idx)
+            if non_empty_ids:
+                ids_with_metadata = [ids[idx] for idx in non_empty_ids]
+                metadatas = [metadatas[idx] for idx in non_empty_ids]
+                texts_with_metadatas = [texts[idx] for idx in non_empty_ids]
+                embeddings_with_metadatas = (
+                    [embeddings[idx] for idx in non_empty_ids] if embeddings else None
+                )
+                self._collection.update(
+                    ids=ids_with_metadata,
+                    embeddings=embeddings_with_metadatas,
+                    metadatas=metadatas,
+                    documents=texts_with_metadatas,
+                )
+            if empty_ids:
+                ids_without_metadatas = [ids[j] for j in empty_ids]
+                embeddings_without_metadatas = (
+                    [embeddings[j] for j in empty_ids] if embeddings else None
+                )
+                texts_without_metadatas = [texts[j] for j in empty_ids]
+
+                self._collection.update(
+                    ids=ids_without_metadatas,
+                    embeddings=embeddings_without_metadatas,
+                    documents=texts_without_metadatas,
+                )
+        else:
+            self._collection.update(
+                ids=ids,
+                embeddings=embeddings,
+                documents=texts,
+            )
+        return ids
+
     def __query_collection(
         self,
         query_texts: Optional[List[str]] = None,
@@ -172,25 +244,30 @@ class ChromeDBCollectionHttpDriver(object):
             **kwargs,
         )
     
-    def _results_to_docs(self, results: Any) -> List:
-        return [doc for doc, _ in self._results_to_docs_and_scores(results)]
+    # def _results_to_docs(self, results: Any) -> List:
+    #     return self._process_results(results)
 
 
-    def _results_to_docs_and_scores(self, results: Any) -> List[Tuple[dict, float]]:
+    def _process_results(self, results: Any) -> List[Tuple[dict, float]]:
         return [
             # TODO: Chroma can do batch querying,
             # we shouldn't hard code to the 1st result
-            ({"page_content": result[0], "metadata": result[1] or {}}, result[2])
+            {"document": result[0],
+              "metadata": result[1] or {},
+              "distance": result[2],
+              "id": result[3],
+             }
             # for i in len(results["distances"])
             for result in zip(
                 results["documents"],
                 results["metadatas"],
                 results["distances"],
+                results["ids"],
             )
 
         ]    
 
-    def similarity_search_with_score(
+    def similarity_search(
         self,
         query: str,
         k: int = DEFAULT_K,
@@ -219,9 +296,9 @@ class ChromeDBCollectionHttpDriver(object):
                 query_embeddings=[query_embedding], n_results=k, where=filter
             )
 
-        return self._results_to_docs_and_scores(results)
+        return self._process_results(results)[0]
 
-    def similarity_search(
+    def get_similarity_search_docs(
         self,
         query: str,
         k: int = DEFAULT_K,
@@ -236,8 +313,9 @@ class ChromeDBCollectionHttpDriver(object):
             filter (Optional[Dict[str, str]]): Filter by metadata. Defaults to None.
 
         """
-        docs_and_scores = self.similarity_search_with_score(query, k, filter=filter)
-        return [doc for doc, _ in docs_and_scores][0]['page_content']
+        results = self.similarity_search(query, k, filter=filter)
+        # return [doc for doc, _ in docs_and_scores][0]['page_content']
+        return results["document"]
     
     def rm_coll_all_itmes(self):
         all_ids = self.get(ids=None, limit=None, include=[])

@@ -189,14 +189,40 @@ class DiaryLog(wsgi.Application):
                     break
             if not diary_of_id:
                 return json.dumps({"error": "diary not found in database"})
-        que_string: List[str] = self.diary_log_api.get_que_string_from_content(
+            
+        que_strings: str = self.diary_log_api.get_que_string_from_content(
             processed_block_content)
-        if que_string and que_string[0] not in diary_of_id[0]:
-            self.asyn_task_api.asyn_add_texts_to_vector_db_coll(texts=que_string,
-                                                           metadatas=[{
-                                                               "tags":
-                                                               ','.join(tags)
-                                                           }])
+        que_string = que_strings[0] if que_strings else None
+
+        old_que_strings: str = self.diary_log_api.get_que_string_from_content(
+            diary_of_id[0])
+        old_que_string = old_que_strings[0] if old_que_strings else None
+
+        update_flag = que_string != old_que_string
+        
+        metadatas = [{"tags": ','.join(tags)}]
+        if update_flag and old_que_string:
+            search_result = self.vector_db_api.similarity_search(
+                    query=old_que_string, top_k=1)
+            # document = search_result["document"][0]
+            distance = search_result["distance"][0]
+            if distance >= 0.1:
+                update_flag = False
+            # threshold = 0
+            origin_id= search_result["id"][0]
+
+        if update_flag and que_string and old_que_string:
+            self.asyn_task_api.asyn_update_texts_to_vector_db_coll(
+                ids=[origin_id], 
+                texts=[que_string],
+                metadatas= metadatas)
+        elif que_string and old_que_string is None:
+            self.asyn_task_api.asyn_add_texts_to_vector_db_coll(texts=[que_string],
+                                                           metadatas=metadatas)
+        elif que_string is None and old_que_string:
+            self.vector_db_api.delete_items_by_ids(ids=[origin_id])
+
+
         # 保存到本地数据库
         self.diary_db_api.update_log(diary_log["record_id"], 
                                      processed_block_content,
@@ -341,7 +367,7 @@ class DiaryLog(wsgi.Application):
         # search contents from vecter db
         search_result = []
         if search_data:
-            search_result = self.vector_db_api.search_texts(
+            search_result = self.vector_db_api.get_similarity_search_docs(
                 query=search_data, top_k=10)
         return json.dumps({"search_result": search_result})
 

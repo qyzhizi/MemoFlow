@@ -8,8 +8,8 @@ services:
     image: qyzhizi/memoflow:v0.1.5
 
     ports:
-     - "9000:9000"
-     - "5678:5678"
+     - "9999:9000"
+     - "6789:6789"
     # restart: always
     volumes:
       - "..:/app"
@@ -17,7 +17,7 @@ services:
       - net
     command: >
       sh -c "python memoflow/cmd/celery_work > celery_work.log 2>&1 &
-             python -m debugpy --listen 0.0.0.0:5678 --wait-for-client  memoflow/cmd/main"
+             python -m debugpy --listen 0.0.0.0:6789 --wait-for-client  memoflow/cmd/main"
   redis:
     image: "redis/redis-stack-server:latest"
     networks:

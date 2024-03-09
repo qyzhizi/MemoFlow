@@ -86,6 +86,7 @@ def update_file_to_janguoyun(base_url: str, acount: str, token: str,
     else:
         my_client.upload_content_to_new_file(content, to_path, overwrite)
 
+
 @celery.task
 def celery_push_updatedfile_to_jianguoyun(base_url: str, acount: str, token: str,
                                           to_path: str, content: str,
@@ -95,6 +96,7 @@ def celery_push_updatedfile_to_jianguoyun(base_url: str, acount: str, token: str
     my_client = jianguoyun_clients[acount]
     if my_client.exists(to_path):
         my_client.update_whole_file(updated_content=content, file_path=to_path)
+
 
 @celery.task
 def add_texts_to_vector_db_coll(texts: Iterable[str],
@@ -106,6 +108,17 @@ def add_texts_to_vector_db_coll(texts: Iterable[str],
                                               ids=ids,
                                               **kwargs)
 
+
+@celery.task
+def update_texts_to_vector_db_coll(
+                            ids: List[str],
+                            texts: Iterable[str],
+                            metadatas: Optional[List[dict]]=None,
+                            **kwargs: Any) -> None:
+    vector_db_coll_manager_instance.add_texts(texts=texts,
+                                              metadatas=metadatas,
+                                              ids=ids,
+                                              **kwargs)
 
 @celery.task
 def time_task():

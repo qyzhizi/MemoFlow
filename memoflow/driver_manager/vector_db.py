@@ -28,8 +28,18 @@ class VectorDBCollectionManager(manager.Manager):
                   **kwargs: Any):
         self.driver.add_texts(texts, metadatas, ids, **kwargs)
         # self.driver.vector_db.persist()
+    
+    def update_texts(self,
+                     ids: List[str],
+                     texts: Iterable[str],
+                     metadatas: Optional[List[dict]]=None,
+                     **kwargs: Any):
+        self.driver.update_texts(ids, texts, metadatas,  **kwargs)
 
-    def search_texts(self,
+    def get_similarity_search_docs(self, query: str, top_k: int, **kwargs: Any):
+        return self.driver.get_similarity_search_docs(query, top_k, **kwargs)
+
+    def similarity_search(self,
                      query: str,
                      top_k: int,
                      **kwargs: Any):
@@ -51,8 +61,8 @@ class VectorDBCollectionManager(manager.Manager):
     def get_collection_size(self):
         return self.driver.collection_count()
 
-    # def delete_items_by_ids(self, ids: List[str]):
-    #     return self.driver.delete_items_by_ids(ids)
+    def delete_items_by_ids(self, ids: List[str]):
+        return self.driver.delete_items_by_ids(ids)
 
     def rm_coll_all_itmes(self):
         return self.driver.rm_coll_all_itmes()

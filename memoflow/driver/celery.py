@@ -19,3 +19,10 @@ class CeleryDriver(object):
                                     metadatas: Optional[List[dict]]=None,
                                     ids: Optional[List[str]] = None):
         celery_task.add_texts_to_vector_db_coll.delay(texts, metadatas, ids)
+
+    def asyn_update_texts_to_vector_db_coll(self,
+                                    ids: List[str],
+                                    texts: List[str],
+                                    metadatas: Optional[List[dict]]=None):
+        celery_task.update_texts_to_vector_db_coll.delay(ids, texts, metadatas)
+        
