@@ -1,5 +1,6 @@
 __import__('pysqlite3')
 import sys
+import time
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 from chromadb import PersistentClient
 from chromadb import HttpClient
@@ -49,16 +50,26 @@ class ChromeDBCollectionHttpDriver(object):
                                                anonymized_telemetry=False,
                                                is_persistent=True))
 
+        MAX_RETRY = 3  # 设置最大重试次数
+        retry_count = 0  # 初始化重试计数器
         # if chroma db init readly, http_client will connect it
         collection_status = False
-        while collection_status != True:
+        while retry_count < MAX_RETRY:
             try:
                 self._collection = self._client.get_or_create_collection(
                     name=COLLECTION_NAME,
                     embedding_function=self._embedding_function.get_embeddings)
                 collection_status = True
+                break  # 成功获取或创建集合后退出循环
             except Exception as e:
-                pass
+                retry_count += 1
+                if retry_count >= MAX_RETRY:
+                    LOG.exception("Failed to get or create collection after maximum retries.")
+                    raise e
+                    # break
+                else:
+                    # 延迟等待一段时间后再重试
+                    time.sleep(1)  # 休眠2秒后再重试（可以根据需要调整等待时间）
 
     # def get_vector_db(self):
     #     return self.vector_db
