@@ -8,7 +8,7 @@ services:
     env_file:
       - ../.env
     expose:
-      - 9090
+      - 6060
     # restart: always
     volumes:
       - "../:/app"
@@ -17,7 +17,7 @@ services:
       - "traefik.http.routers.web-dl-router.rule=Host(`localhost`)"
       - "traefik.http.routers.web-dl-router.entrypoints=http_web"
       - "traefik.http.routers.web-dl-router.service=web-dl-service"
-      - "traefik.http.services.web-dl-service.loadbalancer.server.port=9090"
+      - "traefik.http.services.web-dl-service.loadbalancer.server.port=6060"
     networks:
       - traefik_traefik      
 

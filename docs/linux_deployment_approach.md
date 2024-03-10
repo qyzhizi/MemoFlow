@@ -20,9 +20,9 @@
 
 - 4、访问log笔记页面
 
-    浏览器输入：http://x.x.x.x:9090/v1/diary-log/index.html
+    浏览器输入：http://x.x.x.x:6060/v1/diary-log/index.html
 
-    本地访问：http://localhost:9090/v1/diary-log/index.html
+    本地访问：http://localhost:6060/v1/diary-log/index.html
     
     正式使用前，需要配置，参考：
     [MemoFlow Configuration](./memoflow_configuration.md)

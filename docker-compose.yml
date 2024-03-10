@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     ports:
-     - "9090:9090"
+     - "6060:6060"
     volumes:
       - ".:/app"
     networks:

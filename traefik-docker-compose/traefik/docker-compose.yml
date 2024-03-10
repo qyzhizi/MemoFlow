@@ -12,7 +12,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "9090:9090"
+      - "6060:6060"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       # - "./traefik.yml:/traefik.yml:ro"
