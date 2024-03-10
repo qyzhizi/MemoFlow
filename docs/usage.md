@@ -1,5 +1,5 @@
 ## 使用方法
-以本地启动为例，启动服务后，访问：`http://localhost:9000/v1/diary-log/index.html`
+以本地启动为例，启动服务后，访问：`http://localhost:8080/v1/diary-log/index.html`
 ，可得到页面， 输入框中输入卡片笔记，然后点击`commit`：
 
 <div align="center">

@@ -4,11 +4,11 @@ services:
   main_server:
     depends_on:
       - redis
-    image: qyzhizi/memoflow:v0.1.1
+    image: qyzhizi/memoflow:v0.1.5
     env_file:
       - ../.env
     ports:
-     - "9000:9000"
+     - "8080:8080"
     volumes:
       - "../.env:/app/.env"
       - "../log_file:/app/log_file"
@@ -16,6 +16,7 @@ services:
     networks:
       - net    
     restart: on-failure
+    command:  sh -c "python setup.py egg_info && sh memoflow/cmd/run.sh"   
 
   redis:
     image: "redis/redis-stack-server:latest"

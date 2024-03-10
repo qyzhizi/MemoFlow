@@ -9,11 +9,12 @@ services:
     env_file:
       - ../../.env
     ports:
-     - "9000:9000"
+     - "8080:8080"
     volumes:
       - "../../:/app"
     networks:
       - net    
+    command:  sh -c "python setup.py egg_info && sh memoflow/cmd/run.sh"
 
   redis:
     image: "redis/redis-stack-server:latest"

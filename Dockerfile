@@ -29,7 +29,7 @@ RUN pip install -r requirements.txt -i https://mirrors.cloud.tencent.com/pypi/si
 # RUN rm -rf $(pip cache dir)/*
 
 # Expose the port of the container
-EXPOSE 9000
+EXPOSE 8080
 
 # 给 run.sh 文件添加可执行权限
 RUN chmod +x memoflow/cmd/run.sh
