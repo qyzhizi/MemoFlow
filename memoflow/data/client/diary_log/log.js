@@ -248,7 +248,8 @@ function editLogEntry(pre, record_id) {
     var editLog = document.getElementById('editLog');
 
     // 显示模态框
-    modal.style.display = "block";
+    // modal.style.display = "block";
+    modal.style.display = "flex";
 
     // 获取保存按钮
     var saveChangesBtn = document.getElementById('saveChangesBtn');
@@ -676,7 +677,7 @@ $(function() {
         // 获取编辑框元素
         var modal = document.getElementById('editLogModal');
         // 检测编辑框是否为打开状态
-        if (modal.style.display === "block") {
+        if (modal.style.display === "flex") {
             // 显示提示框
             event.preventDefault();
             // beforeunload 事件的返回值

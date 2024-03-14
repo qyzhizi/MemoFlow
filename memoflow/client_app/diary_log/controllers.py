@@ -26,6 +26,10 @@ class DiaryLog(wsgi.Application):
 
     def get_html(self, req):
         return self.diary_log_client_api.get_html()
+    
+    def get_index_css(self, req):
+        LOG.info("get index css file")
+        return self.diary_log_client_api.get_index_css()
 
     def get_js(self, req):
         return self.diary_log_client_api.get_js()

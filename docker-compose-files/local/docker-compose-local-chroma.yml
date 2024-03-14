@@ -14,6 +14,7 @@ services:
       - "../../:/app"
     networks:
       - net    
+    restart: on-failure
     command:  sh -c "python setup.py egg_info && sh memoflow/cmd/run.sh"
 
   redis:

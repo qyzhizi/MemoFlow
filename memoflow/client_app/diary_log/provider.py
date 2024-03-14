@@ -8,6 +8,7 @@ from memoflow.conf import CONF
 LOG = logging.getLogger(__name__)
 
 INDEX_HTML_PATH = CONF.diary_log_client['index_html_path']
+INDEX_CSS_PATH = CONF.diary_log_client['index_css_path']
 LOGIN_HTML_PATH = CONF.diary_log_client['login_html_path']
 LOG_JS_PATH = CONF.diary_log_client['log_js_path']
 
@@ -19,6 +20,10 @@ class Manager(object):
 
     def get_html(self, index_html_path=INDEX_HTML_PATH):
         with open(index_html_path, "r", encoding='UTF-8')as f:
+            res = f.read()
+        return res
+    def get_index_css(self, index_css_path=INDEX_CSS_PATH):
+        with open(index_css_path, "r", encoding='UTF-8')as f:
             res = f.read()
         return res
 
