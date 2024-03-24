@@ -44,22 +44,47 @@ class GitHupApi(object):
         self.repo.update_file(file_path, commit_message, updated_content,
                               file.sha, branch_name)
 
+    # def get_contents(self, sync_file_path_list, branch_name):
+    #     contents = {}
+    #     for file_path in sync_file_path_list:
+    #         # pull file from github
+    #         try:
+    #             files = self.repo.get_contents(file_path, ref=branch_name)
+    #         except UnknownObjectException as e:
+    #             LOG.warning(f"Exception: {e}")
+    #             LOG.info(f"File {file_path} not found, skip it.")
+    #             continue
+    #         if isinstance(files, list):
+    #             contents.update(
+    #                 dict(zip([file.path for file in files],
+    #                     [file.decoded_content.decode() for file in files])))
+    #             # for file in files:
+    #             #     contents.append(file.decoded_content.decode())
+    #         else:
+    #             contents[file_path]=files.decoded_content.decode()
+
+    #     return contents
+
     def get_contents(self, sync_file_path_list, branch_name):
         contents = {}
         for file_path in sync_file_path_list:
+            if not file_path:
+                continue
             # pull file from github
             try:
-                files = self.repo.get_contents(file_path, ref=branch_name)
+                file_content = self.repo.get_contents(file_path, ref=branch_name)
             except UnknownObjectException as e:
                 LOG.warning(f"Exception: {e}")
                 LOG.info(f"File {file_path} not found, skip it.")
                 continue
-            if isinstance(files, list):
-                contents = dict(zip(sync_file_path_list,
-                                    [file.decoded_content.decode() for file in files]))
-                # for file in files:
-                #     contents.append(file.decoded_content.decode())
+            
+            if isinstance(file_content, list):
+                # 对于列表中的每个文件，将其路径作为键，内容作为值添加到contents字典中
+                for file in file_content:
+                    contents[file.path] = file.decoded_content.decode()
             else:
-                contents[file_path]=files.decoded_content.decode()
+                # 将单个文件的路径作为键，内容作为值添加到contents字典中
+                contents[file_path] = file_content.decoded_content.decode()
 
         return contents
+

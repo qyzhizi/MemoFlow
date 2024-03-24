@@ -3,7 +3,11 @@
 import asyncio
 import logging
 import json
+from datetime import datetime
+from datetime import timedelta
 import requests
+import uuid
+from webob import Request
 import re
 
 from memoflow.core import dependency
@@ -11,6 +15,8 @@ from memoflow.core import manager
 from memoflow.conf import CONF
 from memoflow.api import notion_api
 from memoflow.utils.token_jwt import TokenManager
+from memoflow.api.github_api import GitHupApi
+from memoflow.utils.common import username_to_table_name
 
 from typing import (
     Any,
@@ -35,13 +41,113 @@ class Manager(manager.Manager):
 
     def __init__(self):
         super(Manager, self).__init__(CONF.diary_log.driver)
+        # #debug
+        # from memoflow.app.diary_log.driver.backend import DiaryLogDriver
+        # self.driver = DiaryLogDriver()
     
     def generate_token(self, user_id):
         return TokenManager.generate_token(user_id)
 
     def verify_token(self, token):
         return TokenManager.verify_token(token)
+    
+    def get_access_token(self, code):
 
+        CLIENT_SECRET = CONF.diary_log['CLIENT_SECRET']
+        CLIENT_ID = CONF.diary_log['CLIENT_ID']
+        # 回调 URL，需与 GitHub App 中设置的一致
+        # REDIRECT_URI = '/v1/diary-log/github-authenticate-callback'  
+
+        # 使用 code 获取访问令牌
+        token_url = 'https://github.com/login/oauth/access_token'
+        payload = {
+            'client_id': CLIENT_ID,
+            'client_secret': CLIENT_SECRET,
+            'code': code,
+            # 'redirect_uri': REDIRECT_URI
+        }
+        headers = {'Accept': 'application/json'}
+
+        # 创建 POST 请求对象
+        request = Request.blank(token_url, method='POST',
+                                POST=payload, headers=headers)
+        # 发送请求
+        response = request.get_response()
+
+        # 解析响应内容
+        if response.status_code == 200:
+            # print(response.json())
+            data = json.loads(response.text)
+            # access_token = data.get('access_token', None)
+            # if not access_token:
+            #     # return 'Failed to retrieve access token'
+            #     LOG.error('Failed to retrieve access token')
+            return data
+        else:
+            return None
+    
+    def get_github_access_token_by_refresh_token(self, refresh_token):
+        # 参考：
+        # https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/refreshing-user-access-tokens
+
+        CLIENT_SECRET = CONF.diary_log['CLIENT_SECRET']
+        CLIENT_ID = CONF.diary_log['CLIENT_ID']
+        token_url = 'https://github.com/login/oauth/access_token'
+        payload = {
+            'client_id': CLIENT_ID,
+            'client_secret': CLIENT_SECRET,
+            'grant_type': "refresh_token",
+            'refresh_token': refresh_token
+        }
+        headers = {'Accept': 'application/json'}
+        # 创建 POST 请求对象
+        request = Request.blank(token_url, method='POST',
+                                POST=payload, headers=headers)
+        # 发送请求
+        response = request.get_response()
+        if response.status_code == 200:
+            data = json.loads(response.text)
+            if "access_token" not in data:
+                return None
+            return data
+        elif response.status_code == 401:
+            return None
+        return None
+    
+    def process_github_tokens_info_to_db_format(self, github_tokens_info):
+        access_token = github_tokens_info.get('access_token', None)
+        github_access_token_expires_in = github_tokens_info.get('expires_in', None)
+        refresh_token = github_tokens_info.get('refresh_token', None)
+        github_refresh_token_expires_in = github_tokens_info.get('refresh_token_expires_in', None)
+
+        # 获取当前时间
+        current_time = datetime.now()
+
+        # 增加 github_access_token_expires_in 秒（8小时），然后减去120秒
+        access_token_expires_at = current_time + timedelta\
+            (seconds=(github_access_token_expires_in - 120))
+        refresh_token_expires_at = current_time + timedelta\
+            (seconds=(github_refresh_token_expires_in - 120))
+        
+        github_tokens_info = {
+            'access_token': access_token,
+            'access_token_expires_at': access_token_expires_at,
+            'refresh_token': refresh_token,
+            'refresh_token_expires_at': refresh_token_expires_at,
+        }
+        return github_tokens_info
+
+    def test_github_access(
+            self,
+            access_token,
+            github_repo_name
+            ):
+        self.driver.test_github_access(
+            access_token=access_token,
+            github_repo_name=github_repo_name
+            )
+    
+    
     def process_block(self, block_string):
         """处理子块缩进
         block_string: 使用process_content函数处理后的字符串,它在特的行
@@ -381,29 +487,71 @@ class Manager(manager.Manager):
     # 同步任务，批量获取 github 文件内容
     def get_contents_from_github(self, token, repo, sync_file_path_list,
                                  branch_name):
-        contents = self.driver.get_contents_from_github(token, repo,
-                                                    sync_file_path_list,
-                                                    branch_name)
+        contents = self.driver.get_contents_from_github(
+            token, repo,
+            sync_file_path_list,
+            branch_name)
         return contents
     
-    def sync_contents_from_github_to_db(self, sync_file_paths, sync_table_names):
-        if len(sync_file_paths) != len(sync_table_names):
-            raise Exception("sync_file_paths and sync_table_names length not equal")
-        token = CONF.diary_log['GITHUB_TOKEN']
-        repo = CONF.diary_log['GITHUB_REPO']
+    def sync_files_to_card_contents(
+            self,
+            github_access_info
+            ):
+        """_summary_
+
+        Args:
+            github_access_info (_type_): _description_
+
+        Returns:
+            dict:: {str: list(tuple(str, str))}
+        """
+            
+        current_sync_file = github_access_info['current_sync_file']
+        other_sync_file_list = github_access_info['other_sync_file_list']
+        # if current_sync_file and other_sync_file_list:
+        sync_file_paths = [current_sync_file.strip()] + \
+            other_sync_file_list.strip().split(',')
+        
+        
+        access_token = github_access_info['access_token']
+        # repo = CONF.diary_log['GITHUB_REPO']
+        repo = github_access_info['github_repo_name']
+        # if not (repo and access_token):
+        #     return []
         branch_name = "main"
+        
         contents = self.get_contents_from_github(
-            token, repo, sync_file_paths, branch_name)
+            access_token, repo, sync_file_paths, branch_name)
         if len(contents.keys()) != len(sync_file_paths):
             LOG.warn("contents length and len(sync_file_paths) not equal")
-        # sync contents to db
-        path_table_map = dict(zip(sync_file_paths, sync_table_names))
-        # sync_table_names = [path_table_map[file_path] for file_path in contents]
-        for file_path in contents:
-            self.sync_contents_to_db(
-                [contents[file_path]],
-                table_name=path_table_map[file_path],
-                data_base_path=SYNC_DATA_BASE_PATH)
+        
+        # diary_table_name = user_info['diary_table_name']
+        # processed_card_contents = {}
+        sync_files_to_card_contents = []
+        for sync_file in contents:
+            processed_card_contents = self.driver.text_to_card_contents(
+                content=contents[sync_file])
+            sync_files_to_card_contents.append((sync_file, processed_card_contents))
+        return sync_files_to_card_contents
+
+    # def sync_contents_from_github_to_db(self, sync_file_paths, sync_table_names):
+    #     if len(sync_file_paths) != len(sync_table_names):
+    #         raise Exception("sync_file_paths and sync_table_names length not equal")
+    #     token = CONF.diary_log['GITHUB_TOKEN']
+    #     repo = CONF.diary_log['GITHUB_REPO']
+    #     branch_name = "main"
+    #     contents = self.get_contents_from_github(
+    #         token, repo, sync_file_paths, branch_name)
+    #     if len(contents.keys()) != len(sync_file_paths):
+    #         LOG.warn("contents length and len(sync_file_paths) not equal")
+    #     # sync contents to db
+    #     path_table_map = dict(zip(sync_file_paths, sync_table_names))
+    #     # sync_table_names = [path_table_map[file_path] for file_path in contents]
+    #     for file_path in contents:
+    #         self.sync_contents_to_db(
+    #             [contents[file_path]],
+    #             table_name=path_table_map[file_path],
+    #             data_base_path=SYNC_DATA_BASE_PATH)
 
     def sync_contents_from_jianguoyun_to_db(self, sync_file_paths, sync_table_names):
         if len(sync_file_paths) != len(sync_table_names):
@@ -492,11 +640,147 @@ class DiaryDBManager(manager.Manager):
     def __init__(self):
         super(DiaryDBManager, self).__init__(CONF.diary_log.DIARY_DB_DRIVER)
 
-    def save_log(self,
-                 content,
-                 tags,
-                 table_name=SYNC_TABLE_NAME,
-                 data_base_path=SYNC_DATA_BASE_PATH):
+        # #debug need to delete
+        # from memoflow.driver.sqlite3_db.diary_log import DBSqliteDriver
+        # self.driver = DBSqliteDriver()
+    
+    def add_user(self, username, password, email=None):
+        """
+        Add a user to the file sync system.
+
+        Args:
+            username (str): The user's username.
+            password (str): The user's password.
+            email (str): The user's email address.
+
+        Returns:
+            None
+        """
+        SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
+        USER_TABLE_NAME = CONF.diary_log['USER_TABLE_NAME']
+
+        user_id = str(uuid.uuid4())
+        diary_table_name = username_to_table_name(
+            user_id=user_id,
+            username=username)
+
+        self.driver.add_user(
+            user_id=user_id,
+            username=username,
+            password=password,
+            email=email,
+            diary_table_name=diary_table_name,
+            data_base_path=SYNC_DATA_BASE_PATH,
+            table_name=USER_TABLE_NAME)
+    
+    def create_diary_table(
+            self,
+            diary_table_name
+            ):
+        self.driver.create_diary_log_table(
+            data_base_path=SYNC_DATA_BASE_PATH,
+            table_name=diary_table_name
+        )
+    
+    def user_add_or_update_github_access_data_to_db(
+            self, user_id,
+            data_dict,
+            # github_rep_name,
+            # current_sync_file,
+            # other_sync_file_list, 
+            # github_tokens_info=None,
+            # github_user_info=None,
+            ):
+        """
+        Add GitHub access information for a user to the file sync system.
+
+        Args:
+            user_id (str): The ID of the user.
+            data_dict (dict): The GitHub access information.
+
+        Returns:
+            None
+        """
+        SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
+        # USER_TABLE_NAME = CONF.diary_log['USER_TABLE_NAME']
+        GITHUB_ACCESS_TABLE_NAME=CONF.diary_log['GITHUB_ACCESS_TABLE_NAME']
+
+        # access_token = github_tokens_info.get(
+        #     'access_token') if github_tokens_info else None
+        # access_token_expires_at = github_tokens_info.get(
+        #     'access_token_expires_at') if github_tokens_info else None
+        # refresh_token = github_tokens_info.get(
+        #     'refresh_token') if github_tokens_info else None
+        # refresh_token_expires_at = github_tokens_info.get(
+        #     'refresh_token_expires_at') if github_tokens_info else None
+        # github_user_name = github_user_info.get(
+        #     'username') if github_user_info else None
+        
+        self.driver.user_add_or_update_github_access_data(
+            user_id=user_id,
+            # current_sync_file=current_sync_file,
+            # other_sync_file_list=other_sync_file_list,
+            # access_token=access_token,
+            # access_token_expires_at=access_token_expires_at,
+            # refresh_token=refresh_token,
+            # refresh_token_expires_at=refresh_token_expires_at,
+            # github_user_name=github_user_name,
+            data_dict=data_dict,
+            data_base_path=SYNC_DATA_BASE_PATH,
+            table_name=GITHUB_ACCESS_TABLE_NAME)        
+        
+    def user_partial_update_github_access_data_to_db(
+            self, update_values, conditions):
+        """更新表中的数据。函数接受更新的参数以及更新条件作为输入，
+        然后执行相应的 SQL 语句来更新表
+
+        Args:
+            update_values (dict): 需要更新的字段
+            conditions (dict): 更新的筛选条件, must contain `user_id`
+        """
+        SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
+        GITHUB_ACCESS_TABLE_NAME=CONF.diary_log['GITHUB_ACCESS_TABLE_NAME']
+        self.driver.user_partial_update_github_access_data_to_db(
+            update_values=update_values,
+            conditions=conditions,
+            table_name=GITHUB_ACCESS_TABLE_NAME,
+            data_base_path=SYNC_DATA_BASE_PATH
+            )
+
+    def get_github_access_info_by_user_id(self, user_id):
+        SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
+        GITHUB_ACCESS_TABLE_NAME = CONF.diary_log['GITHUB_ACCESS_TABLE_NAME']
+        github_access_info = self.driver.get_github_access_info_by_user_id(
+            user_id=user_id,
+            data_base_path=SYNC_DATA_BASE_PATH,
+            table_name=GITHUB_ACCESS_TABLE_NAME)
+        return github_access_info
+        
+    def get_user_info_by_username(self, username):
+        SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
+        USER_TABLE_NAME = CONF.diary_log['USER_TABLE_NAME']
+        user_id = self.driver.get_user_info_by_username(
+            username=username,
+            data_base_path=SYNC_DATA_BASE_PATH,
+            table_name=USER_TABLE_NAME)
+        return user_id
+    
+    def get_user_info_by_id(self, user_id):
+        SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
+        USER_TABLE_NAME = CONF.diary_log['USER_TABLE_NAME']
+        user_info = self.driver.get_user_info_by_id(
+            user_id=user_id,
+            data_base_path=SYNC_DATA_BASE_PATH,
+            table_name=USER_TABLE_NAME)
+        return user_info
+                                                
+    def add_log(self,
+                user_id,
+                content,
+                tags,
+                sync_file=None,
+                data_base_path=SYNC_DATA_BASE_PATH
+                ):
         """save diary(content, tags) to table
 
         Args:
@@ -505,18 +789,37 @@ class DiaryDBManager(manager.Manager):
             table_name (string, optional): 表名. Defaults to SYNC_TABLE_NAME.
         """
 
+        # user_info = self.get_user_info_by_id(
+        #     user_id=user_id)
+        table_name = self.driver.get_table_name_by_user_id(user_id)
         tags_string = ','.join(tags)
-        record_id = self.driver.inser_diary_to_table(table_name=table_name,
-                                         content=content,
-                                         tags=tags_string,
-                                         data_base_path=data_base_path)
+        record_id = self.driver.inser_diary_to_table(
+            content=content,
+            tags=tags_string,
+            table_name=table_name,
+            data_base_path=data_base_path,
+            sync_file=sync_file)
         return record_id
+    
+    def insert_batch_records(
+            self,
+            user_id,
+            columns,
+            records,
+            data_base_path=SYNC_DATA_BASE_PATH
+            ):
+        table_name = self.driver.get_table_name_by_user_id(user_id)
+        self.driver.insert_batch_records(
+            columns=columns,
+            records=records,
+            table_name=table_name,
+            data_base_path=data_base_path)
     
     def update_log(self,
                    id,
+                   user_id,
                    content,
                    tags,
-                   table_name=SYNC_TABLE_NAME,
                    data_base_path=SYNC_DATA_BASE_PATH):
         """update diary log
 
@@ -527,17 +830,24 @@ class DiaryDBManager(manager.Manager):
             table_name (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
             data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
         """
+        table_name = self.driver.get_table_name_by_user_id(user_id)
         tags_string = ','.join(tags)
-        self.driver.update_diary_to_table(id=id,
-                                          table_name=table_name,
-                                          content=content,
-                                          tags=tags_string,
-                                          data_base_path=data_base_path)
+        update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        update_data_dict = {'content': content,
+                            'tags': tags_string,
+                            'update_time': update_time,
+                            }
+
+        self.driver.update_log_to_table(
+            id=id,
+            update_data_dict=update_data_dict,
+            table_name=table_name,
+            data_base_path=data_base_path)
         return id
     
     def get_log_by_id(self,
+                      user_id,
                       id,
-                      table_name=SYNC_TABLE_NAME,
                       columns=['content'],
                       data_base_path=SYNC_DATA_BASE_PATH):
         """get diary log by id
@@ -549,33 +859,34 @@ class DiaryDBManager(manager.Manager):
             data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
 
         """
+        table_name = self.driver.get_table_name_by_user_id(user_id)
         row = self.driver.get_log_by_id(id=id,
                                         table_name=table_name,
                                         columns=columns,
                                         data_base_path=data_base_path)
         return row
 
+    # def get_all_logs(self,
+    #                  table=SYNC_TABLE_NAME,
+    #                  columns=['content'],
+    #                  data_base_path=SYNC_DATA_BASE_PATH):
+    #     """get all diary logs
+
+    #     Args:
+    #         table (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
+    #         columns (list, optional): _description_. Defaults to ['contents'].
+    #         data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
+
+    #     Returns:
+    #         string: json string
+    #     """
+    #     rows = self.driver.get_all_logs(table_name=table,
+    #                                     columns=columns,
+    #                                     data_base_path=data_base_path)
+    #     return rows
+
     def get_all_logs(self,
-                     table=SYNC_TABLE_NAME,
-                     columns=['content'],
-                     data_base_path=SYNC_DATA_BASE_PATH):
-        """get all diary logs
-
-        Args:
-            table (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
-            columns (list, optional): _description_. Defaults to ['contents'].
-            data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
-
-        Returns:
-            string: json string
-        """
-        rows = self.driver.get_all_logs(table_name=table,
-                                        columns=columns,
-                                        data_base_path=data_base_path)
-        return rows
-
-    def get_logs(self,
-                 table=SYNC_TABLE_NAME,
+                 user_id,
                  columns=['content'],
                  data_base_path=SYNC_DATA_BASE_PATH):
         """get all diary logs
@@ -587,14 +898,45 @@ class DiaryDBManager(manager.Manager):
 
         """
 
-        rows = self.driver.get_all_logs(table_name=table,
+        user_info = self.get_user_info_by_id(
+            user_id=user_id)
+        diary_table_name = user_info['diary_table_name']
+        rows = self.driver.get_all_logs(table_name=diary_table_name,
                                         columns=columns,
                                         data_base_path=data_base_path)
-        # return [row[0] for row in rows]
         return rows
+    
+    def get_logs_by_filter(self,
+                           user_id,
+                           filter={},
+                           columns=['content'],
+                           order_by="create_time",
+                           ascending=False,
+                           data_base_path=SYNC_DATA_BASE_PATH
+                           ):
+        """get logs by filter
+
+        Args:
+            table (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
+            columns (list, optional): _description_. Defaults to ['contents'].
+            data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
+
+        Returns:
+            string: json string
+        """
+        table_name = self.driver.get_table_name_by_user_id(user_id)
+        rows = self.driver.get_logs_by_filter(
+            filter=filter,
+            columns=columns,
+            order_by=order_by,
+            ascending=ascending,
+            table_name=table_name,
+            data_base_path=data_base_path)
+        return rows
+
     def delete_log(self,
                   id,
-                  table=SYNC_TABLE_NAME,
+                  user_id,
                   data_base_path=SYNC_DATA_BASE_PATH):
         """delete one diary log
 
@@ -604,10 +946,24 @@ class DiaryDBManager(manager.Manager):
             data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
         """
 
-        return self.driver.delete_log(id=id,
-                               table_name=table,
-                               data_base_path=data_base_path)
-        # return json.dumps({'status': 'success'})
+        table_name = self.driver.get_table_name_by_user_id(user_id)
+        return self.driver.delete_log(
+            id=id,
+            table_name=table_name,
+            data_base_path=data_base_path)
+    
+    def delete_log_by_filters(
+            self,
+            user_id,
+            filters,
+            data_base_path=SYNC_DATA_BASE_PATH
+            ):
+            
+        table_name = self.driver.get_table_name_by_user_id(user_id)
+        self.driver.delete_records_by_filters(
+            table_name=table_name,
+            filters=filters,
+            data_base_path=data_base_path)
 
     def delete_all_log(self,
                        data_base_path=SYNC_DATA_BASE_PATH,
@@ -662,11 +1018,13 @@ class DiaryDBManager(manager.Manager):
             list: [[content1], [content2], ...]
         """
         rows = self.driver.get_all_logs(table_name, columns, data_base_path)
+
         contents = [row[0] for row in rows]
         return json.dumps({'logs': contents})
 
-    def save_log_to_clipboard_table(self,table_name, columns, data, data_base_path):
-        self.driver.insert_columns_to_table(table_name=table_name,
-                                                  columns=columns,
-                                                  data=data,
-                                                  data_base_path=data_base_path)
+    def save_log_to_clipboard_table(
+            self, table_name, data_dict, data_base_path):
+        self.driver.insert_columns_to_table(
+            table_name=table_name,
+            data_dict=data_dict,
+            data_base_path=data_base_path)

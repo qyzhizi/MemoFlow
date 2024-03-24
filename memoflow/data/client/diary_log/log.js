@@ -326,7 +326,7 @@ function editLogEntry(pre, record_id) {
                     alert("登录已过期，请重新登录");
                     // HTTPUnauthorized error
                     console.log("Unauthorized - Redirecting to login page");
-                    window.location.href = '/v1/diary-log/login.html';
+                    window.location.href = '/v1/diary-log/login';
                 } else {
                     // Handle other error types as needed
                     console.log("Other error:", textStatus, errorThrown);
@@ -363,7 +363,7 @@ function deleteLogEntry(record_id) {
                 alert("登录已过期，请重新登录");
                 // HTTPUnauthorized error
                 console.log("Unauthorized - Redirecting to login page");
-                window.location.href = '/v1/diary-log/login.html';
+                window.location.href = '/v1/diary-log/login';
             } else {
                 // Handle other error types as needed
                 console.log("Other error:", textStatus, errorThrown);
@@ -508,7 +508,7 @@ $(function() {
                     alert("登录已过期，请重新登录");
                     // HTTPUnauthorized error
                     console.log("Unauthorized - Redirecting to login page");
-                    window.location.href = '/v1/diary-log/login.html';
+                    window.location.href = '/v1/diary-log/login';
                 } else {
                     // Handle other error types as needed
                     console.log("Other error:", textStatus, errorThrown);
@@ -537,7 +537,7 @@ $(function() {
                 // alert("登录已过期，请重新登录");
                 // HTTPUnauthorized error
                 console.log("Unauthorized - Redirecting to login page");
-                window.location.href = '/v1/diary-log/login.html';
+                window.location.href = '/v1/diary-log/login';
             } else {
                 // Handle other error types as needed
                 console.log("Other error:", textStatus, errorThrown);

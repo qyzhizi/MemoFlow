@@ -6,7 +6,7 @@ from memoflow.app.diary_log_second import controllers
 class Router(wsgi.ComposableRouter):
     def add_routes(self, mapper):
         diary_log_second_controller = controllers.DiaryLog()
-        mapper.connect('/diary-log-second/index.html',
+        mapper.connect('/diary-log-second/diary-log',
                        controller=diary_log_second_controller,
                        action='get_html',
                        conditions=dict(method=['GET']))

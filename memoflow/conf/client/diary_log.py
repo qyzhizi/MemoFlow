@@ -14,6 +14,12 @@ CONF_OPTS = [
     cfg.StrOpt('index_css_path',
                default='memoflow/data/client/diary_log/index.css',
                help='主页css路径'),
+    cfg.StrOpt('register_html_path',
+               default='memoflow/data/client/diary_log/register/register.html',
+               help='注册register.html路径'),
+    cfg.StrOpt('register_js_path',
+               default="memoflow/data/client/diary_log/register/register.js",
+               help='注册register.js路径'),
     cfg.StrOpt('login_html_path',
                default='memoflow/data/client/diary_log/login/login.html',
                help='login.html路径'),
@@ -35,7 +41,14 @@ CONF_OPTS = [
     cfg.StrOpt('vector_search_js_path',
                 default="memoflow/data/client/diary_log/vector_search/vector_search.js",
                 help='vector_search js文件路径'),
-
+    
+    # Settings
+    cfg.StrOpt('setting_html_path',
+               default='memoflow/data/client/diary_log/settings/setting.html',
+               help='settings html路径'),
+    cfg.StrOpt('setting_js_path',
+                default="memoflow/data/client/diary_log/settings/setting.js",
+                help='settings js文件路径'),
 
 ]
 

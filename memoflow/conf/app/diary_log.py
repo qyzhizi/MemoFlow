@@ -10,14 +10,19 @@ FLOMO_API_URL = env_vars.get("FLOMO_API_URL", None)
 DATABASE_ID = env_vars.get("DATABASE_ID", None)
 NOTION_API_KEY = env_vars.get("NOTION_API_KEY", None)
 
+# github config
 GITHUB_TOKEN = env_vars.get("GITHUB_TOKEN", None)
 GITHUB_REPO = env_vars.get("GITHUB_REPO", None)
+# github app config
+CLIENT_SECRET = env_vars.get("CLIENT_SECRET", None)
+CLIENT_ID = env_vars.get("CLIENT_ID", None)
 
 GITHUB_CURRENT_SYNC_FILE_PATH = env_vars.get("GITHUB_CURRENT_SYNC_FILE_PATH",
                                              None)
 JIANGUOYUN_CURRENT_SYNC_FILE_PATH = env_vars.get("JIANGUOYUN_CURRENT_SYNC_FILE_PATH",  None)                                             
 GITHUB_OTHER_SYNC_FILE_LIST = env_vars.get("GITHUB_OTHER_SYNC_FILE_LIST", None)
 
+# database cofig
 SYNC_DATA_BASE_PATH = env_vars.get("SYNC_DATA_BASE_PATH", None)
 SYNC_TABLE_NAME = env_vars.get("SYNC_TABLE_NAME", None)
 REVIEW_TABLE_NAME = env_vars.get("REVIEW_TABLE_NAME", None)
@@ -26,6 +31,10 @@ DATA_BASE_CLIPBOARD_PATH = env_vars.get("DATA_BASE_CLIPBOARD_PATH", None)
 CLIPBOARD_TABLE_NAME = env_vars.get("CLIPBOARD_TABLE_NAME", None)
 DIARY_LOG_LOGIN_USER = env_vars.get("DIARY_LOG_LOGIN_USER", None)
 DIARY_LOG_LOGIN_PASSWORD = env_vars.get("DIARY_LOG_LOGIN_PASSWORD", None)
+
+USER_TABLE_NAME = env_vars.get("USER_TABLE_NAME", 'users')
+GITHUB_ACCESS_TABLE_NAME = env_vars.get("GITHUB_ACCESS_TABLE_NAME", 'github_access')
+
 
 #获取发送任务标志位
 SEND_TO_GITHUB = bool(int(env_vars.get("SEND_TO_GITHUB", 0)))
@@ -63,6 +72,7 @@ if CLIPBOARD_TABLE_NAME == None:
 
 # 声明配置项
 CONF_OPTS = [
+    # database config
     cfg.StrOpt('SYNC_DATA_BASE_PATH',
                default=SYNC_DATA_BASE_PATH,
                help='同步数据库的路径'),
@@ -70,15 +80,32 @@ CONF_OPTS = [
     cfg.StrOpt('DIARY_LOG_LOGIN_PASSWORD', default=DIARY_LOG_LOGIN_PASSWORD, help='密码'),
     cfg.StrOpt('SYNC_TABLE_NAME', default=SYNC_TABLE_NAME, help='同步数据库的表名'),
     cfg.StrOpt('REVIEW_TABLE_NAME', default=REVIEW_TABLE_NAME, help='review表'),
+    cfg.StrOpt('USER_TABLE_NAME', default=USER_TABLE_NAME, help='user表'),
+    cfg.StrOpt('GITHUB_ACCESS_TABLE_NAME', default=GITHUB_ACCESS_TABLE_NAME, help='github access表'),
+
+    # database user table
+    cfg.StrOpt('USER_TABLE_NAME', default=USER_TABLE_NAME, help='user表'),
+    cfg.StrOpt('GITHUB_ACCESS_TABLE_NAME',
+               default=GITHUB_ACCESS_TABLE_NAME,
+               help='github access表'),
+
     cfg.StrOpt('REVIEW_TAGS', default='que,web', help='review 筛选标签'),
     cfg.StrOpt('FLOMO_API_URL', default=FLOMO_API_URL, help='flomo api url'),
     cfg.StrOpt('DATABASE_ID', default=DATABASE_ID, help='notion db id'),
     cfg.StrOpt('NOTION_API_KEY', default=NOTION_API_KEY,
                help='notion api key'),
+    # github config
     cfg.StrOpt('GITHUB_TOKEN',
                default=GITHUB_TOKEN,
                help='github access token'),
     cfg.StrOpt("GITHUB_REPO", default=GITHUB_REPO, help='github repo'),
+    # github app config
+    cfg.StrOpt('CLIENT_SECRET',
+               default=CLIENT_SECRET,
+               help='github client secret'),
+    cfg.StrOpt('CLIENT_ID',
+               default=CLIENT_ID,
+               help='github client id'),
     cfg.StrOpt("GITHUB_CURRENT_SYNC_FILE_PATH",
                default=GITHUB_CURRENT_SYNC_FILE_PATH,
                help='GITHUB_CURRENT_SYNC_FILE_PATH'),

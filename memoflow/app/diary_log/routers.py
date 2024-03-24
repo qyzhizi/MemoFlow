@@ -10,6 +10,10 @@ class Router(wsgi.ComposableRouter):
                        controller=diary_log_controller,
                        action='login',
                        conditions=dict(method=['POST']))
+        mapper.connect('/diary-log/register',
+                       controller=diary_log_controller,
+                       action='register',
+                       conditions=dict(method=['POST']))
         mapper.connect('/diary-log/getlogs',
                        controller=diary_log_controller,
                        action='get_logs',
@@ -103,4 +107,27 @@ class Router(wsgi.ComposableRouter):
                        controller=diary_log_controller,
                        action='delete_all_collection_item',
                        conditions=dict(method=['DELETE']))
+        
+        # github-authenticate
+        mapper.connect('/diary-log/github-authenticate',
+                        controller=diary_log_controller,
+                        action='github_authenticate',
+                        conditions=dict(method=['GET']))
+        
+        # github-authenticate-callback
+        mapper.connect('/diary-log/github-authenticate-callback',
+                        controller=diary_log_controller,
+                        action='github_authenticate_callback',
+                        conditions=dict(method=['GET']))        
+        
+        # /v1/diary-log/github-config
+        mapper.connect('/diary-log/github-config',
+                        controller=diary_log_controller,
+                        action='github_config',
+                        conditions=dict(method=['POST']))
+        # /v1/diary-log/get-github-config
+        mapper.connect('/diary-log/get-github-config',
+                        controller=diary_log_controller,
+                        action='get_github_config',
+                        conditions=dict(method=['GET']))
                        

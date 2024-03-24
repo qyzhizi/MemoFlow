@@ -40,9 +40,9 @@
     第一次运行会拉取 qyzhizi/memoflow:v0.1.1 镜像，大小为360M； 也会拉取 redis 镜像。然后启动服务。  
 - 5、访问客户端页面
 
-    浏览器输入：http://x.x.x.x:6060/v1/diary-log/index.html
+    浏览器输入：http://x.x.x.x:6060/v1/diary-log
 
-    本地访问：http://localhost:6060/v1/diary-log/index.html    
+    本地访问：http://localhost:6060/v1/diary-log    
 
 ## 本地构建镜像，运行服务
 需要下载源代码，构建镜像，然后使用 docker-compose 启动服务。
@@ -70,7 +70,7 @@
 
 - 5、访问客户端页面
 
-    浏览器输入：http://x.x.x.x:6060/v1/diary-log/index.html
+    浏览器输入：http://x.x.x.x:6060/v1/diary-log
 
-    本地访问：http://localhost:6060/v1/diary-log/index.html
+    本地访问：http://localhost:6060/v1/diary-log
     

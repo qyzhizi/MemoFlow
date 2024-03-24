@@ -6,7 +6,7 @@ from memoflow.client_app.diary_log import controllers
 class Router(wsgi.ComposableRouter):
     def add_routes(self, mapper):
         diary_log_controller = controllers.DiaryLog()
-        mapper.connect('/diary-log/index.html',
+        mapper.connect('/diary-log',
                        controller=diary_log_controller,
                        action='get_html',
                        conditions=dict(method=['GET']))
@@ -29,7 +29,7 @@ class Router(wsgi.ComposableRouter):
                        conditions=dict(method=['GET']))                                             
         
         # 粘贴板
-        mapper.connect('/diary-log/clipboard.html',
+        mapper.connect('/diary-log/clipboard',
                        controller=diary_log_controller,
                        action='get_clipboard_html',
                        conditions=dict(method=['GET']))
@@ -39,7 +39,7 @@ class Router(wsgi.ComposableRouter):
                        conditions=dict(method=['GET']))                                             
 
         # vector_search
-        mapper.connect('/diary-log/vector-search.html',
+        mapper.connect('/diary-log/vector-search',
                        controller=diary_log_controller,
                        action='get_vector_search_html',
                        conditions=dict(method=['GET']))
@@ -49,7 +49,38 @@ class Router(wsgi.ComposableRouter):
                        conditions=dict(method=['GET']))
         
         # login
-        mapper.connect('/diary-log/login.html',
+        mapper.connect('/diary-log/login',
                         controller=diary_log_controller,
                         action='get_login_html',
+                        conditions=dict(method=['GET']))
+
+        # register
+        mapper.connect('/diary-log/register',
+                        controller=diary_log_controller,
+                        action='get_register_html',
+                        conditions=dict(method=['GET']))
+        
+        mapper.connect('/diary-log/register.js',
+                        controller=diary_log_controller,
+                        action='get_register_js',
+                        conditions=dict(method=['GET']))
+        # Settings
+        mapper.connect('/diary-log/setting',
+                        controller=diary_log_controller,
+                        action='get_setting_html',
+                        conditions=dict(method=['GET']))
+        mapper.connect('/diary-log/setting.js',
+                        controller=diary_log_controller,
+                        action='get_setting_js',
+                        conditions=dict(method=['GET']))
+        
+        # github-authenticate
+        mapper.connect('/diary-log/github-authenticate',
+                        controller=diary_log_controller,
+                        action='github_authenticate',
+                        conditions=dict(method=['GET']))
+        # github-authenticate-callback
+        mapper.connect('/diary-log/github-authenticate-callback',
+                        controller=diary_log_controller,
+                        action='github_authenticate_callback',
                         conditions=dict(method=['GET']))

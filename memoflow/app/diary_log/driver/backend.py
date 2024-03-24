@@ -25,24 +25,36 @@ class DiaryLogDriver(object):
 
     def celery_update_file_to_github(self, token, repo, file_path, added_content,
                                     commit_message, branch_name):
-        if self.github_api_instance.get(repo, None) is None:
-            self.github_api_instance[repo] = GitHupApi(token=token, repo=repo)
-        my_api_instance = self.github_api_instance[repo]
+        # if self.github_api_instance.get(repo, None) is None:
+        #     self.github_api_instance[repo] = GitHupApi(token=token, repo=repo)
+        # my_api_instance = self.github_api_instance[repo]
+        my_api_instance = GitHupApi(token=token, repo=repo)
         my_api_instance.update_file(file_path=file_path,
                                     added_content=added_content,
                                     commit_message=commit_message,
                                     branch_name=branch_name)
 
-    def get_contents_from_github(self, token, repo, sync_file_path_list,
-                                 branch_name):
-        if self.github_api_instance.get(repo, None) is None:
-            self.github_api_instance[repo] = GitHupApi(token=token,
-                                                       repo=repo)
-        my_api_instance = self.github_api_instance[repo]
-        contents = my_api_instance.get_contents(sync_file_path_list=sync_file_path_list,
-                                            branch_name=branch_name)
+    def get_contents_from_github(
+            self, token, repo, sync_file_path_list, branch_name):
+        # if self.github_api_instance.get(repo, None) is None:
+        #     self.github_api_instance[repo] = GitHupApi(token=token,
+        #                                                repo=repo)
+        # my_api_instance = self.github_api_instance[repo]
+        my_api_instance = GitHupApi(token=token, repo=repo)
+        contents = my_api_instance.get_contents\
+            (sync_file_path_list=sync_file_path_list,
+             branch_name=branch_name)
 
         return contents
+    
+    def test_github_access(
+            self, 
+            access_token,
+            github_repo_name
+            ):
+        my_api_instance = GitHupApi(token=access_token,     
+                                    repo=github_repo_name)
+        return my_api_instance.repo.name,  my_api_instance.repo.owner.login
     
     def get_contents_from_jianguoyun(self, base_url: str, 
                                      acount: str,
@@ -58,4 +70,7 @@ class DiaryLogDriver(object):
                                           table_name=table_name,
                                           data_base_path=data_base_path)
 
+    def text_to_card_contents(self, content):
+        return db_sync.text_to_card_contents(
+                content=content)
     

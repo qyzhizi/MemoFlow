@@ -32,8 +32,13 @@ def token_required(func):
     def decorated_func(*args, **kwargs):
         if args and isinstance(args[1], Request):
             req = args[1]
+        else:
+            req = kwargs.get('req')
 
         token = req.headers.get('Authorization')
+        if not token:
+            # Try getting token from cookies if not found in headers
+            token = req.cookies.get('Authorization')
 
         if not token:
             return HTTPUnauthorized(json.dumps({"error": "Token is missing"}))
@@ -42,6 +47,7 @@ def token_required(func):
 
         decoded_data = TokenManager.verify_token(token[7:])
         if decoded_data:
+            req.environ['user_id'] = decoded_data.get('user_id', None)
             return func(*args, **kwargs)
         else:
             raise HTTPUnauthorized(json.dumps({"error": "Invalid credentials"}))

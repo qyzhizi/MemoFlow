@@ -15,6 +15,9 @@ LOG_JS_PATH = CONF.diary_log_client['log_js_path']
 REVIEW_JS_PATH = CONF.diary_log_client['review_js_path']
 VECTOR_SEARCH_JS_PATH = CONF.diary_log_client['vector_search_js_path']
 
+SETTINGS_HTML_PATH = CONF.diary_log_client['setting_html_path']
+SETTINGS_JS_PATH = CONF.diary_log_client['setting_js_path']
+
 #clipboard
 CLIPBOARD_HTML_PATH = CONF.diary_log_client['clipboard_html_path']
 CLIPBOARD_JS_PATH = CONF.diary_log_client['clipboard_js_path']
@@ -23,7 +26,14 @@ CLIPBOARD_JS_PATH = CONF.diary_log_client['clipboard_js_path']
 class DiaryLog(wsgi.Application):
     def get_login_html(self, req):
         return self.diary_log_client_api.get_login_html()
+    
+    # register
+    def get_register_html(self, req):
+        return self.diary_log_client_api.get_register_html()
 
+    def get_register_js(self, req):
+        return self.diary_log_client_api.get_register_js()
+    
     def get_html(self, req):
         return self.diary_log_client_api.get_html()
     
@@ -59,4 +69,14 @@ class DiaryLog(wsgi.Application):
     def get_vector_search_js(self, req):
         return self.diary_log_client_api.get_vector_search_js(
             js_path=VECTOR_SEARCH_JS_PATH)
+    
+    # Settings
+    def get_setting_html(self, req):
+        return self.diary_log_client_api.get_setting_html(
+            setting_html_path=SETTINGS_HTML_PATH)
+    
+    def get_setting_js(self, req):
+        return self.diary_log_client_api.get_setting_js(
+            setting_js_path=SETTINGS_JS_PATH)
+        
 

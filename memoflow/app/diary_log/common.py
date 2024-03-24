@@ -13,6 +13,8 @@ class GithubTablePathMap():
     sync_file_paths, sync_table_names = common.paths_to_table_names(GITHUB_FILE_LIST)
     current_table_name = sync_table_names[0]
     current_table_path = sync_file_paths[0]
+    other_table_path = sync_file_paths[1:]
+    # other_table_name = sync_table_names[1:]
     table_path_map = dict(zip(sync_table_names, sync_file_paths))
     path_table_map = dict(zip(sync_file_paths, sync_table_names))
     other_table_path_map = dict(zip(sync_table_names[1:], sync_file_paths[1:]))

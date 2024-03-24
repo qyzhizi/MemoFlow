@@ -52,9 +52,10 @@ github_api_instance ={}
 @celery.task
 def celery_update_file_to_github(token, repo, file_path, added_content,
                                  commit_message, branch_name):
-    if github_api_instance.get(repo, None) is None:
-        github_api_instance[repo] = github_api.GitHupApi(token=token, repo=repo)
-    my_api_instance = github_api_instance[repo]
+    # if github_api_instance.get(repo, None) is None:
+    #     github_api_instance[repo] = github_api.GitHupApi(token=token, repo=repo)
+    # my_api_instance = github_api_instance[repo]
+    my_api_instance = github_api.GitHupApi(token=token, repo=repo)
     my_api_instance.update_file(file_path=file_path,
                                 added_content=added_content,
                                 commit_message=commit_message,
@@ -64,9 +65,10 @@ def celery_update_file_to_github(token, repo, file_path, added_content,
 @celery.task
 def celery_push_updatedfile_to_github(token, repo, file_path, updated_content,
                                  commit_message, branch_name):
-    if github_api_instance.get(repo, None) is None:
-        github_api_instance[repo] = github_api.GitHupApi(token=token, repo=repo)
-    my_api_instance = github_api_instance[repo]
+    # if github_api_instance.get(repo, None) is None:
+    #     github_api_instance[repo] = github_api.GitHupApi(token=token, repo=repo)
+    # my_api_instance = github_api_instance[repo]
+    my_api_instance = github_api.GitHupApi(token=token, repo=repo)
     my_api_instance.update_file(file_path=file_path,
                                 updated_content=updated_content,
                                 commit_message=commit_message,
