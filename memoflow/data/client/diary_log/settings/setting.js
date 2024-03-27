@@ -77,14 +77,11 @@ $(function() {
                     if (jsonResponse.unknown_object_exception){
                         alert("404 unknown_object_exception");
                     }
-                    return;
                 }
                 if (jsonResponse.success === 1) {
                     alert("Success");
                 }
                 else{alert("Failed, please check your configuration")}
-                // 请求成功处理
-                console.log('Changes saved successfully.');
                 // 刷新页面
                 getGithubConfig();
 

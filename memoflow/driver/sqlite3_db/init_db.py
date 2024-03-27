@@ -26,7 +26,7 @@ def init_db():
         data_base_path=SYNC_DATA_BASE_PATH,
         table_name=REVIEW_TABLE_NAME)
 
-    # if user_settings('SEND_TO_GITHUB', None) == True:
+    # if user_settings.get('SEND_TO_GITHUB', None) == True:
     #     for table_name in GithubTablePathMap.sync_table_names:
     #         diary_log_db.create_diary_log_table(
     #             data_base_path=SYNC_DATA_BASE_PATH,

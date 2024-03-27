@@ -169,7 +169,7 @@ class DiaryLog(wsgi.Application):
         # get user settings
         user_settings = self.diary_db_api.get_user_settings(user_id)
         # 向github仓库（logseq 笔记软件）发送数据
-        if user_settings('SEND_TO_GITHUB', None) == True:
+        if user_settings.get('SEND_TO_GITHUB', None) == True:
 
             github_access_info = self.get_access_token_by_user_id(
                 user_id=user_id)
@@ -302,7 +302,7 @@ class DiaryLog(wsgi.Application):
 
         user_settings = self.diary_db_api.get_user_settings(user_id)
         # 向github仓库（logseq 笔记软件）发送更新后的数据
-        if user_settings('SEND_TO_GITHUB', None) == True:
+        if user_settings.get('SEND_TO_GITHUB', None) == True:
 
             # file_path = CONF.diary_log['GITHUB_CURRENT_SYNC_FILE_PATH']
             github_access_info = self.get_access_token_by_user_id(
@@ -376,7 +376,7 @@ class DiaryLog(wsgi.Application):
     # def get_contents_from_github(self, req):
     #     user_id = req.environ['user_id']
     #     user_settings = self.diary_db_api.get_user_settings(user_id)
-    #     if user_settings('SEND_TO_GITHUB', None) != True:
+    #     if user_settings.get('SEND_TO_GITHUB', None) != True:
     #         return json.dumps({"error": "CONF SEND_TO_GITHUB != True"})
     #     if len(sync_file_paths) != len(sync_table_names):
     #         raise Exception("sync_file_paths and sync_table_names length not equal")
@@ -402,7 +402,7 @@ class DiaryLog(wsgi.Application):
     def sync_contents_from_repo_to_db(self, req):
         user_id = req.environ['user_id']
         user_settings = self.diary_db_api.get_user_settings(user_id)
-        if user_settings('SEND_TO_GITHUB', None) == True:
+        if user_settings.get('SEND_TO_GITHUB', None) == True:
             github_access_info = self.get_access_token_by_user_id(
                 user_id=user_id)
 
@@ -413,6 +413,7 @@ class DiaryLog(wsgi.Application):
                 github_access_infos else []
             values_to_keep = [
                 github_access_info["current_sync_file"] ] + github_access_infos
+            # values_to_keep.append(None)
             self.diary_db_api.delete_records_not_in_list(
                 user_id=user_id,
                 field_name='sync_file',
@@ -423,6 +424,8 @@ class DiaryLog(wsgi.Application):
                 github_access_info=github_access_info,
                 )
             # Batch insert files in reverse order
+            columns = ['content', 'tags', 'sync_file']
+            records = []
             for sync_file, card_contents in sync_files_to_card_contents[::-1]:
                 if not card_contents:
                     continue
@@ -430,16 +433,14 @@ class DiaryLog(wsgi.Application):
                     user_id = user_id,
                     filters={"sync_file":sync_file}
                 )
-                columns = ['content', 'tags', 'sync_file']
-                records = []
                 for content, tags in card_contents:
                     records.append([content, tags, sync_file])
 
-                self.diary_db_api.insert_batch_records(
-                    user_id=user_id,
-                    columns=columns,
-                    records=records,
-                )
+            self.diary_db_api.insert_batch_records(
+                user_id=user_id,
+                columns=columns,
+                records=records,
+            )
             return "success"
         elif CONF.diary_log['SEND_TO_JIANGUOYUN'] == True:
             self.diary_log_api.sync_contents_from_jianguoyun_to_db(
@@ -637,10 +638,10 @@ class DiaryLog(wsgi.Application):
                 'gitOtherSyncFileName', None)
             }
 
-        if config_input_flag:
-            self.diary_db_api.user_add_or_update_github_access_data_to_db(
-                user_id=user_id,
-                data_dict=config_input_repo_info)
+        # if config_input_flag:
+        self.diary_db_api.user_add_or_update_github_access_data_to_db(
+            user_id=user_id,
+            data_dict=config_input_repo_info)
         if  config_input_flag and access_token:
             try:
                 # self.diary_log_api.test_github_access(
@@ -783,7 +784,7 @@ class DiaryLog(wsgi.Application):
     def asyn_push_user_current_sync_file_to_repo(
             self, user_id, sync_file):
         user_settings = self.diary_db_api.get_user_settings(user_id)
-        if user_settings('SEND_TO_GITHUB', None) == True:
+        if user_settings.get('SEND_TO_GITHUB', None) == True:
             github_access_info = self.get_access_token_by_user_id(
                 user_id=user_id)
 
