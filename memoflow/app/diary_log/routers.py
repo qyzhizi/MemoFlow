@@ -120,6 +120,12 @@ class Router(wsgi.ComposableRouter):
                         action='github_authenticate_callback',
                         conditions=dict(method=['GET']))        
         
+        # github-app-authenticate
+        mapper.connect('/diary-log/github-app-authenticate',
+                        controller=diary_log_controller,
+                        action='github_app_authenticate',
+                        conditions=dict(method=['GET']))
+        
         # /v1/diary-log/github-config
         mapper.connect('/diary-log/github-config',
                         controller=diary_log_controller,

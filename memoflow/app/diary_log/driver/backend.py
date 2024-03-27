@@ -27,9 +27,9 @@ class DiaryLogDriver(object):
                                     commit_message, branch_name):
         # if self.github_api_instance.get(repo, None) is None:
         #     self.github_api_instance[repo] = GitHupApi(token=token, repo=repo)
-        # my_api_instance = self.github_api_instance[repo]
-        my_api_instance = GitHupApi(token=token, repo=repo)
-        my_api_instance.update_file(file_path=file_path,
+        # github_api = self.github_api_instance[repo]
+        github_api = GitHupApi(token=token, repo=repo)
+        github_api.update_file(file_path=file_path,
                                     added_content=added_content,
                                     commit_message=commit_message,
                                     branch_name=branch_name)
@@ -39,9 +39,9 @@ class DiaryLogDriver(object):
         # if self.github_api_instance.get(repo, None) is None:
         #     self.github_api_instance[repo] = GitHupApi(token=token,
         #                                                repo=repo)
-        # my_api_instance = self.github_api_instance[repo]
-        my_api_instance = GitHupApi(token=token, repo=repo)
-        contents = my_api_instance.get_contents\
+        # github_api = self.github_api_instance[repo]
+        github_api = GitHupApi(token=token, repo=repo)
+        contents = github_api.get_contents\
             (sync_file_path_list=sync_file_path_list,
              branch_name=branch_name)
 
@@ -52,9 +52,21 @@ class DiaryLogDriver(object):
             access_token,
             github_repo_name
             ):
-        my_api_instance = GitHupApi(token=access_token,     
+        github_api = GitHupApi(token=access_token,     
                                     repo=github_repo_name)
-        return my_api_instance.repo.name,  my_api_instance.repo.owner.login
+        return github_api.repo.name,  github_api.repo.owner.login
+    
+    def create_file_if_not_exist_in_github(
+            self,
+            access_token:str,
+            github_repo_name:str,
+            files_paths:List[str]
+        ):
+        github_api = GitHupApi(token=access_token,     
+                                    repo=github_repo_name)
+        for file_path in files_paths:
+            github_api.create_file_if_not_exist(
+                path=file_path, content='', branch='main')
     
     def get_contents_from_jianguoyun(self, base_url: str, 
                                      acount: str,

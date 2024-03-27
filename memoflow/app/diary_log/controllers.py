@@ -45,6 +45,7 @@ CLIPBOARD_DATA_BASE_PATH = CONF.diary_log[
 # GitHub App
 CLIENT_SECRET = CONF.diary_log['CLIENT_SECRET']
 CLIENT_ID = CONF.diary_log['CLIENT_ID']
+GITHUB_APP_URL = CONF.diary_log['GITHUB_APP_URL']
 
 if CONF.diary_log['SEND_TO_GITHUB'] == True:
     sync_file_paths = GithubTablePathMap.sync_file_paths
@@ -165,8 +166,10 @@ class DiaryLog(wsgi.Application):
         # self.asyn_task_api.celery_send_log_notion(diary_log=processed_content)
         # # asyncio.run(self.diary_log_api.run_tasks(diary_log))
 
+        # get user settings
+        user_settings = self.diary_db_api.get_user_settings(user_id)
         # 向github仓库（logseq 笔记软件）发送数据
-        if CONF.diary_log['SEND_TO_GITHUB'] == True:
+        if user_settings('SEND_TO_GITHUB', None) == True:
 
             github_access_info = self.get_access_token_by_user_id(
                 user_id=user_id)
@@ -250,7 +253,10 @@ class DiaryLog(wsgi.Application):
             processed_content)
         old_diary_content = self.diary_db_api.get_log_by_id(
             user_id=user_id,
-            id=diary_log["record_id"])
+            id=diary_log["record_id"],
+            columns=['content', 'sync_file'])
+        # get sync_file
+        sync_file = old_diary_content[1]
 
         # 保存到本地数据库
         self.diary_db_api.update_log(
@@ -273,29 +279,47 @@ class DiaryLog(wsgi.Application):
             old_que_string, que_string, tags)
 
         # 向远程仓库发送更新后的 sync_file
-        self.asyn_push_user_current_sync_file_to_repo(user_id=user_id)
+        self.asyn_push_user_current_sync_file_to_repo(
+            user_id=user_id,
+            sync_file=sync_file)
 
         return json.dumps({"content": processed_block_content})
 
     @token_required
     def delete_log(self, req, record_id):
         user_id = req.environ['user_id']
+        old_diary_content = self.diary_db_api.get_log_by_id(
+            user_id=user_id,
+            id=record_id,
+            columns=['content', 'sync_file'])
+        
+        # get sync_file
+        sync_file = old_diary_content[1]
 
         res = self.diary_db_api.delete_log(user_id=user_id, id=record_id)
         if res:
             LOG.info(f"delete diary log success, id: {record_id}")
-        rows = self.diary_db_api.get_all_logs(user_id=user_id)
-        updated_contents = [row[0] for row in rows]
-        updated_contents.reverse()
 
+        user_settings = self.diary_db_api.get_user_settings(user_id)
         # 向github仓库（logseq 笔记软件）发送更新后的数据
-        if CONF.diary_log['SEND_TO_GITHUB'] == True:
-            updated_content = "\n".join(updated_contents)
+        if user_settings('SEND_TO_GITHUB', None) == True:
 
             # file_path = CONF.diary_log['GITHUB_CURRENT_SYNC_FILE_PATH']
             github_access_info = self.get_access_token_by_user_id(
                 user_id=user_id)
-            file_path = github_access_info['current_sync_file']
+            
+            # default order_by create_time DESC descending sort
+            rows = self.diary_db_api.get_logs_by_filter(
+                user_id=user_id,
+                filter={"sync_file": sync_file},
+                columns=['content'],
+                order_by="create_time",
+                ascending=False
+            )
+            updated_contents = [row[0] for row in rows]
+            updated_content = "\n".join(updated_contents)
+
+            file_path = sync_file
             commit_message = "commit by memoflow"
             branch_name = "main"
             # token = CONF.diary_log['GITHUB_TOKEN']
@@ -348,47 +372,60 @@ class DiaryLog(wsgi.Application):
             data_base_path=CLIPBOARD_DATA_BASE_PATH)
         return json.dumps(diary_log)  # data 是否可行？
 
-    @token_required
-    def get_contents_from_github(self, req):
-        user_id = req.environ['user_id']
-        if CONF.diary_log['SEND_TO_GITHUB'] != True:
-            return json.dumps({"error": "CONF SEND_TO_GITHUB != True"})
-        if len(sync_file_paths) != len(sync_table_names):
-            raise Exception("sync_file_paths and sync_table_names length not equal")
-        github_access_info = self.get_access_token_by_user_id(
-                user_id=user_id)
-        # token = CONF.diary_log['GITHUB_TOKEN']
-        token = github_access_info['access_token']
-        repo = github_access_info['github_repo_name']
-        # token = CONF.diary_log['GITHUB_TOKEN']
-        # repo = CONF.diary_log['GITHUB_REPO']
-        branch_name = "main"
-        contents = self.diary_log_api.get_contents_from_github(
-            token, repo, sync_file_paths, branch_name)
-        if len(contents) != len(sync_file_paths):
-            raise Exception("contents length and len(sync_file_paths) not equal")
-        result = []
-        for content in contents:
-            result.extend(content)
-        # return contents
-        return json.dumps({"contents": result})
+    # @token_required
+    # def get_contents_from_github(self, req):
+    #     user_id = req.environ['user_id']
+    #     user_settings = self.diary_db_api.get_user_settings(user_id)
+    #     if user_settings('SEND_TO_GITHUB', None) != True:
+    #         return json.dumps({"error": "CONF SEND_TO_GITHUB != True"})
+    #     if len(sync_file_paths) != len(sync_table_names):
+    #         raise Exception("sync_file_paths and sync_table_names length not equal")
+    #     github_access_info = self.get_access_token_by_user_id(
+    #             user_id=user_id)
+    #     # token = CONF.diary_log['GITHUB_TOKEN']
+    #     token = github_access_info['access_token']
+    #     repo = github_access_info['github_repo_name']
+    #     # token = CONF.diary_log['GITHUB_TOKEN']
+    #     # repo = CONF.diary_log['GITHUB_REPO']
+    #     branch_name = "main"
+    #     contents = self.diary_log_api.get_contents_from_github(
+    #         token, repo, sync_file_paths, branch_name)
+    #     if len(contents) != len(sync_file_paths):
+    #         raise Exception("contents length and len(sync_file_paths) not equal")
+    #     result = []
+    #     for content in contents:
+    #         result.extend(content)
+    #     # return contents
+    #     return json.dumps({"contents": result})
 
     @token_required
     def sync_contents_from_repo_to_db(self, req):
         user_id = req.environ['user_id']
-
-        if CONF.diary_log['SEND_TO_GITHUB'] == True:
+        user_settings = self.diary_db_api.get_user_settings(user_id)
+        if user_settings('SEND_TO_GITHUB', None) == True:
             github_access_info = self.get_access_token_by_user_id(
                 user_id=user_id)
 
+            # delete records whose value is not in the  values_to_keep
+            github_access_infos = github_access_info[
+                'other_sync_file_list'].strip()
+            github_access_infos = github_access_infos.split(',') if \
+                github_access_infos else []
+            values_to_keep = [
+                github_access_info["current_sync_file"] ] + github_access_infos
+            self.diary_db_api.delete_records_not_in_list(
+                user_id=user_id,
+                field_name='sync_file',
+                values_to_keep=values_to_keep
+            )
             sync_files_to_card_contents = \
                 self.diary_log_api.sync_files_to_card_contents(
                 github_access_info=github_access_info,
                 )
-            # 将文件逆序批量插入
+            # Batch insert files in reverse order
             for sync_file, card_contents in sync_files_to_card_contents[::-1]:
                 if not card_contents:
-                    return "success"
+                    continue
                 self.diary_db_api.delete_log_by_filters(
                     user_id = user_id,
                     filters={"sync_file":sync_file}
@@ -403,16 +440,17 @@ class DiaryLog(wsgi.Application):
                     columns=columns,
                     records=records,
                 )
+            return "success"
         elif CONF.diary_log['SEND_TO_JIANGUOYUN'] == True:
             self.diary_log_api.sync_contents_from_jianguoyun_to_db(
                 sync_file_paths=JianguoyunTablePathMap.sync_file_paths,
                 sync_table_names=JianguoyunTablePathMap.sync_table_names)
-
-        return "success"
+            return "success"
+        return "failed"
 
     def search_contents_from_vecter_db(self, req):
         data = req.body
-        # 将POST数据转换为JSON格式
+        # Convert post data to json format
         search_data = json.loads(data)['search_data']
         LOG.info("search_data json_data:, %s" % search_data)
         # search contents from vecter db
@@ -520,8 +558,6 @@ class DiaryLog(wsgi.Application):
         # 调用 GitHub API 获取 access token
         origin_github_tokens_info = self.diary_log_api.get_access_token(code)
         user_id = req.environ['user_id']
-        # current_sync_file = CONF.diary_log['GITHUB_CURRENT_SYNC_FILE_PATH']
-        # other_sync_file_list = ",".join(GithubTablePathMap.other_table_path)
 
         github_tokens_info = self.diary_log_api.\
                     process_github_tokens_info_to_db_format(
@@ -545,6 +581,13 @@ class DiaryLog(wsgi.Application):
             "access_token_expires_at": access_token_expires_at,
             "refresh_token_expires_at": refresh_token_expires_at
             }))
+
+    @token_required
+    def github_app_authenticate(self, req):
+        github_app_url = GITHUB_APP_URL
+        # 创建一个 HTTPFound 对象来重定向到 GitHub 授权链接
+        response = HTTPFound(location=github_app_url)
+        return response
     
     @token_required
     def github_config(self, req):
@@ -561,21 +604,24 @@ class DiaryLog(wsgi.Application):
         }
         github_repo_name = config_input_repo_info.get("github_repo_name", None)
         current_sync_file = config_input_repo_info.get("current_sync_file", None)
-        other_sync_file_list = config_input_repo_info.get(
+
+        # process other_sync_file_list to right format
+        other_sync_file_list:str = config_input_repo_info.get(
             "other_sync_file_list", None)
-        
+        other_sync_file_list = \
+            [path.strip() for path in other_sync_file_list.split(',') 
+             if path.strip()] if other_sync_file_list else []
+        # delete Duplicate items
+        if current_sync_file in other_sync_file_list:
+            other_sync_file_list.remove(current_sync_file)
+        other_sync_file_list = ','.join(other_sync_file_list)
+        config_input_repo_info["other_sync_file_list"] = other_sync_file_list
+
         db_github_access_info = self.get_access_token_by_user_id(
     user_id)
         access_token = db_github_access_info.get('access_token', None)
 
-        # success_flg = None
-        # access_token_flg =None
-        # test_github_access_flg = None
-        # unknown_object_exception = None
-        config_input_flag = (github_repo_name is not None and 
-                             (current_sync_file  or 
-                              other_sync_file_list)
-                               is not None)
+        config_input_flag = (github_repo_name !='') and (current_sync_file != '') 
         
         status_dict ={
             "success": None,
@@ -597,12 +643,22 @@ class DiaryLog(wsgi.Application):
                 data_dict=config_input_repo_info)
         if  config_input_flag and access_token:
             try:
-                self.diary_log_api.test_github_access(
+                # self.diary_log_api.test_github_access(
+                #     access_token=access_token,
+                #     github_repo_name=github_repo_name)
+                self.diary_log_api.init_sync_files_for_github(
                     access_token=access_token,
-                    github_repo_name=github_repo_name)
+                    github_repo_name=github_repo_name,
+                    current_sync_file=current_sync_file,
+                    other_sync_file_list=other_sync_file_list)
+                # bing github success , save flag to db
+                self.diary_db_api.update_user_settings_to_db(
+                    user_id=user_id,
+                    user_settings={"SEND_TO_GITHUB": "True"})
+
                 status_dict['success'] = 1
                 status_dict['access_token_flg'] = 1
-                status_dict['test_github_access_flg'] = 1
+                status_dict['init_sync_files_for_github'] = 1
             except UnknownObjectException as e:
                 LOG.error(e)
                 status_dict['success'] = 0
@@ -617,8 +673,11 @@ class DiaryLog(wsgi.Application):
                 # github.GithubException.UnknownObjectException 404
                 LOG.error(e)
                 status_dict['success'] = 0
-                status_dict['test_github_access_flg'] = 0
+                status_dict['init_sync_files_for_github'] = 0
         else:
+            self.diary_db_api.update_user_settings_to_db(
+                    user_id=user_id,
+                    user_settings={"SEND_TO_GITHUB": "False"})
             status_dict['success'] = 0
             status_dict['access_token_flg'] = 0
 
@@ -626,8 +685,10 @@ class DiaryLog(wsgi.Application):
     @token_required
     def get_github_config(self, req):
         user_id = req.environ['user_id']
-        github_access_info = self.get_access_token_by_user_id(
-    user_id)
+        try:
+            github_access_info = self.get_access_token_by_user_id(user_id)
+        except Exception as e:
+            github_access_info = {}
         config_input_repo_info = {
             "github_repo_name": github_access_info.get('github_repo_name', None),
             "current_sync_file": github_access_info.get(
@@ -645,15 +706,34 @@ class DiaryLog(wsgi.Application):
             }))   
 
     def get_access_token_by_user_id(self, user_id):
+        """ get github access info by user_id from db.
+        if access_token has expired, get new access_token from github.
+        if refresh_token has expired, return empty dict.
+        if access_token and refresh_token both has expired, return empty dict.
+        
+
+        Args:
+            user_id (uuid): _description_
+
+        Returns:
+            dict : github access info 
+        """
         github_access_info = self.diary_db_api.\
             get_github_access_info_by_user_id(user_id)
 
         # access_token = github_access_info['access_token']
-        refresh_token = github_access_info['refresh_token']
-        access_token_expires_at = github_access_info[
-            'access_token_expires_at']
+        refresh_token = github_access_info.get('refresh_token', None)
+        access_token_expires_at = github_access_info.get(
+            'access_token_expires_at', None)
         access_token_expires_at = datetime.strptime\
-            (access_token_expires_at, '%Y-%m-%d %H:%M:%S.%f')
+            (access_token_expires_at, '%Y-%m-%d %H:%M:%S.%f') \
+                if access_token_expires_at else None
+        
+        if not refresh_token or not access_token_expires_at:
+            LOG.error( "github refresh token don't exit, "
+                    "please bing github again")
+            raise Exception("github refresh token don't exit, "
+                    "please bing github again")
 
         # 获取当前时间
         current_datetime = datetime.now()
@@ -667,13 +747,11 @@ class DiaryLog(wsgi.Application):
                     '%Y-%m-%d %H:%M:%S.%f')
             # if refresh token alse has expired
             if current_datetime > refresh_token_expires_at:
-                response = Response(
-                    json.dumps(
-                    {"github refresh token hans expired, \
-                        please bing github again"
-                    }))
-                response.status_code = 401
-                return response
+                LOG.error( "github refresh token has expired, \
+                    please bing github again")
+                raise Exception("github refresh token has expired, \
+                    please bing github again")
+
             # 获取新的access_token
             origin_github_tokens_info = self.diary_log_api.\
                 get_github_access_token_by_refresh_token\
@@ -703,16 +781,16 @@ class DiaryLog(wsgi.Application):
         return github_access_info
 
     def asyn_push_user_current_sync_file_to_repo(
-            self, user_id):
-
-        if CONF.diary_log['SEND_TO_GITHUB'] == True:
+            self, user_id, sync_file):
+        user_settings = self.diary_db_api.get_user_settings(user_id)
+        if user_settings('SEND_TO_GITHUB', None) == True:
             github_access_info = self.get_access_token_by_user_id(
                 user_id=user_id)
 
             # default order_by create_time DESC descending sort
             rows = self.diary_db_api.get_logs_by_filter(
                 user_id=user_id,
-                filter={"sync_file": github_access_info['current_sync_file']},
+                filter={"sync_file": sync_file},
                 columns=['content'],
                 order_by="create_time",
                 ascending=False
@@ -720,7 +798,7 @@ class DiaryLog(wsgi.Application):
             updated_contents = [row[0] for row in rows]
             # updated_contents.reverse()
             updated_content = "\n".join(updated_contents)
-            file_path = github_access_info['current_sync_file']
+            file_path = sync_file
             commit_message = "commit by memoflow"
             branch_name = "main"
             token = github_access_info['access_token']

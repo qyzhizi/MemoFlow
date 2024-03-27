@@ -13,34 +13,33 @@ SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
 
 class DBSqliteDriver(object):
     @classmethod
-    def init_db_diary_log(cls, data_base_path, table_name):
-
+    def init_db_diary_log(cls, data_base_path):
+        # 初始化数据库
+        LOG.info("初始化diary_log数据库路径: %s", data_base_path)
         # 判断data_base_path是否存在，不存在则创建
         dir_path = os.path.dirname(data_base_path)
         if not os.path.exists(dir_path):
             LOG.info("同步数据库路径不存在，创建路径: %s", dir_path)
             os.makedirs(dir_path)
-        # 初始化数据库
-        LOG.info("初始化diary_log数据库路径: %s", data_base_path)
-        conn = sqlite3.connect(data_base_path)
-        c = conn.cursor()
-        # c.execute(f'CREATE TABLE IF NOT EXISTS {table_name} (id TEXT PRIMARY KEY, content TEXT, tags TEXT)')
+        # conn = sqlite3.connect(data_base_path)
+        # c = conn.cursor()
+        # # c.execute(f'CREATE TABLE IF NOT EXISTS {table_name} (id TEXT PRIMARY KEY, content TEXT, tags TEXT)')
+        # # c.execute(
+        # # f"CREATE TABLE IF NOT EXISTS {table_name} "
+        # # f"(id CHAR(36) PRIMARY KEY, user_id CHAR(36), "
+        # # f"content TEXT, tags TEXT, sync_file VARCHAR(512))"
+        # # )
         # c.execute(
-        # f"CREATE TABLE IF NOT EXISTS {table_name} "
-        # f"(id CHAR(36) PRIMARY KEY, user_id CHAR(36), "
-        # f"content TEXT, tags TEXT, sync_file VARCHAR(512))"
+        #     f"CREATE TABLE IF NOT EXISTS {table_name} "
+        #     f"(id CHAR(36) PRIMARY KEY, "
+        #     f"content TEXT, "
+        #     f"tags TEXT, "
+        #     f"sync_file VARCHAR(512), "
+        #     f"update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+        #     f"create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
         # )
-        c.execute(
-            f"CREATE TABLE IF NOT EXISTS {table_name} "
-            f"(id CHAR(36) PRIMARY KEY, "
-            f"content TEXT, "
-            f"tags TEXT, "
-            f"sync_file VARCHAR(512), "
-            f"update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
-            f"create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
-        )
-        conn.commit()
-        conn.close()
+        # conn.commit()
+        # conn.close()
 
     @classmethod
     def create_diary_log_table(cls, data_base_path, table_name):
@@ -76,7 +75,24 @@ class DBSqliteDriver(object):
                 f")"
             )
 
-    
+    @classmethod
+    def create_user_settings_table(cls, data_base_path,
+                                   user_settings_table_name):
+        # 使用 with 语法创建数据库连接，并自动管理连接的打开和关闭
+        with sqlite3.connect(data_base_path) as conn:
+            cursor = conn.cursor()
+            # 创建 user_settings 表
+            cursor.execute(
+                f"CREATE TABLE IF NOT EXISTS {user_settings_table_name} ("
+                f"user_id INTEGER, "
+                f"setting_key VARCHAR(255), "
+                f"setting_value TEXT, "
+                f"PRIMARY KEY (user_id, setting_key)"
+                f")"
+            )
+            # 提交事务
+            conn.commit()
+
     @classmethod
     def create_github_access_table(cls, data_base_path, user_table_name,
                                    github_access_table_name):
@@ -179,6 +195,45 @@ class DBSqliteDriver(object):
                 return None
     
     @classmethod
+    def update_user_settings_to_db(
+        cls,
+        user_id: str,
+        user_settings: dict,
+        data_base_path: str,
+        table_name: str
+    ) -> None:
+        # 构建 user_settings_list 列表
+        user_settings_list = [(user_id, key, str(value)) 
+                              for key, value in user_settings.items()]
+
+        with sqlite3.connect(data_base_path) as conn:
+            cursor = conn.cursor()
+
+            # 插入或更新多个用户设置
+            cursor.executemany(
+                f"INSERT OR REPLACE INTO {table_name} "
+                f"(user_id, setting_key, setting_value) VALUES (?, ?, ?)",
+                  user_settings_list)
+
+            # 提交事务
+            conn.commit()
+    
+    @classmethod
+    def get_user_settings(
+        cls, user_id: str, data_base_path: str, table_name: str) -> dict:
+        with sqlite3.connect(data_base_path) as conn:
+            cursor = conn.cursor()
+
+            # 查询用户设置
+            cursor.execute(f"SELECT setting_key, setting_value FROM {table_name} WHERE user_id=?", (user_id,))
+            rows = cursor.fetchall()
+
+            # 将查询结果转换为字典形式
+            user_settings = {row[0]: row[1] for row in rows}
+
+            return user_settings
+
+    @classmethod
     def user_add_or_update_github_access_data(
         cls,
         user_id, 
@@ -240,6 +295,16 @@ class DBSqliteDriver(object):
             
     @classmethod
     def get_github_access_info_by_user_id(cls, user_id, data_base_path, table_name):
+        """_summary_
+
+        Args:
+            user_id (_type_): _description_
+            data_base_path (_type_): _description_
+            table_name (_type_): _description_
+
+        Returns:
+            dict: dict type
+        """
         LOG.info(f"get_github_access_info_by_user_id: {table_name}, \
                 所在数据库：{data_base_path}")
         with sqlite3.connect(data_base_path) as conn:
@@ -254,7 +319,7 @@ class DBSqliteDriver(object):
             if result:
                 return dict(result)
             else:
-                return None
+                return {}
 
     @classmethod
     def init_db_clipboard_log(cls, data_base_path, table_name):
@@ -297,7 +362,8 @@ class DBSqliteDriver(object):
             return None
 
     @classmethod
-    def get_logs_by_filter(cls, filter, columns, table_name, data_base_path, order_by="create_time", ascending=False):
+    def get_logs_by_filter(cls, filter, columns, table_name, data_base_path,
+                           order_by="create_time", ascending=False):
         """get logs by filter
 
         Args:
@@ -385,6 +451,19 @@ class DBSqliteDriver(object):
         conn.close()
         return True if c.rowcount > 0 else False
 
+    @classmethod
+    def delete_records_not_in_list(cls, table_name, data_base_path,
+                                   field_name, values_to_keep):
+        with sqlite3.connect(data_base_path) as conn:
+            c = conn.cursor()
+            # 使用 NOT IN 条件删除不在给定列表中的记录
+            query = f'DELETE FROM {table_name} WHERE {field_name} NOT IN \
+                ({",".join("?" * len(values_to_keep))})'
+            c.execute(query, values_to_keep)
+            # 提交更改
+            conn.commit()
+            return True if c.rowcount > 0 else False
+    
     @classmethod
     def delete_records_by_filters(cls, data_base_path, table_name, filters):
         """Delete records based on multiple filter conditions."""

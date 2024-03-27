@@ -16,6 +16,7 @@ GITHUB_REPO = env_vars.get("GITHUB_REPO", None)
 # github app config
 CLIENT_SECRET = env_vars.get("CLIENT_SECRET", None)
 CLIENT_ID = env_vars.get("CLIENT_ID", None)
+GITHUB_APP_URL= env_vars.get("GITHUB_APP_URL", None)
 
 GITHUB_CURRENT_SYNC_FILE_PATH = env_vars.get("GITHUB_CURRENT_SYNC_FILE_PATH",
                                              None)
@@ -33,7 +34,10 @@ DIARY_LOG_LOGIN_USER = env_vars.get("DIARY_LOG_LOGIN_USER", None)
 DIARY_LOG_LOGIN_PASSWORD = env_vars.get("DIARY_LOG_LOGIN_PASSWORD", None)
 
 USER_TABLE_NAME = env_vars.get("USER_TABLE_NAME", 'users')
-GITHUB_ACCESS_TABLE_NAME = env_vars.get("GITHUB_ACCESS_TABLE_NAME", 'github_access')
+USER_SETTINGS_TABLE_NAME = env_vars.get("USER_SETTINGS_TABLE_NAME",
+                                        'user_settings')
+GITHUB_ACCESS_TABLE_NAME = env_vars.get("GITHUB_ACCESS_TABLE_NAME",
+                                        'github_access')
 
 
 #获取发送任务标志位
@@ -80,14 +84,18 @@ CONF_OPTS = [
     cfg.StrOpt('DIARY_LOG_LOGIN_PASSWORD', default=DIARY_LOG_LOGIN_PASSWORD, help='密码'),
     cfg.StrOpt('SYNC_TABLE_NAME', default=SYNC_TABLE_NAME, help='同步数据库的表名'),
     cfg.StrOpt('REVIEW_TABLE_NAME', default=REVIEW_TABLE_NAME, help='review表'),
-    cfg.StrOpt('USER_TABLE_NAME', default=USER_TABLE_NAME, help='user表'),
-    cfg.StrOpt('GITHUB_ACCESS_TABLE_NAME', default=GITHUB_ACCESS_TABLE_NAME, help='github access表'),
+    # cfg.StrOpt('USER_TABLE_NAME', default=USER_TABLE_NAME, help='user表'),
+    # cfg.StrOpt('GITHUB_ACCESS_TABLE_NAME', default=GITHUB_ACCESS_TABLE_NAME, help='github access表'),
 
     # database user table
     cfg.StrOpt('USER_TABLE_NAME', default=USER_TABLE_NAME, help='user表'),
     cfg.StrOpt('GITHUB_ACCESS_TABLE_NAME',
                default=GITHUB_ACCESS_TABLE_NAME,
                help='github access表'),
+    cfg.StrOpt('USER_SETTINGS_TABLE_NAME',
+               default=USER_SETTINGS_TABLE_NAME,
+               help='user_settings table name'
+               ),
 
     cfg.StrOpt('REVIEW_TAGS', default='que,web', help='review 筛选标签'),
     cfg.StrOpt('FLOMO_API_URL', default=FLOMO_API_URL, help='flomo api url'),
@@ -106,6 +114,9 @@ CONF_OPTS = [
     cfg.StrOpt('CLIENT_ID',
                default=CLIENT_ID,
                help='github client id'),
+    cfg.StrOpt('GITHUB_APP_URL',
+               default=GITHUB_APP_URL,
+               help='GITHUB APP URL'),
     cfg.StrOpt("GITHUB_CURRENT_SYNC_FILE_PATH",
                default=GITHUB_CURRENT_SYNC_FILE_PATH,
                help='GITHUB_CURRENT_SYNC_FILE_PATH'),

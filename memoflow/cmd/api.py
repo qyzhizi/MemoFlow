@@ -6,7 +6,7 @@ from paste import deploy
 from memoflow.core.wsgi_server import Server
 from memoflow.core import dependency
 from memoflow.core import backends
-from memoflow.driver.sqlite3_db import init_db
+from memoflow.driver.sqlite3_db.init_db import init_db
 
 cp = ConfigParse(CONF.server['server_conf_path'])
 cf_defaults = cp.read_file().get("default")

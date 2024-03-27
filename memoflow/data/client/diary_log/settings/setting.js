@@ -80,8 +80,9 @@ $(function() {
                     return;
                 }
                 if (jsonResponse.success === 1) {
-                    alert("success");
+                    alert("Success");
                 }
+                else{alert("Failed, please check your configuration")}
                 // 请求成功处理
                 console.log('Changes saved successfully.');
                 // 刷新页面

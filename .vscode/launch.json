@@ -26,7 +26,8 @@
                     "remoteRoot": "/app"
                 }
             ],
-            "justMyCode": false
+            // "justMyCode": false
+            "justMyCode": true
         }
     ]
 }

@@ -147,6 +147,35 @@ class Manager(manager.Manager):
             github_repo_name=github_repo_name
             )
     
+    def init_sync_files_for_github(
+        self,
+        access_token:str,
+        github_repo_name:str,
+        current_sync_file:str,
+        other_sync_file_list:str
+    ):
+        """ create sync file if file not exist in github repo.
+        current_sync_file: the file path in github repo,
+        other_sync_file_list: the file path in github repo,
+        split by ',', and space is optional.
+        example:
+        current_sync_file = 'diary_log/diary_log.json'
+
+        Args:
+            access_token (str): _description_
+            github_repo_name (str): _description_
+            current_sync_file (str): _description_
+            other_sync_file_list (str): _description_
+        """
+        other_sync_file_list = [path.strip() for path in
+                                 other_sync_file_list.split(',')] \
+            if other_sync_file_list else []
+        all_sync_files = other_sync_file_list + ([current_sync_file] 
+                                                 if current_sync_file else [])
+        self.driver.create_file_if_not_exist_in_github(
+            access_token=access_token,
+            github_repo_name=github_repo_name,
+            files_paths=all_sync_files)
     
     def process_block(self, block_string):
         """处理子块缩进
@@ -509,9 +538,13 @@ class Manager(manager.Manager):
         current_sync_file = github_access_info['current_sync_file']
         other_sync_file_list = github_access_info['other_sync_file_list']
         # if current_sync_file and other_sync_file_list:
+
+        other_sync_file_list = [path.strip() for path in
+                            other_sync_file_list.split(',')] \
+            if other_sync_file_list else []
+
         sync_file_paths = [current_sync_file.strip()] + \
-            other_sync_file_list.strip().split(',')
-        
+            other_sync_file_list
         
         access_token = github_access_info['access_token']
         # repo = CONF.diary_log['GITHUB_REPO']
@@ -773,6 +806,37 @@ class DiaryDBManager(manager.Manager):
             data_base_path=SYNC_DATA_BASE_PATH,
             table_name=USER_TABLE_NAME)
         return user_info
+    
+    def update_user_settings_to_db(
+            self, user_id:str, user_settings:dict) -> None:
+        SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
+        USER_SETTINGS_TABLE_NAME = CONF.diary_log['USER_SETTINGS_TABLE_NAME']
+
+        self.driver.update_user_settings_to_db(
+            user_id=user_id,
+            user_settings=user_settings,
+            data_base_path=SYNC_DATA_BASE_PATH,
+            table_name=USER_SETTINGS_TABLE_NAME)
+
+    def get_user_settings(
+            self,
+            user_id: str) -> dict:
+
+        SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
+        USER_SETTINGS_TABLE_NAME = CONF.diary_log['USER_SETTINGS_TABLE_NAME']
+        user_settings = self.driver.get_user_settings(
+            user_id=user_id,
+            data_base_path=SYNC_DATA_BASE_PATH,
+            table_name=USER_SETTINGS_TABLE_NAME
+            )
+        for key, value in user_settings.items():
+            if value.strip().lower() == 'true':
+                user_settings[key] = True
+            if value.strip().lower() == 'false':
+                user_settings[key] = False
+        
+        return user_settings
+
                                                 
     def add_log(self,
                 user_id,
@@ -950,6 +1014,26 @@ class DiaryDBManager(manager.Manager):
         return self.driver.delete_log(
             id=id,
             table_name=table_name,
+            data_base_path=data_base_path)
+    
+    def delete_records_not_in_list(
+            self,
+            user_id,
+            field_name,
+            values_to_keep,
+            data_base_path=SYNC_DATA_BASE_PATH):
+        """Based on a certain field, delete all records whose value is not in the given list
+
+        Args:
+            field_name (str): _description_
+            values_to_keep (list): _description_
+            data_base_path (str, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
+        """
+        table_name = self.driver.get_table_name_by_user_id(user_id)
+        self.driver.delete_records_not_in_list(
+            table_name=table_name,
+            field_name=field_name,
+            values_to_keep=values_to_keep,
             data_base_path=data_base_path)
     
     def delete_log_by_filters(
