@@ -638,7 +638,6 @@ class DiaryLog(wsgi.Application):
                 'gitOtherSyncFileName', None)
             }
 
-        # if config_input_flag:
         self.diary_db_api.user_add_or_update_github_access_data_to_db(
             user_id=user_id,
             data_dict=config_input_repo_info)
@@ -683,6 +682,40 @@ class DiaryLog(wsgi.Application):
             status_dict['access_token_flg'] = 0
 
         return Response(json.dumps(status_dict))
+
+    @token_required
+    def jianguoyun_config(self, req):
+        user_id = req.environ['user_id']
+        data = req.body
+        # 将POST数据转换为JSON格式
+        config_data  = json.loads(data)
+        config_input_jianguoyun = {
+            "jianguoyun_count": config_data.get(
+                'github_repo_name', None).strip(),
+            "current_sync_file": config_data.get(
+                'current_sync_file', None).strip(),
+            "other_sync_file_list": config_data.get(
+                'other_sync_file_list', None).strip(),
+            "jianguoyun_token": config_data.get(
+                'jianguoyun_token', None).strip()
+        }
+        current_sync_file = config_input_jianguoyun.get(
+            "current_sync_file", None)
+        other_sync_file_list:str = config_input_jianguoyun.get(
+            "other_sync_file_list", None)
+        other_sync_file_list = \
+            [path.strip() for path in other_sync_file_list.split(',') 
+             if path.strip()] if other_sync_file_list else []        
+        # delete Duplicate items
+        if current_sync_file in other_sync_file_list:
+            other_sync_file_list.remove(current_sync_file)
+        other_sync_file_list = ','.join(other_sync_file_list)
+        config_input_jianguoyun["other_sync_file_list"] = other_sync_file_list
+
+        self.diary_db_api.user_add_or_update_jianguoyun_access_data_to_db(
+            user_id=user_id,
+            data_dict=config_input_jianguoyun)
+
     @token_required
     def get_github_config(self, req):
         user_id = req.environ['user_id']

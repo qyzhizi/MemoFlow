@@ -1,4 +1,21 @@
 $(function() {
+    // 默认显示第一个容器，并隐藏其他容器
+    $(".setting-content:first").show().siblings(".setting-content").hide();
+    // github setting content listener click
+    $('.nav-setting-opt').on('click', function(event) {
+        // // 隐藏所有容器元素
+        // $(".setting-content").hide();
+        // // 获取当前点击的<span>元素对应的目标容器元素的id
+        // var targetId = $(this).data("target");
+        // // 显示对应的容器元素
+        // $("#" + targetId).show();
+
+        // 获取对应的容器元素的id
+        var targetId = $(this).data("target");
+    
+        // 隐藏其他容器元素，显示对应的容器元素
+        $("#" + targetId).show().siblings(".setting-content").hide();
+    });
 
     // 获取链接元素的引用
     var link = document.getElementById('github-bind');

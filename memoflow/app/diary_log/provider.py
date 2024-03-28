@@ -676,6 +676,9 @@ class DiaryDBManager(manager.Manager):
         # #debug need to delete
         # from memoflow.driver.sqlite3_db.diary_log import DBSqliteDriver
         # self.driver = DBSqliteDriver()
+        self.sync_data_base_path = CONF.diary_log['SYNC_DATA_BASE_PATH']
+        self.jianguoyun_access_table=CONF.diary_log[
+            'JIANGUOYUN_ACCESS_TABLE_NAME']
     
     def add_user(self, username, password, email=None):
         """
@@ -718,11 +721,6 @@ class DiaryDBManager(manager.Manager):
     def user_add_or_update_github_access_data_to_db(
             self, user_id,
             data_dict,
-            # github_rep_name,
-            # current_sync_file,
-            # other_sync_file_list, 
-            # github_tokens_info=None,
-            # github_user_info=None,
             ):
         """
         Add GitHub access information for a user to the file sync system.
@@ -735,33 +733,35 @@ class DiaryDBManager(manager.Manager):
             None
         """
         SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
-        # USER_TABLE_NAME = CONF.diary_log['USER_TABLE_NAME']
         GITHUB_ACCESS_TABLE_NAME=CONF.diary_log['GITHUB_ACCESS_TABLE_NAME']
-
-        # access_token = github_tokens_info.get(
-        #     'access_token') if github_tokens_info else None
-        # access_token_expires_at = github_tokens_info.get(
-        #     'access_token_expires_at') if github_tokens_info else None
-        # refresh_token = github_tokens_info.get(
-        #     'refresh_token') if github_tokens_info else None
-        # refresh_token_expires_at = github_tokens_info.get(
-        #     'refresh_token_expires_at') if github_tokens_info else None
-        # github_user_name = github_user_info.get(
-        #     'username') if github_user_info else None
         
         self.driver.user_add_or_update_github_access_data(
             user_id=user_id,
-            # current_sync_file=current_sync_file,
-            # other_sync_file_list=other_sync_file_list,
-            # access_token=access_token,
-            # access_token_expires_at=access_token_expires_at,
-            # refresh_token=refresh_token,
-            # refresh_token_expires_at=refresh_token_expires_at,
-            # github_user_name=github_user_name,
             data_dict=data_dict,
             data_base_path=SYNC_DATA_BASE_PATH,
             table_name=GITHUB_ACCESS_TABLE_NAME)        
         
+    def user_add_or_update_jianguoyun_access_data_to_db(
+            self, user_id,
+            data_dict,
+            ):
+        SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
+        # GITHUB_ACCESS_TABLE_NAME=CONF.diary_log['GITHUB_ACCESS_TABLE_NAME']
+        JIANGUOYUN_ACCESS_TABLE=CONF.diary_log['JIANGUOYUN_ACCESS_TABLE_NAME']
+        self.driver.user_add_or_update_data_to_db(
+            user_id=user_id,
+            data_dict=data_dict,
+            data_base_path=SYNC_DATA_BASE_PATH,
+            table_name=JIANGUOYUN_ACCESS_TABLE)
+    
+    def get_jianguoyun_access_data_by_user_id(
+            self, user_id):
+        return self.driver.get_record_by_filters(
+            filters={"user_id" : user_id},
+            data_base_path=self.sync_data_base_path,
+            table_name=self.jianguoyun_access_table
+            )
+
     def user_partial_update_github_access_data_to_db(
             self, update_values, conditions):
         """更新表中的数据。函数接受更新的参数以及更新条件作为输入，

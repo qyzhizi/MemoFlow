@@ -117,6 +117,27 @@ class DBSqliteDriver(object):
                 f")"
             )
 
+    @classmethod
+    def create_jianguoyun_access_table(cls, data_base_path, user_table_name,
+                                   jianguoyun_access_table_name):
+        """创建表
+        """
+        LOG.info(f"创建数据表: {jianguoyun_access_table_name},"
+                 f"所在数据库：{data_base_path}")
+        with sqlite3.connect(data_base_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                f"CREATE TABLE IF NOT EXISTS {jianguoyun_access_table_name} ("
+                f"id CHAR(36) PRIMARY KEY, "
+                f"user_id CHAR(36) NOT NULL, "
+                f"jianguoyun_count VARCHAR(512), "
+                f"current_sync_file VARCHAR(512), "
+                f"other_sync_file_list TEXT, "
+                f"jianguoyun_token VARCHAR(255), "
+                f"FOREIGN KEY (user_id) REFERENCES {user_table_name}(id)"
+                f")"
+            )
+
     
     @classmethod
     def add_user(cls,
@@ -247,7 +268,8 @@ class DBSqliteDriver(object):
         with sqlite3.connect(data_base_path) as conn:
             cursor = conn.cursor()
             # Check if user_id exists in the table
-            cursor.execute(f"SELECT COUNT(*) FROM {table_name} WHERE user_id=?", (user_id,))
+            cursor.execute(f"SELECT COUNT(*) FROM {table_name}"
+                           f"WHERE user_id=?", (user_id,))
             result = cursor.fetchone()
             count = result[0] if result else 0
 
@@ -269,6 +291,42 @@ class DBSqliteDriver(object):
                 )
 
         return True
+    
+    @classmethod
+    def user_add_or_update_data_to_db(
+        cls,
+        user_id: str,
+        data_dict: dict,
+        data_base_path: str,
+        table_name: str):
+
+        LOG.info(f"user_add_jianguoyun_access_data: {table_name}, \
+                所在数据库：{data_base_path}")
+
+        with sqlite3.connect(data_base_path) as conn:
+            cursor = conn.cursor()
+            # Check if user_id exists in the table
+            cursor.execute(f"SELECT COUNT(*) FROM {table_name}"
+                           f"WHERE user_id=?", (user_id, ))
+            result = cursor.fetchone()
+            count = result[0] if result else 0
+
+            if count > 0:  # User exists, perform update
+                columns = ','.join([f"{key}=?" for key in data_dict.keys()])
+                values = tuple(data_dict.values()) + (user_id,)
+                cursor.execute(
+                    f"UPDATE {table_name} SET {columns} WHERE user_id=?",
+                    values
+                )
+            else:  # User does not exist, perform insert
+                columns = ','.join(data_dict.keys())
+                placeholders = ','.join(['?'] * len(data_dict))
+                values =  (str(uuid.uuid4()), user_id) + tuple(data_dict.values())
+                cursor.execute(
+                    f"INSERT INTO {table_name} (id, user_id,{columns}) "
+                    f"VALUES (?, ?, {placeholders})",
+                    values
+                )
 
     @classmethod
     def user_partial_update_github_access_data_to_db(
@@ -294,7 +352,8 @@ class DBSqliteDriver(object):
                 tuple(update_values.values()) + tuple(conditions.values()))
             
     @classmethod
-    def get_github_access_info_by_user_id(cls, user_id, data_base_path, table_name):
+    def get_github_access_info_by_user_id(
+        cls, user_id, data_base_path, table_name):
         """_summary_
 
         Args:
@@ -320,6 +379,50 @@ class DBSqliteDriver(object):
                 return dict(result)
             else:
                 return {}
+    
+    @classmethod
+    def get_record_by_filters(
+        cls, filters:dict, data_base_path: str, table_name: str):
+        with sqlite3.connect(data_base_path) as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            # 构建 SQL 查询中的 WHERE 子句
+            where_conditions = []
+            values = []
+            for key, value in filters.items():
+                if "%" in value:
+                    where_conditions.append(f"{key} LIKE ?")
+                else:
+                    where_conditions.append(f"{key} = ?")
+                values.append(value)
+
+            where_clause = " AND ".join(where_conditions)
+            cursor.execute(
+                f"SELECT * FROM {table_name} WHERE {where_clause}",
+                values
+            )
+
+    @classmethod
+    def delete_record_by_filters(
+        cls, filters:dict, data_base_path: str, table_name: str):
+        with sqlite3.connect(data_base_path) as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            # 构建 SQL 查询中的 WHERE 子句
+            where_conditions = []
+            values = []
+            for key, value in filters.items():
+                if "%" in value:
+                    where_conditions.append(f"{key} LIKE ?")
+                else:
+                    where_conditions.append(f"{key} = ?")
+                values.append(value)
+
+            where_clause = " AND ".join(where_conditions)
+            cursor.execute(
+                f"DELETE * FROM {table_name} WHERE {where_clause}",
+                values
+            )
 
     @classmethod
     def init_db_clipboard_log(cls, data_base_path, table_name):
