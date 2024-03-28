@@ -52,3 +52,9 @@ def init_db():
         data_base_path=SYNC_DATA_BASE_PATH,
         user_settings_table_name=CONF.diary_log['USER_SETTINGS_TABLE_NAME']
     )
+    # create jianguoyun_access_table
+    diary_log_db.create_jianguoyun_access_table(
+        data_base_path=SYNC_DATA_BASE_PATH,
+        user_table_name=CONF.diary_log['USER_TABLE_NAME'],
+        jianguoyun_access_table_name=CONF.diary_log[
+            'JIANGUOYUN_ACCESS_TABLE_NAME'])

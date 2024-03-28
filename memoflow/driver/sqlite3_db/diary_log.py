@@ -117,6 +117,26 @@ class DBSqliteDriver(object):
                 f")"
             )
 
+    @classmethod
+    def create_jianguoyun_access_table(cls, data_base_path, user_table_name,
+                                   jianguoyun_access_table_name):
+        """创建表
+        """
+        LOG.info(f"创建数据表: {jianguoyun_access_table_name},"
+                 f"所在数据库：{data_base_path}")
+        with sqlite3.connect(data_base_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                f"CREATE TABLE IF NOT EXISTS {jianguoyun_access_table_name} ("
+                f"id CHAR(36) PRIMARY KEY, "
+                f"user_id CHAR(36) NOT NULL, "
+                f"current_sync_file VARCHAR(512), "
+                f"other_sync_file_list TEXT, "
+                f"jianguoyun_token VARCHAR(255), "
+                f"FOREIGN KEY (user_id) REFERENCES {user_table_name}(id)"
+                f")"
+            )
+
     
     @classmethod
     def add_user(cls,
