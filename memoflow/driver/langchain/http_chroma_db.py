@@ -83,10 +83,16 @@ class ChromeDBCollectionHttpDriver(object):
         self._client.delete_collection(self._collection.name)    
 
     def delete_items_by_ids(self, ids: List[str]):
+        if not ids:
+            return 
         self._collection.delete(ids=ids)
 
-    def get(self, ids, include, limit=None):
-        return self._collection.get(ids=ids, limit=limit, include=include)
+    def get(self, ids=None, where=None, 
+            where_document=None, include=None,
+            limit=None):
+        return self._collection.get(
+            ids=ids, where=where, where_document=where_document,
+            limit=limit, include=include)
     
     def collection_count(self) -> int:
         return self._collection.count()
@@ -108,6 +114,8 @@ class ChromeDBCollectionHttpDriver(object):
         Returns:
             List[str]: List of IDs of the added texts.
         """
+        if not texts:
+            return
         if ids is None:
             ids = [str(uuid.uuid1()) for _ in texts]
         embeddings = None
@@ -176,6 +184,8 @@ class ChromeDBCollectionHttpDriver(object):
         Returns:
             List[str]: List of IDs of the updated texts.
         """
+        if not texts:
+            return
         if ids is None:
             raise ValueError("ids must be specified for update_texts")
         if len(ids) != len(texts):

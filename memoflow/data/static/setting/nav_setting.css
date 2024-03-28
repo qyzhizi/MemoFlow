@@ -1,0 +1,96 @@
+.nav-container {
+    flex: 0 0 200px;
+    /* 设置左边容器的固定宽度为200像素 */
+    background-color: rgb(29, 29, 32);
+}
+.nav-fixed-child {
+    position: fixed;
+    top: 30px;
+    /* 可以根据需要调整位置 */
+    margin-left: 10px;
+    left: 0;
+    /* 可以根据需要调整位置 */
+    width: 180px;
+    /* 继承父容器的宽度 */
+    background-color: inherit;
+    /* 继承父容器的背景颜色 */
+    /* z-index: 1000; */
+    /* 可以根据需要调整 z-index */
+    /* 其他样式 */
+}
+.nav-items {
+    background-color: inherit;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+
+}
+.nav-item {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    /* justify-content: space-around; */
+    height: 40px;
+    /* 设置高度为50像素 */
+    gap: 5px;
+    /* 调整间距大小 */
+    background-color: rgb(39, 39, 42);
+    border-radius: 10px;
+    width: 100%;
+
+    text-decoration: none;
+    border: 1px;
+    color: #DDE7EE;
+    cursor: pointer;
+    margin-top: 10px;
+
+}
+.nav-item:hover {
+    /* color: yellow;  */
+    /* 设置鼠标悬停时超链接的颜色
+    /* text-decoration: underline; */
+    /* 添加下划线效果 */
+    background-color: rgb(23, 26, 28);
+    /* background-color: rgb(41, 144, 59); */
+    
+}        
+.action {
+    margin-top: 40px;
+    width: 100%;
+    display: flex;
+}
+
+.nav-setting{
+    display: flex;
+    flex-direction: column;
+    /* width: 20%; */
+    height: 50%;
+    gap: 10px;
+
+}
+.nav-setting-opt{
+    display: flex; 
+    align-items: center; 
+    gap: 3px;
+    cursor:pointer;
+}
+.flex-column{
+    flex-direction: column;
+}
+.justify-content-center{
+    justify-content: center;
+}
+/* justify-content: space-evenly */
+.justify-content-space_evenly{
+    justify-content: space-evenly
+}
+.text-sm{
+    font-size: .875rem;
+}
+.mr-1{
+    margin-right: 0.25rem;
+}
+.text-gray-500{
+    --tw-text-opacity: 1;
+    color: rgb(107 114 128 / var(--tw-text-opacity));
+}

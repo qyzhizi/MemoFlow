@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>MemoFlow</title>
+    <meta charset="UTF-8">
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro">
+</head>
+<style>
+    body {
+        font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
+        padding: 10px;
+        background-color: #333;
+        color: #c9cdd1;
+    }
+    .container {
+        max-width: 50ch;
+        margin-left: auto;
+        margin-right: auto;
+    }               
+    form {
+        width: 100%;
+        font-size: 15px;
+        margin-bottom: 5px;
+        display: flex;
+        flex-direction: column;
+        }
+    div{
+            max-width: 100ch;
+        }
+    button {
+        align-self: flex-start;
+        font-size: 20px;
+        color: rgb(211, 198, 129);
+        background-color: #565755;
+    }
+    input {
+                width: 100%;
+                height: 5vh; /* 设置高度 */
+                font-size: 20px;
+                border: 2px solid hwb(216 76% 20% / 0.922); /* 设置边框样式 */ 
+                margin: 0 auto 10px; /* 设置外边距 */
+                font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
+                text-rendering: geometricPrecision;
+                line-height: 1.35;
+                display: block; /* 设置为块级元素 */
+                background-color: #131415;
+                color: #fff;
+                border: 1px solid #999;
+            }
+</style>
+<body>
+
+    <!-- <h2>Login</h2> -->
+    <div class="container">
+    <form id="loginForm">
+        <label for="username" style="font-size: 20px; color: rgb(176, 177, 170);">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <label for="password" style="font-size: 20px; color: rgb(176, 177, 170);">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <button type="button" onclick="login()">Login</button>
+    </form>
+    </div>
+
+    <script>
+        function login() {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+
+            // Make a POST request to the login endpoint
+            fetch('/v1/diary-log/login', {
+                method: 'POST',
+                // mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json; charset=UTF-8',
+                },
+                body: JSON.stringify({ username: username, password: password }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error("Login failed:", data.error);
+                } else {
+                    console.log("Login successful! Token:", data.token);
+
+                    // Save the token to localStorage
+                    localStorage.setItem('jwtToken', data.token);
+
+                    // Call a function to send protected requests
+                    // sendProtectedRequest();
+
+                    // Redirect to the main page after successful login
+                    window.location.href = '/v1/diary-log';
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+    </script>
+
+</body>
+</html>

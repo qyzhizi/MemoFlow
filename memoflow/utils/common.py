@@ -1,6 +1,48 @@
+import base64
 import os
 import re
+import hashlib
+import secrets
 from collections.abc import Iterable
+from memoflow.exception.visiable_exc import VisiblePathException
+
+def is_base64_encoded(salt_base64):
+    try:
+        # 尝试将字符串解码为原始字节序列
+        decoded = base64.b64decode(salt_base64.encode('utf-8'))
+        # 如果成功解码，则说明是 Base64 编码的字符串
+        return True
+    except Exception as e:
+        # 解码失败，说明不是 Base64 编码的字符串
+        return False
+    
+def hash_password(password, salt:str=None):
+    """
+    salt : Base64 salt or bytes salt or None
+    return : hashed_password and base64 salt
+    """
+    base64_salt = None
+    if salt is None:
+        bytes_salt = secrets.token_bytes(16)  # 生成随机盐
+        # 将盐编码为 Base64 编码
+        base64_salt = base64.b64encode(bytes_salt).decode('utf-8')
+    try:
+        # 尝试将字符串解码为原始字节序列
+        if salt:
+            bytes_salt = base64.b64decode(salt.encode('utf-8'))
+            base64_salt = salt
+        # 如果成功解码，则说明是 Base64 编码的字符串
+    except Exception as e:
+        # 解码失败，说明不是 Base64 编码的字符串
+        bytes_salt = salt
+        base64_salt = base64.b64encode(salt).decode('utf-8')
+    
+    # 使用 SHA-256 哈希函数对密码和盐进行加密
+    hash_object = hashlib.sha256()
+    hash_object.update(password.encode('utf-8') + bytes_salt)
+    hashed_password = hash_object.hexdigest()
+
+    return hashed_password, base64_salt
 
 
 def filename_to_table_name(filename):
@@ -12,6 +54,7 @@ def filename_to_table_name(filename):
     if cleaned_name[0].isdigit():
         cleaned_name = '_' + cleaned_name
     return cleaned_name
+
 
 def username_to_table_name(user_id, username):
     # 去除非法字符
@@ -29,6 +72,7 @@ def username_to_table_name(user_id, username):
     # 将 cleaned_user_id 添加到表名中以确保唯一性
     table_name = f"{cleaned_name}_{cleaned_user_id}"
     return table_name
+
 
 def paths_to_table_names(file_list):
     """
@@ -66,6 +110,55 @@ def is_nested_list(lst, exclude_type):
             # 可迭代非列表元素，排除字符串
             if isinstance(item, Iterable) and not isinstance(item, exclude_type):
                 return False
+
+    return True
+
+
+def match_file_path(file_path):
+    # `\-` 表示`-`, 其中 `\`是转义符合，另外`.` 在字符集中不需要被转义
+    pattern = r'^[a-zA-Z0-9_\-./]+$'
+    if re.match(pattern, file_path):
+        return True
+    else:
+        return False
+
+
+def match_gitrepo_path(file_path):
+    pattern = r'^(?!\/)[a-zA-Z0-9_\-./]+$'
+    if re.match(pattern, file_path):
+        return True
+    else:
+        return False
+    
+
+def validate_linux_file_path(file_path):
+    # 检查文件路径是否为空
+    if not file_path:
+        raise VisiblePathException("文件路径不能为空")
+
+    # 检查文件名是否合法
+    if not match_file_path(file_path):
+        raise VisiblePathException(
+            "文件名包含非法字符或路径分隔符, "
+            "路径必须为字母、数字、下划线、正斜线和点号的字符串"
+            )
+
+    # 检查文件名是否以 .md 或 .txt 结尾
+    if not (file_path.endswith('.md') or file_path.endswith('.txt')):
+        raise VisiblePathException("文件名必须以 .md 或 .txt 结尾")
+    return True
+
+
+def validate_gitrepo_path(file_path):
+    # 检查文件路径是否为空
+    if not file_path:
+        return
+
+    # 检查文件名是否合法
+    if not match_gitrepo_path(file_path):
+        raise VisiblePathException(
+            "github repo 格式错误！请检查后重试"
+            )
 
     return True
 

@@ -10,6 +10,7 @@ from memoflow.api import notion_api
 from memoflow.api import github_api
 from memoflow.api.jianguoyun_api import JianGuoYunClient
 from memoflow.api.jianguoyun_api import jianguoyun_clients
+from memoflow.api.jianguoyun_api import JianGuoYunAccountManager
 
 from memoflow.driver.sqlite3_db.diary_log import DBSqliteDriver as diary_log_db
 from memoflow.driver_manager.vector_db import CeleryVectorDBCollManager
@@ -41,6 +42,7 @@ celery = Celery(__name__,
                 backend=CELERY_BROKER_URL)
 
 vector_db_coll_manager_instance = CeleryVectorDBCollManager()
+jianguoyunaccountmanager = JianGuoYunAccountManager(max_size=10)
 
 @celery.task
 def celery_send_log_notion(diary_log):
@@ -55,6 +57,8 @@ def celery_update_file_to_github(token, repo, file_path, added_content,
     # if github_api_instance.get(repo, None) is None:
     #     github_api_instance[repo] = github_api.GitHupApi(token=token, repo=repo)
     # my_api_instance = github_api_instance[repo]
+    if file_path.startswith('/'):
+        file_path = file_path[1:]
     my_api_instance = github_api.GitHupApi(token=token, repo=repo)
     my_api_instance.update_file(file_path=file_path,
                                 added_content=added_content,
@@ -68,6 +72,8 @@ def celery_push_updatedfile_to_github(token, repo, file_path, updated_content,
     # if github_api_instance.get(repo, None) is None:
     #     github_api_instance[repo] = github_api.GitHupApi(token=token, repo=repo)
     # my_api_instance = github_api_instance[repo]
+    if file_path.startswith('/'):
+        file_path = file_path[1:]
     my_api_instance = github_api.GitHupApi(token=token, repo=repo)
     my_api_instance.update_file(file_path=file_path,
                                 updated_content=updated_content,
@@ -77,27 +83,32 @@ def celery_push_updatedfile_to_github(token, repo, file_path, updated_content,
 
 # 更新文件到坚果云
 @celery.task
-def update_file_to_janguoyun(base_url: str, acount: str, token: str,
+def update_file_to_janguoyun(acount: str, token: str,
                              to_path: str, content: str,
                              overwrite: bool = True) -> None:
-    if jianguoyun_clients.get(acount, None) is None:
-        jianguoyun_clients[acount] = JianGuoYunClient(base_url, acount, token)
-    my_client = jianguoyun_clients[acount]
-    if my_client.exists(to_path):
+    # if jianguoyun_clients.get(acount, None) is None:
+    #     jianguoyun_clients[acount] = JianGuoYunClient(base_url, acount, token)
+    
+    # my_client = jianguoyun_clients[acount]
+    my_client = jianguoyunaccountmanager.get_client(
+        token=token,
+        acount=acount)
+    to_path = my_client.process_path(to_path)
+    if my_client.client.exists(to_path):
         my_client.add_content_to_file(added_content=content, file_path=to_path)
     else:
         my_client.upload_content_to_new_file(content, to_path, overwrite)
 
 
 @celery.task
-def celery_push_updatedfile_to_jianguoyun(base_url: str, acount: str, token: str,
+def celery_push_updatedfile_to_jianguoyun(acount: str, token: str,
                                           to_path: str, content: str,
-                                          overwrite: bool = True) -> None:
-    if jianguoyun_clients.get(acount, None) is None:
-        jianguoyun_clients[acount] = JianGuoYunClient(base_url, acount, token)
-    my_client = jianguoyun_clients[acount]
-    if my_client.exists(to_path):
-        my_client.update_whole_file(updated_content=content, file_path=to_path)
+                                          ) -> None:
+    my_client = jianguoyunaccountmanager.get_client(
+        token=token,
+        acount=acount)
+    to_path = my_client.process_path(to_path)
+    my_client.update_whole_file(updated_content=content, file_path=to_path)
 
 
 @celery.task

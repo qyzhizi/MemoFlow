@@ -84,3 +84,15 @@ class Router(wsgi.ComposableRouter):
                         controller=diary_log_controller,
                         action='github_authenticate_callback',
                         conditions=dict(method=['GET']))
+        
+        # github-setting-content
+        mapper.connect('/diary-log/get-github-setting-content.html',
+                       controller=diary_log_controller,
+                       action='get_github_setting_content_html',
+                       conditions=dict(method=['GET'])
+                       )
+        # static file
+        mapper.connect('/diary-log/static/{file_path:.*}',
+                       controller=diary_log_controller,
+                       action='serve_static_file',
+                       conditions=dict(method=['GET']))

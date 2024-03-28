@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" class="dark" dir="ltr">
+
+<head>
+    <title>dialog-user-info</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/v1/diary-log/static/styles.css">
+    <link rel="stylesheet" href="/v1/diary-log/static/dialog-wrapper.css">
+</head>
+
+<body>
+
+<div id="dialog-wrapper-update-account" 
+    class="dialog-wrapper update-account-dialog showup">
+    <div class="dialog-container">
+        <div class="dialog-header-container !w-64">
+            <p class="title-text">更新个人信息</p><button id="close-account-info-edit"
+                class="MuiIconButton-root MuiIconButton-variantPlain MuiIconButton-colorNeutral MuiIconButton-sizeSm edit-button"
+                type="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-x w-5 h-auto">
+                    <path d="M18 6 6 18"></path>
+                    <path d="m6 6 12 12"></path>
+                </svg></button>
+        </div>
+        <div class="dialog-content-container space-y-2">
+            <div class="w-full flex flex-row justify-start items-center">
+                <span class="text-sm mr-2">头像</span>
+                <label class="relative cursor-pointer hover:opacity-80">
+                    <div class="w-8 h-8 overflow-clip rounded-full !w-10 !h-10">
+                        <div id="dialog-avatar" class="w-full h-auto rounded-full shadow min-w-full min-h-full object-cover dark:opacity-80">
+                            <img src="https://via.placeholder.com/150" decoding="async" loading="lazy" alt="">
+                        </div>
+                    </div>
+                    <input id="dialog-avatar-input" type="file" accept="image/*" class="absolute invisible w-full h-full inset-0">
+                </label>
+                <svg id="remove-dialog-avatar" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-x w-4 h-auto ml-1 cursor-pointer opacity-60 hover:opacity-80 showup">
+                    <path d="M18 6 6 18"></path>
+                    <path d="m6 6 12 12"></path>
+                </svg>
+            </div>
+            <p class="text-sm">用户名<span class="text-sm text-gray-400 ml-1">(用于登录)</span></p>
+            <div  class="MuiInput-root MuiInput-variantOutlined MuiInput-colorNeutral MuiInput-sizeSm w-full css-1teled2">
+                <input id="dialog-username" class="MuiInput-input dialog-username-input" value="">
+            </div>
+            <!-- <p class="text-sm">昵称<span class="text-sm text-gray-400 ml-1">(显示在横幅中)</span></p>
+            <div
+                class="MuiInput-root MuiInput-variantOutlined MuiInput-colorNeutral MuiInput-sizeSm w-full css-1teled2">
+                <input class="MuiInput-input dialog-username-input" value="">
+            </div> -->
+            <p class="text-sm">邮箱<span class="text-sm text-gray-400 ml-1">(可选)</span></p>
+            <div 
+                class="MuiInput-root MuiInput-variantOutlined MuiInput-colorNeutral MuiInput-sizeSm w-full css-1teled2">
+                <input id="dialog-email" type="email" class="MuiInput-input dialog-username-input" value="">
+            </div>
+
+            <div class="w-full flex flex-row justify-end items-center pt-4 space-x-2">
+                <button
+                id="cancel-account-info-edit"
+                class="MuiButton-root MuiButton-variantPlain MuiButton-colorNeutral MuiButton-sizeSm edit-button"
+                type="button">取消</button>
+
+                <button id="save-account-info-edit"
+                class="MuiButton-root MuiButton-variantSolid MuiButton-colorPrimary MuiButton-sizeSm edit-button"
+                type="button">保存</button></div>
+        </div>
+    </div>
+</div>
+
+<!-- </div> -->
+</body>
+</html>

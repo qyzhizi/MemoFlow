@@ -1,4 +1,91 @@
-function addLogEntry(logText, record_id) {
+import { addDivInnerHTMLToBodyContainer } 
+    from '/v1/diary-log/static/utils.js';
+import { navLoadAvatarAndSetUserName,
+    getNavSettingHtml
+} from '/v1/diary-log/static/setting/nav_setting.js';
+
+if (function() { return !this; }()) {
+    console.log("严格模式下运行");
+} else {
+    console.log("非严格模式下运行");
+}
+
+
+$(function() {
+    localStorage.setItem('page_size', null);
+    localStorage.setItem('page_number', null);
+    // get logs
+    getLogs()
+     
+    //导入导航栏
+    getNavSettingHtml()
+    .then(html => {
+        addDivInnerHTMLToBodyContainer(
+            {doc_data: html, container_id: 'nav-container-root' })
+        
+        // // 添加新的类名
+        // var userInfoDiv = document.getElementById('nav-container-root').querySelector('.user-info')
+        // userInfoDiv.classList.add('cursor-pointer');
+
+        navLoadAvatarAndSetUserName()
+    })
+    .catch(error => {
+        console.error(error); // 错误处理
+    });
+
+
+    $('#submit').on('click', function(event) {
+        event.preventDefault();
+        addLog()
+    });
+    $('#click-more-log').on('click', function(event) {
+        event.preventDefault();
+        // 从 localStorage 中读取 page_size 和 page_number
+        // 如果不存在则使用默认值 10
+        var page_size =  localStorage.getItem('page_size'); 
+        // 如果不存在则使用默认值 1
+        var page_number = localStorage.getItem('page_number') || 1; 
+        page_number = (parseInt(page_number) + 1).toString()
+        getLogs(page_size=page_size, page_number=page_number)
+    })
+
+
+    var txtInput = document.getElementById('log');
+    txtInput.addEventListener('keydown', alt_q);
+    txtInput.addEventListener('keydown', tab_to_space);
+
+    var editTxtInput = document.getElementById('editLog');
+    editTxtInput.addEventListener('keydown', alt_q);
+    editTxtInput.addEventListener('keydown', tab_to_space);
+
+    // 监听窗口关闭事件
+    window.addEventListener("beforeunload", function (event) {
+        var inputBox = document.getElementById("log");
+                // 检测输入框内容是否为空
+        if (inputBox.value.trim().length > 0) {
+            // 显示提示框
+            event.preventDefault();
+            // beforeunload 事件的返回值
+            event.returnValue = " ";
+        }
+    });
+    // 监听窗口关闭事件，当编辑窗口未关闭时给出提示
+    window.addEventListener("beforeunload", function (event) {
+        // 获取编辑框元素
+        var modal = document.getElementById('editLogModal');
+        // 检测编辑框是否为打开状态
+        if (modal.style.display === "flex") {
+            // 显示提示框
+            event.preventDefault();
+            // beforeunload 事件的返回值
+            event.returnValue = " ";
+        }
+    });
+
+});
+
+
+function addLogEntry(logText, record_id, reverse=true) {
     var pre = $('<pre class="log-entry"></pre>'); // 添加一个类以便样式控制
     // 将 pre 元素的内容添加到 pre 中
     pre.text(logText);
@@ -43,7 +130,11 @@ function addLogEntry(logText, record_id) {
     logEntryContainer.append(pre);
     // 将 logEntryContainer 添加到 logList 中
     var logList= $('#logList');
-    logList.prepend(logEntryContainer);
+    if(reverse == true){
+        logList.prepend(logEntryContainer);
+    } else{
+        logList.append(logEntryContainer);
+    }
 
     // 点击下拉菜单图标时触发事件
     dropdownIcon.click(function(event) {
@@ -83,9 +174,7 @@ function addLogEntry(logText, record_id) {
         // 弹窗提示，是否删除
         if (confirm('确定要删除该条日志吗？')) {
             // 删除日志条目
-            deleteLogEntry(record_id);
-            // 删除日志条目
-            logEntryContainer.remove();
+            deleteLogEntry(record_id, logEntryContainer);
             // 隐藏下拉菜单
             dropdownMenu.hide();
         }
@@ -146,13 +235,13 @@ function splitStringWithPattern(inputString, pattern_t) {
 function processInputAndReturnString(process_input, pattern_logseq_child) {
     // 遍历 process_input 数组，只输出 匹配项
     for (let i = 1; i < process_input.length; i += 2) {
-        index = i
-        strings_index = i +1
-        pattern_logseq = process_input[i]
-        child_string = process_input[strings_index]
+        let index = i
+        let strings_index = i +1
+        let pattern_logseq = process_input[i]
+        let child_string = process_input[strings_index]
         // 将pattern_logseq 按 “-” 分割
         pattern_logseq = pattern_logseq.split("-")
-        num_t_logseq = pattern_logseq[0].length
+        let num_t_logseq = pattern_logseq[0].length
 
         let child_block_list;
         child_block_list = splitStringWithPattern(child_string, pattern_logseq_child)
@@ -171,15 +260,15 @@ function processInputAndReturnString(process_input, pattern_logseq_child) {
 
 // Cancel Logseq format
 function removeLogseqMatches(inputString) {
-    pattern_logseq_mian = /^[\x20]{0,}\t{0,}-[\x20]/gm
-    pattern_logseq_child = /^[\x20]{0,}\t{0,}[\x20]{2}/gm;
+    var pattern_logseq_mian = /^[\x20]{0,}\t{0,}-[\x20]/gm
+    var pattern_logseq_child = /^[\x20]{0,}\t{0,}[\x20]{2}/gm;
     var result1 = splitStringWithPattern(inputString, pattern_logseq_mian);
     inputString = processInputAndReturnString(result1, pattern_logseq_child)
 
     // 匹配行首的 "  " "\t  " "\t\t  " "\t\t\t  " 等等, 替换为空串
     // ^[\x20]{2} ：表示行首两个空格，匹配 `#ans` 之前的行
     const pattern = /^[\x20]{0,}\t{1,}[\x20]{2}|^[\x20]{2}/gm;
-    String1 = inputString.replace(pattern, '')
+    const String1 = inputString.replace(pattern, '')
 
     // 使用正则表达式进行划分
     var regex = /^\t-[\x20]#ans/gm;
@@ -202,7 +291,7 @@ function removeLogseqMatches(inputString) {
     // 如果长度为 1，说明字符串中没有包含 #ans
     if (splittedParts.length === 1) {
         const pattern1_0 = /^[\x20]{0,}\t-[\x20]/gm;
-        result = splittedParts[0].replace(pattern_t, '#');
+        let result = splittedParts[0].replace(pattern_t, '#');
         result = result.replace(pattern1_0, '- ');
         console.log("输入字符串中没有包含 #ans");
         return result.substring(2);
@@ -212,8 +301,8 @@ function removeLogseqMatches(inputString) {
         console.log("输入字符串中包含了 #ans");
         splittedParts[0] = splittedParts[0].replace(pattern_t, '#');
 
-        part1 = splittedParts[0];
-        part2 = splittedParts[1];
+        var part1 = splittedParts[0];
+        var part2 = splittedParts[1];
         const pattern1_0 = /^[\x20]{0,}\t-[\x20]/gm;
         part1 = part1.replace(pattern1_0, '- ');
         const pattern2_0 = /^[\x20]{0,}\t-[\x20]/gm;
@@ -222,7 +311,7 @@ function removeLogseqMatches(inputString) {
         part2 = part2.replace(pattern2_0, '@blk ');
         part2 = part2.replace(pattern2_1, '- ');
         part2 = part2.replace(pattern2_2, '@blk- ');
-        result = part1 +"#ans"+ part2;
+        var result = part1 +"#ans"+ part2;
         return result.substring(2);
     }
 }
@@ -240,6 +329,133 @@ function copyToClipboard(text) {
     });
   }
 
+
+// let modalMousedownisListenerAttached = false;
+var modal = document.getElementById('editLogModal');
+var modalContent = modal.querySelector('.modal-content');
+var isModalMouseDown = false;
+
+function modalMousedownAttachListener(modal, modalContent) {
+    // if (!modalMousedownisListenerAttached) {
+        modal.addEventListener('mousedown', function(event) {
+            if (!modalContent.contains(event.target)) {
+                console.log("isMouseDown = true;");
+                isModalMouseDown = true;
+            }
+            event.stopPropagation(); // 阻止事件冒泡
+        });
+        // modalMousedownisListenerAttached = true;
+    // }
+}
+modalMousedownAttachListener(modal, modalContent);
+
+    
+modal.addEventListener('mouseup', function(event) {
+    console.log("enter addEventListener modal mouseup ")
+    if (!modalContent.contains(event.target) && isModalMouseDown) {
+        event.preventDefault(); // 阻止默认的操作
+        // debugger;
+        var confirmation = confirm("是否关闭编辑页面？");
+        console.log("关闭编辑页面？")
+
+        // 如果用户点击确定按钮
+        if (confirmation) {
+            // 清空编辑框
+            editLog.value = '';
+            editLog.curPreObject = null;
+            editLog.cur_record_id = null;
+            // 关闭模态框
+            modal.style.display = "none";
+        } else {
+            // 如果用户点击取消按钮，则什么也不做
+            // 用户选择不保存，取消关闭操作
+        }
+    }
+    isModalMouseDown = false;
+});  
+
+
+
+// 获取关闭按钮，并为其添加点击事件处理程序
+var closeBtn = document.getElementsByClassName("close")[0];
+closeBtn.onclick = function() {
+    var editLog = document.getElementById('editLog');
+    // 弹出窗口提示是否提交
+    var confirmation = confirm("是否关闭编辑页面？");
+
+    // 如果用户点击确定按钮
+    if (confirmation) {
+        // 清空编辑框
+        editLog.value = '';
+        editLog.curPreObject = null;
+        editLog.cur_record_id = null;
+        // 关闭模态框
+        modal.style.display = "none";
+    } 
+
+}
+
+
+// 获取保存按钮
+var saveChangesBtn = document.getElementById('saveChangesBtn');
+// 当用户点击保存按钮时
+saveChangesBtn.onclick = function() {
+    var modal = document.getElementById('editLogModal');
+    // 获取编辑框中的文本域
+    var editLog = document.getElementById('editLog');
+
+    // 获取cur_record_id属性的值
+    var curRecordId = editLog.getAttribute('cur_record_id');
+    var pre = editLog.curPreObject;
+    // 获取编辑后的日志内容
+    var editedText = editLog.value;
+
+    // 这里可以发送请求到后端，保存编辑后的日志内容
+    if (editedText === '') {
+        console.log("log is none")
+        return; // 退出函数
+    }
+
+    $.ajax({
+        url: '/v1/diary-log/updatelog',
+        type: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+        },
+        contentType: 'application/json',
+        data: JSON.stringify({content: editedText, record_id: curRecordId}),
+        success: function(response) {
+            response = JSON.parse(response)
+            const reponseText = response.content
+            // 更新原始的日志内容
+            pre.text(reponseText);
+            replaceURLsWithLinks(pre)
+            // 清空编辑框
+            editLog.value = '';
+            editLog.curPreObject = null;
+            editLog.cur_record_id = null;
+            // 关闭模态框
+            modal.style.display = "none";
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR);
+
+            if (jqXHR.status === 401) {
+                // 提示登录已过期
+                alert("登录已过期，请重新登录");
+                // HTTPUnauthorized error
+                console.log("Unauthorized - Redirecting to login page");
+                window.location.href = '/v1/diary-log/login';
+            } else {
+                // Handle other error types as needed
+                console.log("Other error:", textStatus, errorThrown);
+            }
+        }
+    });
+
+}
+
+
 function editLogEntry(pre, record_id) {
     // 获取编辑框元素
     var modal = document.getElementById('editLogModal');
@@ -247,103 +463,112 @@ function editLogEntry(pre, record_id) {
     // 获取编辑框中的文本域
     var editLog = document.getElementById('editLog');
 
+    // 如果存在，先删除cur_record_id属性
+    if (editLog.hasAttribute('cur_record_id')) {
+        editLog.removeAttribute('cur_record_id');
+    }
+
+    // 将record_id赋值给editLog的cur_record_id属性
+    editLog.setAttribute('cur_record_id', record_id);
+    // 将 pre 赋值给 editLog 
+    editLog.curPreObject = pre;
+
     // 显示模态框
     // modal.style.display = "block";
     modal.style.display = "flex";
 
-    // 获取保存按钮
-    var saveChangesBtn = document.getElementById('saveChangesBtn');
+    // // 获取保存按钮
+    // var saveChangesBtn = document.getElementById('saveChangesBtn');
 
-    // 获取关闭按钮，并为其添加点击事件处理程序
-    var closeBtn = document.getElementsByClassName("close")[0];
-    closeBtn.onclick = function() {
-        // 弹出窗口提示是否提交
-        var confirmation = confirm("是否关闭编辑页面？");
+    // // 获取关闭按钮，并为其添加点击事件处理程序
+    // var closeBtn = document.getElementsByClassName("close")[0];
+    // closeBtn.onclick = function() {
+    //     // 弹出窗口提示是否提交
+    //     var confirmation = confirm("是否关闭编辑页面？");
 
-        // 如果用户点击确定按钮
-        if (confirmation) {
-            // 清空编辑框
-            editLog.value = '';
-            // 关闭模态框
-            modal.style.display = "none";
-        } 
+    //     // 如果用户点击确定按钮
+    //     if (confirmation) {
+    //         // 清空编辑框
+    //         editLog.value = '';
+    //         // 关闭模态框
+    //         modal.style.display = "none";
+    //     } 
 
-    }
+    // }
 
     // 当用户点击模态框外部区域时，关闭模态框
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            // 弹出窗口提示是否提交
-            var confirmation = confirm("是否关闭编辑页面？");
+    // var modal = document.getElementById('editLogModal');
+    
+    
+    
+    
+    // modal.addEventListener('mousedown', function(event) {
+    //     if (!modalContent.contains(event.target)) {
+    //         console.log("isMouseDown = true;")
+    //         isMouseDown = true;
+    //     }
+    //     event.stopPropagation(); // 阻止事件冒泡
+    // });
+    
 
-            // 如果用户点击确定按钮
-            if (confirmation) {
-                // 清空编辑框
-                editLog.value = '';
-                // 关闭模态框
-                modal.style.display = "none";
-            } else {
-                // 如果用户点击取消按钮，则什么也不做
-                // 用户选择不保存，取消关闭操作
-            }
-        }
-    }
-    // 当用户点击保存按钮时
-    saveChangesBtn.onclick = function() {
-        // 获取编辑后的日志内容
-        var editedText = editLog.value;
 
-        // 这里可以发送请求到后端，保存编辑后的日志内容
-        if (editedText === '') {
-            console.log("log is none")
-            return; // 退出函数
-        }
 
-        $.ajax({
-            url: '/v1/diary-log/updatelog',
-            type: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
-            },
-            contentType: 'application/json',
-            data: JSON.stringify({content: editedText, record_id: record_id}),
-            success: function(response) {
-                response = JSON.parse(response)
-                reponseText = response.content
-                // 更新原始的日志内容
-                pre.text(reponseText);
-                replaceURLsWithLinks(pre)
-                // 清空编辑框
-                editLog.value = '';
-                // 关闭模态框
-                modal.style.display = "none";
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.log(jqXHR);
+    // // 当用户点击保存按钮时
+    // saveChangesBtn.onclick = function() {
+    //     // 获取编辑后的日志内容
+    //     var editedText = editLog.value;
 
-                if (jqXHR.status === 401) {
-                    // 提示登录已过期
-                    alert("登录已过期，请重新登录");
-                    // HTTPUnauthorized error
-                    console.log("Unauthorized - Redirecting to login page");
-                    window.location.href = '/v1/diary-log/login';
-                } else {
-                    // Handle other error types as needed
-                    console.log("Other error:", textStatus, errorThrown);
-                }
-            }
-        });
+    //     // 这里可以发送请求到后端，保存编辑后的日志内容
+    //     if (editedText === '') {
+    //         console.log("log is none")
+    //         return; // 退出函数
+    //     }
 
-    }
+    //     $.ajax({
+    //         url: '/v1/diary-log/updatelog',
+    //         type: 'POST',
+    //         headers: {
+    //             'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+    //         },
+    //         contentType: 'application/json',
+    //         data: JSON.stringify({content: editedText, record_id: record_id}),
+    //         success: function(response) {
+    //             response = JSON.parse(response)
+    //             const reponseText = response.content
+    //             // 更新原始的日志内容
+    //             pre.text(reponseText);
+    //             replaceURLsWithLinks(pre)
+    //             // 清空编辑框
+    //             editLog.value = '';
+    //             // 关闭模态框
+    //             modal.style.display = "none";
+    //         },
+    //         error: function(jqXHR, textStatus, errorThrown) {
+    //             console.log(jqXHR);
+
+    //             if (jqXHR.status === 401) {
+    //                 // 提示登录已过期
+    //                 alert("登录已过期，请重新登录");
+    //                 // HTTPUnauthorized error
+    //                 console.log("Unauthorized - Redirecting to login page");
+    //                 window.location.href = '/v1/diary-log/login';
+    //             } else {
+    //                 // Handle other error types as needed
+    //                 console.log("Other error:", textStatus, errorThrown);
+    //             }
+    //         }
+    //     });
+
+    // }
 
     // 将原始日志内容填充到编辑框中
-    pre_text = getOriginTextFromPre(pre);
+    var pre_text = getOriginTextFromPre(pre);
     pre_text = restoreLatexFromRendered(pre)
     editLog.value = removeLogseqMatches(pre_text);
 }
 
 // 删除日志条目函数
-function deleteLogEntry(record_id) {
+function deleteLogEntry(record_id, logentrycontainer) {
     // 删除日志条目的具体逻辑
     $.ajax({
         url: '/v1/diary-log/deletelog/' + record_id,
@@ -354,6 +579,7 @@ function deleteLogEntry(record_id) {
         success: function(response) {
             // 请求成功时的处理
             console.log('Logs deleted successfully.');
+            logentrycontainer.remove()
         },
         error: function(jqXHR, textStatus, errorThrown) {
             console.log(jqXHR);
@@ -450,133 +676,153 @@ function getOriginTextFromPre(element) {
 // 例如：
 // addLogEntry('这是一条日志信息');
 
-
-$(function() {
-    $('#submit').on('click', function(event) {
-        event.preventDefault();
-        const now = new Date();
-        const dateStr = now.toLocaleDateString();
-        const timeStr = now.toLocaleTimeString();
-        var log = `## ${dateStr} ${timeStr}:\n`+ $('#log').val();
-        if ($('#log').val() === '') {
-            console.log("log is none")
-            return; // 退出函数
-        }
-
-        $.ajax({
-            url: '/v1/diary-log/addlog',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({content: log}),
-            success: function(response) {
-                response = JSON.parse(response)
-                addLogEntry(response.content, response.record_id)
-                
-                // 清空 输入框
-                $('#log').val('');
-                // console.log(response);
-            },
-            error: function(error) {
-                console.log(error);
-            }
-        });
-    });
-    $('#pull').on('click', function(event) {
-        event.preventDefault();
-        // ask for confirmation
-        if (!confirm("Are you sure to pull files from github?")) {
-            return;
-        }
-        $.ajax({
-            url: '/v1/diary-log/sync-contents-from-repo-to-db',
-            type: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
-            },
-            success: function(response) {
-                console.log(response);
-                // pop up a dialog
-                alert(response);
-                // reload the page
-                window.location.reload();
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.log(jqXHR);
-        
-                if (jqXHR.status === 401) {
-                    // 提示登录已过期
-                    alert("登录已过期，请重新登录");
-                    // HTTPUnauthorized error
-                    console.log("Unauthorized - Redirecting to login page");
-                    window.location.href = '/v1/diary-log/login';
-                } else {
-                    // Handle other error types as needed
-                    console.log("Other error:", textStatus, errorThrown);
-                }
-            }
-        });
-    });
+function addLog() {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString();
+    const timeStr = now.toLocaleTimeString();
+    var log = `## ${dateStr} ${timeStr}:\n` + $('#log').val();
+    if ($('#log').val() === '') {
+        console.log("log is none");
+        return; // 退出函数
+    }
+    
     $.ajax({
-        url: '/v1/diary-log/getlogs',
+        url: '/v1/diary-log/addlog',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({content: log}),
+        success: function(response) {
+            response = JSON.parse(response)
+            addLogEntry(response.content, response.record_id)
+            
+            // 清空 输入框
+            $('#log').val('');
+            // console.log(response);
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+}
+
+
+
+function getLogs(page_size = null, page_number = null) {
+    var get_log_url = '/v1/diary-log/getlogs';
+    
+    if (page_size !== null && page_number !== null) {
+        get_log_url += '?page_size=' + page_size + 
+                       '&page_number=' + page_number;
+    }
+    
+    $.ajax({
+        url: get_log_url,
         type: 'GET',
         headers: {
             'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
         },
         success: function(response) {
-            // console.log(response);
-            response = JSON.parse(response)
+            response = JSON.parse(response);
+            page_size = response.page_size;
+            page_number = response.page_number;
+            localStorage.setItem('page_size', page_size);
+            localStorage.setItem('page_number', page_number);
+
             for (var i = 0; i < response.logs.length; i++) {
-                addLogEntry(response.logs[i], response.ids[i]);
+                addLogEntry(response.logs[i], response.ids[i], false);
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            console.log(jqXHR);
-    
             if (jqXHR.status === 401) {
-                // 不该提示，不然每开一个页面浏览器插件会不停弹窗提示
-                // alert("登录已过期，请重新登录");
-                // HTTPUnauthorized error
                 console.log("Unauthorized - Redirecting to login page");
                 window.location.href = '/v1/diary-log/login';
             } else {
-                // Handle other error types as needed
                 console.log("Other error:", textStatus, errorThrown);
             }
         }
     });
+}
 
-    $('#delete_all').on('click', function(event) {
-        event.preventDefault();
-        // var log = $('#log').val();
-        $.ajax({
-            url: '/v1/diary-log/delete_all_log',
-            type: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
-            },
-            success: function(response) {
-                var logList= $('#logList');
-                logList.html("");
-                // console.log(response);
-            },
-            error: function(error) {
-                console.log(error);
+
+function alt_q(event) {
+    if (event.altKey && event.key === "q") {
+      console.log("alt+q was pressed.");
+      var textarea = event.target; // 获取事件的目标元素
+      // 在这里编写按下alt+q 后要执行的代码
+        var start = textarea.selectionStart;
+        var end = textarea.selectionEnd;
+        var value = textarea.value;
+        var selectedText = value.substring(start, end);
+        var indentedText = selectedText.split('\n').map(function(line) {
+            const leading_t = '\t'
+            return leading_t + line; // 将生成的空格字符串和剩余的字符串拼接返回
+        }).join('\n');
+        textarea.value = value.substring(0, start) +
+                         indentedText + value.substring(end);
+        if (selectedText.length){
+            textarea.selectionStart = start;
+            textarea.selectionEnd = end + 
+                (indentedText.length - selectedText.length);
+        } else {
+            textarea.selectionEnd = end + 
+                (indentedText.length - selectedText.length);
+            textarea.selectionStart = textarea.selectionEnd;
+        }                
+    }
+};
+
+
+function tab_to_space(event) {
+    if (event.key === "Tab") { // 按下Tab键或Shift+Tab键
+        console.log("tab was pressed.");
+        var textarea = event.target; // 获取事件的目标元素
+        var start = textarea.selectionStart;
+        var end = textarea.selectionEnd;
+        var value = textarea.value;
+        var selectedText = value.substring(start, end);
+        var tab_to_space_num = 2
+
+        if (event.shiftKey) { // 按下Shift键 需要反缩进
+
+            // 获取选中文本所在行的起始位置和结束位置
+            var lineStart = value.lastIndexOf('\n', start - 1) + 1;
+            var lineEnd = value.indexOf('\n', end);
+            // 如果选中文本所在行是最后一行，需要特殊处理
+            if (lineEnd === -1) {
+            lineEnd = value.length;
             }
-        });
-    });
-    
-    function alt_q(event) {
-        if (event.altKey && event.key === "q") {
-          console.log("alt+q was pressed.");
-          var textarea = event.target; // 获取事件的目标元素
-          // 在这里编写按下alt+q 后要执行的代码
-            var start = textarea.selectionStart;
-            var end = textarea.selectionEnd;
-            var value = textarea.value;
-            var selectedText = value.substring(start, end);
+            // 获取选中文本所在行的所有字符串
+            selectedText = value.substring(lineStart, lineEnd);
+
+            var unindentedText = selectedText.split('\n').map(function(line) {
+                var leadingTabs = line.match(/^\t+/); // 匹配行首的制表符
+                if (leadingTabs) { // 存在制表符
+                    // 将制表符替换为四个空格，然后去掉前四个空格或制表符
+                    let i = 0;
+                    while (line[i] === '\t') {i++;}
+                    // const leadingSpaces = '    '.repeat(i); // 生成 i 个空格的字符串
+                    const leadingSpaces = ' '.repeat(tab_to_space_num).repeat(i); // 生成 i 个空格的字符串
+                    line = leadingSpaces + line.substring(i); // 将生成的空格字符串和剩余的字符串拼接返回
+                    return line.substring(4);
+                } else if (line.match(/^ {1}/)) { // 前面至少有一个空格时
+                    const leadingSpaces = line.match(/^\x20/)[0];
+                return line.substring(leadingSpaces.length)
+                } else {
+                    return line;
+                }
+            }).join('\n');
+            textarea.value = value.substring(0, lineStart) + unindentedText + value.substring(lineEnd);
+            var length_d = selectedText.length - unindentedText.length;
+            if ((start - length_d) < lineStart){textarea.selectionStart = lineStart}
+            else {textarea.selectionStart = start - length_d;}
+            textarea.selectionEnd = end - length_d;
+        } else { // 没有按下Shift键
             var indentedText = selectedText.split('\n').map(function(line) {
-                const leading_t = '\t'
-                return leading_t + line; // 将生成的空格字符串和剩余的字符串拼接返回
+                let i = 0;
+                while (line[i] === '\t') {i++;}
+                j = i+1 // 使用4个空格进行正向缩进
+                const leadingSpaces = ' '.repeat(tab_to_space_num).repeat(j); // 生成 i 个空格的字符串
+                return leadingSpaces + line.substring(i); // 将生成的空格字符串和剩余的字符串拼接返回
             }).join('\n');
             textarea.value = value.substring(0, start) + indentedText + value.substring(end);
             if (selectedText.length){
@@ -585,104 +831,8 @@ $(function() {
             } else {
                 textarea.selectionEnd = end + (indentedText.length - selectedText.length);
                 textarea.selectionStart = textarea.selectionEnd;
-            }                
-        }
-      };
-    function tab_to_space(event) {
-            if (event.key === "Tab") { // 按下Tab键或Shift+Tab键
-                console.log("tab was pressed.");
-                var textarea = event.target; // 获取事件的目标元素
-                var start = textarea.selectionStart;
-                var end = textarea.selectionEnd;
-                var value = textarea.value;
-                var selectedText = value.substring(start, end);
-                var tab_to_space_num = 2
-
-                if (event.shiftKey) { // 按下Shift键 需要反缩进
-
-                    // 获取选中文本所在行的起始位置和结束位置
-                    var lineStart = value.lastIndexOf('\n', start - 1) + 1;
-                    var lineEnd = value.indexOf('\n', end);
-                    // 如果选中文本所在行是最后一行，需要特殊处理
-                    if (lineEnd === -1) {
-                    lineEnd = value.length;
-                    }
-                    // 获取选中文本所在行的所有字符串
-                    selectedText = value.substring(lineStart, lineEnd);
-
-                    var unindentedText = selectedText.split('\n').map(function(line) {
-                        var leadingTabs = line.match(/^\t+/); // 匹配行首的制表符
-                        if (leadingTabs) { // 存在制表符
-                            // 将制表符替换为四个空格，然后去掉前四个空格或制表符
-                            let i = 0;
-                            while (line[i] === '\t') {i++;}
-                            // const leadingSpaces = '    '.repeat(i); // 生成 i 个空格的字符串
-                            const leadingSpaces = ' '.repeat(tab_to_space_num).repeat(i); // 生成 i 个空格的字符串
-                            line = leadingSpaces + line.substring(i); // 将生成的空格字符串和剩余的字符串拼接返回
-                            return line.substring(4);
-                        } else if (line.match(/^ {1}/)) { // 前面至少有一个空格时
-                            const leadingSpaces = line.match(/^\x20/)[0];
-                        return line.substring(leadingSpaces.length)
-                        } else {
-                            return line;
-                        }
-                    }).join('\n');
-                    textarea.value = value.substring(0, lineStart) + unindentedText + value.substring(lineEnd);
-                    var length_d = selectedText.length - unindentedText.length;
-                    if ((start - length_d) < lineStart){textarea.selectionStart = lineStart}
-                    else {textarea.selectionStart = start - length_d;}
-                    textarea.selectionEnd = end - length_d;
-                } else { // 没有按下Shift键
-                    var indentedText = selectedText.split('\n').map(function(line) {
-                        let i = 0;
-                        while (line[i] === '\t') {i++;}
-                        j = i+1 // 使用4个空格进行正向缩进
-                        const leadingSpaces = ' '.repeat(tab_to_space_num).repeat(j); // 生成 i 个空格的字符串
-                        return leadingSpaces + line.substring(i); // 将生成的空格字符串和剩余的字符串拼接返回
-                    }).join('\n');
-                    textarea.value = value.substring(0, start) + indentedText + value.substring(end);
-                    if (selectedText.length){
-                        textarea.selectionStart = start;
-                        textarea.selectionEnd = end + (indentedText.length - selectedText.length);
-                    } else {
-                        textarea.selectionEnd = end + (indentedText.length - selectedText.length);
-                        textarea.selectionStart = textarea.selectionEnd;
-                    }
-                }
-                event.preventDefault();
             }
-    };
-
-    var txtInput = document.getElementById('log');
-    txtInput.addEventListener('keydown', alt_q);
-    txtInput.addEventListener('keydown', tab_to_space);
-
-    var editTxtInput = document.getElementById('editLog');
-    editTxtInput.addEventListener('keydown', alt_q);
-    editTxtInput.addEventListener('keydown', tab_to_space);
-
-    // 监听窗口关闭事件
-    window.addEventListener("beforeunload", function (event) {
-        var inputBox = document.getElementById("log");
-                // 检测输入框内容是否为空
-        if (inputBox.value.trim().length > 0) {
-            // 显示提示框
-            event.preventDefault();
-            // beforeunload 事件的返回值
-            event.returnValue = " ";
         }
-    });
-    // 监听窗口关闭事件，当编辑窗口未关闭时给出提示
-    window.addEventListener("beforeunload", function (event) {
-        // 获取编辑框元素
-        var modal = document.getElementById('editLogModal');
-        // 检测编辑框是否为打开状态
-        if (modal.style.display === "flex") {
-            // 显示提示框
-            event.preventDefault();
-            // beforeunload 事件的返回值
-            event.returnValue = " ";
-        }
-    });
-
-});
+        event.preventDefault();
+    }
+};

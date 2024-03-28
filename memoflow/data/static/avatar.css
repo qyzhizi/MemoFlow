@@ -1,0 +1,37 @@
+.user-info {
+    /* 设置文字颜色为白色以确保对比度 */
+    color: white;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    height: 40px;
+    width: fit-content;
+}
+/* .cursor-pointer {
+        cursor: pointer;
+} */
+/* 使用ID选择器，因为它具有高特异性 */
+#user-name-avatar {
+    /* 添加过渡效果，使背景颜色变化更平滑 */
+    transition: background-color 0.3s ease; 
+}
+
+#user-name-avatar:hover {
+    background-color: rgb(39, 39, 42); /* 鼠标悬停时的背景颜色 */
+}
+
+.user-info img {
+    width: 30px;
+    /* 根据需要调整头像图标的大小 */
+    height: 30px;
+    border-radius: 50%;
+    /* 可以将头像设置为圆形 */
+    margin-right: 10px;
+    /* 根据需要调整图像和用户名之间的间距 */
+}
+.border-transparent {
+    border-color: transparent;
+}
+/* .border {
+    border-width: 1px;
+} */

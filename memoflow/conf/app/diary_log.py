@@ -38,7 +38,9 @@ USER_SETTINGS_TABLE_NAME = env_vars.get("USER_SETTINGS_TABLE_NAME",
                                         'user_settings')
 GITHUB_ACCESS_TABLE_NAME = env_vars.get("GITHUB_ACCESS_TABLE_NAME",
                                         'github_access')
-
+# jianguoyun db config
+JIANGUOYUN_ACCESS_TABLE_NAME = env_vars.get("JIANGUOYUN_ACCESS_TABLE_NAME",
+                                        'jianguoyun_access')
 
 #获取发送任务标志位
 SEND_TO_GITHUB = bool(int(env_vars.get("SEND_TO_GITHUB", 0)))
@@ -96,6 +98,10 @@ CONF_OPTS = [
                default=USER_SETTINGS_TABLE_NAME,
                help='user_settings table name'
                ),
+    # database jianguoyun table config
+    cfg.StrOpt('JIANGUOYUN_ACCESS_TABLE_NAME',
+               default=JIANGUOYUN_ACCESS_TABLE_NAME,
+               help='jianguoyun access table name'),
 
     cfg.StrOpt('REVIEW_TAGS', default='que,web', help='review 筛选标签'),
     cfg.StrOpt('FLOMO_API_URL', default=FLOMO_API_URL, help='flomo api url'),

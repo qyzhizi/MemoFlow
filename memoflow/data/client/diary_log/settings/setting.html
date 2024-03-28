@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en" class="dark" dir="ltr">
 <head>
     <title>Settings</title>
     <meta charset="UTF-8">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
-
-
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro">
+
+    <link rel="stylesheet" href="/v1/diary-log/static/styles.css">
+    <link rel="stylesheet" href="/v1/diary-log/static/setting/nav_setting.css">
+    <link rel="stylesheet" href="/v1/diary-log/static/setting/setting_content.css">
+    <link rel="stylesheet" href="/v1/diary-log/static/dialog-wrapper.css">
+    <link rel="stylesheet" href="/v1/diary-log/static/avatar.css">
+
     <style>
         body {
             font-family: "Source Code Pro", "Courier New", "等线", Courier, monospace;
@@ -58,39 +60,17 @@
             /* 继承父容器的宽度 */
             background-color: inherit;
             /* 继承父容器的背景颜色 */
-            z-index: 1000;
+            /* z-index: 100; */
             /* 可以根据需要调整 z-index */
             /* 其他样式 */
         }
 
-        .user-info {
-            background-color: rgb(39, 39, 42);
-            color: white;
-            /* 设置文字颜色为白色以确保对比度 */
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            height: 40px;
-        }
-
-        .user-info img {
-            width: 30px;
-            /* 根据需要调整头像图标的大小 */
-            height: 30px;
-            border-radius: 50%;
-            /* 可以将头像设置为圆形 */
-            margin-right: 10px;
-            /* 根据需要调整图像和用户名之间的间距 */
-        }
 
         .nav-items {
             background-color: inherit;
-            margin-top: 20px;
+            margin-top: 10px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            /* align-items: center; */
-            /* justify-content: space-around; */
 
         }
 
@@ -105,6 +85,7 @@
             /* 调整间距大小 */
             background-color: rgb(39, 39, 42);
             border-radius: 10px;
+            width: 100%;
 
         }
 
@@ -195,20 +176,12 @@
             gap: 10px;
 
         }
-        .setting-content{
-            display: flex;
-            flex: 1;
-            padding-left: 10px;
-            padding-right: 10px;
-            height: fit-content;
-            justify-content: center;
-            flex-direction: column;
-            width: 100%;
-            min-width: 0px;
+        .nav-setting-opt{
+            display: flex; 
+            align-items: center; 
+            gap: 3px;
+            cursor:pointer;
         }
-        /* .nav-setting-opt{
-            align-items: center;
-        } */
 
         /* 媒体查询 */
         @media (max-width: 110ch) {
@@ -219,100 +192,14 @@
             }
         }
 
-        /* 设置超链接的默认样式 */
-        #github-authorization {
-            text-decoration: none;
-            /* 去除超链接的下划线 */
-            display: inline-block;
-            padding: 5px 5px;
-            /* background-color: rgb(29, 29, 32); */
-            /* background-color: transparent; */
-            background-color: rgb(35, 134, 54);
-            border: 1px;
-            border-style: solid;
-            border-color: #32383E;
-            /* color: white; */
-            color: #DDE7EE;
-            text-decoration: none;
-            /* border: none; */
-            /* border-radius: 4px; */
-            cursor: pointer;
-            width: fit-content;
-            margin-top: 10px;
-        }
-        #github-authorization:hover {
-            /* color: yellow;  */
-            /* 设置鼠标悬停时超链接的颜色
-            /* text-decoration: underline; */
-            /* 添加下划线效果 */
-            /* background-color: rgb(23, 26, 28); */
-            background-color: rgb(41, 144, 59);
-            
-        }        
-        /* 设置超链接的默认样式 */
-        a {
-            text-decoration: none;
-            /* 去除超链接的下划线 */
-            display: inline-block;
-            padding: 5px 5px;
-            /* background-color: rgb(29, 29, 32); */
-            /* background-color: transparent; */
-            background-color: rgb(35, 134, 54);
-            border: 1px;
-            border-style: solid;
-            border-color: #32383E;
-            /* color: white; */
-            color: #DDE7EE;
-            text-decoration: none;
-            /* border: none; */
-            /* border-radius: 4px; */
-            cursor: pointer;
-            width: fit-content;
-            margin-top: 10px;
-        }
-        /* 设置超链接的:hover伪类样式，当鼠标悬停在超链接上时的样式 */
-        a:hover {
-            /* color: yellow;  */
-            /* 设置鼠标悬停时超链接的颜色
-            /* text-decoration: underline; */
-            /* 添加下划线效果 */
-            background-color: rgb(23, 26, 28);
-            /* background-color: rgb(41, 144, 59); */
-            
-        }
-
-        /* Button Styles */
-        button {
-            background-color: rgb(11, 107, 203);
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: rgb(24, 94, 165);
-        }
-        .setting-title{
-            display: flex;
-            flex-direction: row;
-            width: 100%;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .setting_hr{
-            border: none;
-            background-color: rgba(159 166 173 /0.16);
-            block-size: 1.5px;
-            margin-top: 0.75rem !important;
-            margin-bottom: 1rem !important;
-
-        }
         .flex{
             display: flex;
         }
         .flex-row{
             flex-direction: row;
+        }
+        .flex-column{
+            flex-direction: column;
         }
         .items-center{
             align-items: center;
@@ -336,135 +223,48 @@
         .mr-1{
             margin-right: 0.25rem;
         }
-        .css-button{
-            min-height: 2rem;
-            font-size: 0.875rem;
-            box-sizing: border-box;
+        .text-gray-500{
+            --tw-text-opacity: 1;
+            color: rgb(107 114 128 / var(--tw-text-opacity));
+        }
+        /* 设置超链接的默认样式 */
+        a {
+            text-decoration: none;
+            /* 去除超链接的下划线 */
+            display: inline-block;
+            padding: 5px 5px;
+            background-color: rgb(29, 29, 32);
             /* background-color: transparent; */
-            background-color: rgb(35, 134, 54);
-            /* cursor: pointer; */
-            display: inline-flex;
-            -webkit-box-align: center;
-            align-items: center;
-            -webkit-box-pack: center;
-            justify-content: center;
-            position: relative;
-            color: #DDE7EE;
+            /* background-color: rgb(35, 134, 54); */
             border: 1px;
             border-style: solid;
             border-color: #32383E;
-            padding-inline: 0.75rem;
-            border-radius: 6px;
-            padding-block: 0.25rem;
-            min-width: 0px;
-        }
-        .css-button:hover {
-            /* background-color: rgb(23, 26, 28); */
-            /* background-color: rgb(23, 26, 28); */
-            background-color: rgb(41, 144, 59);
-        }
-        .css-setting-content{
-            min-width: 0px;
-            box-shadow: 0 0 #000, 0px 1px 2px 0px rgba(0 0 0 /0.6);
-            min-height: 2rem;
-            cursor: text;
-            position: relative;
-            display: flex;
-            line-height: 1.5;
+            /* color: white; */
             color: #DDE7EE;
-            border: 1px solid;
-            border-color: #32383E;
-            background-color: #0B0D0E;
+            text-decoration: none;
+            /* border: none; */
+            /* border-radius: 4px; */
+            cursor: pointer;
+            width: fit-content;
+            margin-top: 10px;
         }
-        .css-setting-content::before{
-            box-sizing: border-box;
-            content: "";
-            display: block;
-            position: absolute;
-            pointer-events: none;
-            inset: 0px;
-            z-index: 1;
-            border-radius: inherit;
-            margin: calc(1px * -1);
-            box-shadow: inset 0 0 0 calc(0*2px) #0B6BCB;
-        }
-        .css-setting-input{
-            border: none;
-            min-width: 0px;
-            outline: 0px;
-            padding: 0px;
-            flex: 1 1 0%;
-            color: inherit;
-            background-color: transparent;
-            font-family: inherit;
-            font-size: inherit;
-            font-style: inherit;
-            font-weight: inherit;
-            line-height: inherit;
-            text-overflow: ellipsis;
-        }
+        /* 设置超链接的:hover伪类样式，当鼠标悬停在超链接上时的样式 */
+        a:hover {
+            /* color: yellow;  */
+            /* 设置鼠标悬停时超链接的颜色
+            /* text-decoration: underline; */
+            /* 添加下划线效果 */
+            background-color: rgb(23, 26, 28);
+            /* background-color: rgb(41, 144, 59); */
+            
+        }        
 
     </style>
 </head>
 
 <body>
     <div class="container">
-        <div class="nav-container">
-            <div class="nav-fixed-child">
-
-                <div class="user-info">
-                    <img src="https://via.placeholder.com/150" alt="Avatar">
-                    <span>UserName</span>
-                </div>
-                <div class="nav-items">
-                    <a id="header-home" class="nav-item" href="/v1/diary-log" aria-current="page">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="20" width="22.5" viewBox="0 0 576 512">
-                            <path fill="#ffffff"
-                                d="M575.8 255.5c0 18-15 32.1-32 32.1h-32l.7 160.2c0 2.7-.2 5.4-.5 8.1V472c0 22.1-17.9 40-40 40H456c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1H416 392c-22.1 0-40-17.9-40-40V448 384c0-17.7-14.3-32-32-32H256c-17.7 0-32 14.3-32 32v64 24c0 22.1-17.9 40-40 40H160 128.1c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2H104c-22.1 0-40-17.9-40-40V360c0-.9 0-1.9 .1-2.8V287.6H32c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z" />
-                        </svg> Home
-                    </a>
-
-                    <a id="header-search" class="nav-item" href="/v1/diary-log/vector-search" aria-current="page">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 512 512">
-                            <path fill="#ffffff"
-                                d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
-                        </svg> VectorSearch
-                    </a>
-
-                    <a id="header-review" class="nav-item" href="/v1/diary-log/review" aria-current="page">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="20" width="22.5" viewBox="0 0 576 512">
-                            <path fill="#cbcfd5" d="M288 80c-65.2 0-118.8 29.6-159.9 67.7C89.6 183.5 63 226 49.4
-                             256c13.6 30 40.2 72.5 78.6 108.3C169.2 402.4 222.8 432 288 432s118.8-29.6 159.9-67.7C486.4
-                              328.5 513 286 526.6 256c-13.6-30-40.2-72.5-78.6-108.3C406.8 109.6 353.2 80 288 80zM95.4 
-                              112.6C142.5 68.8 207.2 32 288 32s145.5 36.8 192.6 80.6c46.8 43.5 78.1 95.4 93 131.1c3.3 
-                              7.9 3.3 16.7 0 24.6c-14.9 35.7-46.2 87.7-93 131.1C433.5 443.2 368.8 480 288 
-                              480s-145.5-36.8-192.6-80.6C48.6 356 17.3 304 2.5 268.3c-3.3-7.9-3.3-16.7 0-24.6C17.3 208 
-                              48.6 156 95.4 112.6zM288 336c44.2 0 80-35.8 80-80s-35.8-80-80-80c-.7 0-1.3 0-2 0c1.3 5.1 2 
-                              10.5 2 16c0 35.3-28.7 64-64 64c-5.5 0-10.9-.7-16-2c0 .7 0 1.3 0 2c0 44.2 35.8 80 80 80zm0-208a128
-                               128 0 1 1 0 256 128 128 0 1 1 0-256z" />
-                        </svg> Review</a>
-
-                    <a id="header-clipboard" class="nav-item" href="/v1/diary-log/clipboard" aria-current="page">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="20" width="15" viewBox="0 0 384 512">
-                            <path fill="#cbcfd5"
-                                d="M280 64h40c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128C0 92.7 28.7 64 64 64h40 9.6C121 27.5 153.3 0 192 0s71 27.5 78.4 64H280zM64 112c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16H320c8.8 0 16-7.2 16-16V128c0-8.8-7.2-16-16-16H304v24c0 13.3-10.7 24-24 24H192 104c-13.3 0-24-10.7-24-24V112H64zm128-8a24 24 0 1 0 0-48 24 24 0 1 0 0 48z" />
-                        </svg> Clipboard</a>
-
-                    <a id="header-setting" class="nav-item" href="/v1/diary-log/setting" aria-current="page"><svg
-                            xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="lucide-settings">
-                            <path stroke="#cbcfd5"
-                                d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z">
-                            </path>
-                            <circle stroke="#cbcfd5" cx="12" cy="12" r="3"></circle>
-                        </svg> Settings</a>
-                </div>
-
-
-
-            </div>
-        </div>
+        <div id="nav-container-root" class="nav-container"> </div>
 
         <div class="contents-container">
             <div class="section-container">
@@ -472,108 +272,41 @@
                     <div class="setting-container text-gray-600">
                         <div class="nav-setting">
                             <span class="text-sm">Basic</span>
-                            <span id="nav-setting-opt-account" class="nav-setting-opt" style="display: flex; align-items: center; gap: 3px;">
+                            <span id="nav-setting-opt-account" data-target="account-setting-content" class="nav-setting-opt" >
                                 <svg xmlns="http://www.w3.org/2000/svg" height="20" width="17.5" viewBox="0 0 448 512"><path fill="#ffffff" d="M304 128a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM49.3 464H398.7c-8.9-63.3-63.3-112-129-112H178.3c-65.7 0-120.1 48.7-129 112zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3z"/></svg>
                                 Account
                             </span>
-                            <span id="nav-setting-opt-github" class="nav-setting-opt" style="display: flex; align-items: center; gap: 3px;">
+                            <span id="nav-setting-opt-github" data-target="github-setting-content" class="nav-setting-opt" >
                                 <svg xmlns="http://www.w3.org/2000/svg" height="20" width="19.375" viewBox="0 0 496 512"><path fill="#ffffff" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3 .3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5 .3-6.2 2.3zm44.2-1.7c-2.9 .7-4.9 2.6-4.6 4.9 .3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3 .7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3 .3 2.9 2.3 3.9 1.6 1 3.6 .7 4.3-.7 .7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3 .7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3 .7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
                                 BindGitHub
                             </span>
+                            <span id="nav-setting-opt-jianguoyun" data-target="jianguoyun-setting-content" class="nav-setting-opt" >
+                                <svg fill="#000000" height="20" width="20" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill="#ffffff" d="M394.86,136.98c-39.168-36.505-90.246-56.611-143.812-56.611c-56.993,0-108.743,22.754-146.744,59.608
+                                      C93.39,126.618,60,77.501,98.835,15.37c2.938-4.704,1.511-10.899-3.198-13.843c-4.694-2.938-10.899-1.511-13.843,3.198
+                                      C34.512,80.378,78.6,140.691,90.492,154.708c-31.396,36.841-50.407,84.542-50.407,136.625c0,53.575,20.107,105.046,56.611,144.204
+                                      c1.859,1.996,4.449,3.595,7.172,3.595c0.059,0,0.118,0,0.177,0c2.663,0,5.219-1.452,7.103-3.341L395.115,151.63
+                                      c1.928-1.928,2.987-4.751,2.943-7.478C398.009,141.424,396.857,138.839,394.86,136.98z M104.495,413.63
+                                      c-28.651-34.278-44.319-77.311-44.319-122.297c0-105.247,85.626-190.872,190.872-190.872c44.976,0,88.014,15.667,122.302,44.319
+                                      L104.495,413.63z"/>
+                                    <path fill="#ffffff" d="M470.097,338.35c-7-51.809-33.65-103.137-75.045-144.528c-3.924-3.924-10.281-3.924-14.206,0L153.533,421.13
+                                      c-1.884,1.884-2.943,4.439-2.943,7.103c0,2.663,1.06,5.219,2.943,7.103C203.831,485.634,267.099,512,324.308,512
+                                      c40.812,0,78.543-13.421,106.262-41.145C463.2,438.23,477.239,391.169,470.097,338.35z M423.119,449.197l-14.279-14.278
+                                      c-3.924-3.924-10.281-3.924-14.205,0c-3.924,3.924-3.924,10.281,0,14.205l14.276,14.276
+                                      c-58.436,48.948-159.361,33.934-233.938-35.299l212.843-212.838c34.317,36.932,56.356,81.25,62.37,125.775
+                                      C455.933,383.565,446.319,421.528,423.119,449.197z"/>
+                                </svg>
+                                BindJianguoyun
+                            </span>
                         </div>
-
-                        <div class="setting-content">
-                            <div class="flex flex-row items-center justify-content-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" height="96" width="84" viewBox="0 0 448 512"><path fill="#ffffff" d="M448 96c0-35.3-28.7-64-64-64H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96zM265.8 407.7c0-1.8 0-6 .1-11.6c.1-11.4 .1-28.8 .1-43.7c0-15.6-5.2-25.5-11.3-30.7c37-4.1 76-9.2 76-73.1c0-18.2-6.5-27.3-17.1-39c1.7-4.3 7.4-22-1.7-45c-13.9-4.3-45.7 17.9-45.7 17.9c-13.2-3.7-27.5-5.6-41.6-5.6s-28.4 1.9-41.6 5.6c0 0-31.8-22.2-45.7-17.9c-9.1 22.9-3.5 40.6-1.7 45c-10.6 11.7-15.6 20.8-15.6 39c0 63.6 37.3 69 74.3 73.1c-4.8 4.3-9.1 11.7-10.6 22.3c-9.5 4.3-33.8 11.7-48.3-13.9c-9.1-15.8-25.5-17.1-25.5-17.1c-16.2-.2-1.1 10.2-1.1 10.2c10.8 5 18.4 24.2 18.4 24.2c9.7 29.7 56.1 19.7 56.1 19.7c0 9 .1 21.7 .1 30.6c0 4.8 .1 8.6 .1 10c0 4.3-3 9.5-11.5 8C106 393.6 59.8 330.8 59.8 257.4c0-91.8 70.2-161.5 162-161.5s166.2 69.7 166.2 161.5c.1 73.4-44.7 136.3-110.7 158.3c-8.4 1.5-11.5-3.7-11.5-8zm-90.5-54.8c-.2-1.5 1.1-2.8 3-3.2c1.9-.2 3.7 .6 3.9 1.9c.3 1.3-1 2.6-3 3c-1.9 .4-3.7-.4-3.9-1.7zm-9.1 3.2c-2.2 .2-3.7-.9-3.7-2.4c0-1.3 1.5-2.4 3.5-2.4c1.9-.2 3.7 .9 3.7 2.4c0 1.3-1.5 2.4-3.5 2.4zm-14.3-2.2c-1.9-.4-3.2-1.9-2.8-3.2s2.4-1.9 4.1-1.5c2 .6 3.3 2.1 2.8 3.4c-.4 1.3-2.4 1.9-4.1 1.3zm-12.5-7.3c-1.5-1.3-1.9-3.2-.9-4.1c.9-1.1 2.8-.9 4.3 .6c1.3 1.3 1.8 3.3 .9 4.1c-.9 1.1-2.8 .9-4.3-.6zm-8.5-10c-1.1-1.5-1.1-3.2 0-3.9c1.1-.9 2.8-.2 3.7 1.3c1.1 1.5 1.1 3.3 0 4.1c-.9 .6-2.6 0-3.7-1.5zm-6.3-8.8c-1.1-1.3-1.3-2.8-.4-3.5c.9-.9 2.4-.4 3.5 .6c1.1 1.3 1.3 2.8 .4 3.5c-.9 .9-2.4 .4-3.5-.6zm-6-6.4c-1.3-.6-1.9-1.7-1.5-2.6c.4-.6 1.5-.9 2.8-.4c1.3 .7 1.9 1.8 1.5 2.6c-.4 .9-1.7 1.1-2.8 .4z"/></svg>
-
-                            </div>
-
-                            <hr class="setting_hr">
-                            <div class="setting-title">
-                                <div class="flex flex-row items-center">
-                                    <div class="w-auto flex items-center">
-                                        <span class="text-sm mr-1">
-                                            (1) Bind GitHub Repo
-                                        </span>
-                                    </div>
-                                </div>
-                                <!-- <button class="css-button" bype="button">保存</button> -->
-                            </div>
-                            <div class="flex flex-row items-center justify-content-space_evenly">
-                                <a class="github-authorization" id="github-bind" href="/v1/diary-log/github-authenticate" >
-                                    Bind GitHub Repo
-                                  </a>
-                                  <a class="github-authorization" href="/v1/diary-log/github-app-authenticate" target="_blank">
-                                    Authorization GitHub App
-                                  </a>
-
-                            </div>
-                                  
-                            <hr class="setting_hr">
-
-                            <div class="setting-title">
-                                <div class="flex flex-row items-center">
-                                    <div class="w-auto flex items-center">
-                                        <span class="text-sm mr-1">
-                                            (2) Git Rep Path
-                                        </span>
-                                    </div>
-                                </div>
-                                <!-- <button class="css-button" bype="button">保存</button> -->
-                            </div>
-                            <div class="css-setting-content w-full">
-                                <!-- <input placeholder="e.g.: Username/RepoName" class="css-setting-input" value> -->
-                                <input id="gitRepPathInput" placeholder="e.g.: Username/RepoName" class="css-setting-input" value>
-                            </div>
-
-                            <hr class="setting_hr">
-                            <div class="setting-title">
-                                <div class="flex flex-row items-center">
-                                    <div class="w-auto flex items-center">
-                                        <span class="text-sm mr-1">
-                                            (3) Git Current Sync File Name
-                                        </span>
-                                    </div>
-                                </div>
-                                <!-- <button class="css-button" bype="button">保存</button> -->
-                            </div>
-                            <div class="css-setting-content w-full">
-                                <!-- <input placeholder="e.g.: path/1.md" class="css-setting-input" value> -->
-                                <input id="gitCurrentSyncFileNameInput" placeholder="e.g.: path/1.md" class="css-setting-input" value>
-                            </div>
-
-                            <hr class="setting_hr">
-                            <div class="setting-title">
-                                <div class="flex flex-row items-center">
-                                    <div class="w-auto flex items-center">
-                                        <span class="text-sm mr-1">
-                                            (4) Git Other Sync File Name
-                                        </span>
-                                    </div>
-                                </div>
-                                <!-- <button class="css-button" bype="button">保存</button> -->
-                            </div>
-                            <div class="css-setting-content w-full">
-                                <!-- <input placeholder="comma-separated paths, e.g.: path/2.md,path/3.md" class="css-setting-input" value> -->
-                                <input id="gitOtherSyncFileNameInput"
-                                 placeholder="comma-separated paths, e.g.: path/2.md,path/3.md" class="css-setting-input" value>
-                            </div>
-
-                            <hr class="setting_hr">
-                            <div class="setting-title">
-                                <!-- <button class="css-button" bype="button">Save Changes</button> -->
-                                <button id="saveChangesButton" class="css-button" type="button">Save Changes</button>
-
-                            </div>
-                        </div>
-
+                        <div id="main-setting-content" class="flex flex-row w-full"> </div>
                     </div>
                 </div>
             </div>
         </div>
 
     </div>
-    <script src="/v1/diary-log/setting.js"></script>
+    <script type="module" src="/v1/diary-log/setting.js"></script>
 </body>
 
 </html>
