@@ -77,6 +77,23 @@ class DiaryLogDriver(object):
         my_client = jianguoyun_clients[acount]
         return my_client.get_contents(files_paths)
     
+    def create_file_if_not_exist_in_jianguoyun(
+            self,
+            jianguoyun_base_url: str,
+            jianguoyun_account: str,
+            jianguoyun_token: str,
+            all_sync_files: List[str]):
+        # get client instance, if not exist, create one, else use it
+        if self.jianguoyun_clients.get(jianguoyun_account, None) is None:
+            jianguoyun_clients[jianguoyun_account] = JianGuoYunClient(
+            jianguoyun_base_url, jianguoyun_account, jianguoyun_token)
+        my_client = jianguoyun_clients[jianguoyun_account]
+
+        for sync_file_path in all_sync_files:
+            my_client.upload_content_to_new_file(
+                content='',
+                to_path=sync_file_path)
+    
     def sync_contents_to_db(self, contents, table_name, data_base_path):
         db_sync.process_file_content_2_db(contents=contents,
                                           table_name=table_name,

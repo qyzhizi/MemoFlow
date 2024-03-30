@@ -159,7 +159,7 @@ class Manager(manager.Manager):
         other_sync_file_list: the file path in github repo,
         split by ',', and space is optional.
         example:
-        current_sync_file = 'diary_log/diary_log.json'
+        current_sync_file = '/diary_log/diary_log.md'
 
         Args:
             access_token (str): _description_
@@ -176,6 +176,37 @@ class Manager(manager.Manager):
             access_token=access_token,
             github_repo_name=github_repo_name,
             files_paths=all_sync_files)
+    
+    def init_sync_files_for_jianguoyun(
+            self, 
+            jianguoyun_account:str,
+            jianguoyun_token: str,
+            current_sync_file: str,
+            other_sync_file_list: str):
+        """ create sync file if file not exist in jianguoyun.
+        current_sync_file: the file path in jianguoyun,
+        other_sync_file_list: the file path in jianguoyun,
+        split by ', ', and space is optional.
+        example:
+        current_sync_file = '/diary_log/diary_log.md'
+
+        Args:
+            jianguoyun_account (str): _description_
+            jianguoyun_token (str): _description_
+            current_sync_file (str): _description_
+            other_sync_file_list (str): _description_
+        """
+        other_sync_file_list = [path.strip() for path in
+                                 other_sync_file_list.split(', ')] \
+            if other_sync_file_list else []
+        all_sync_files = other_sync_file_list + ([current_sync_file]
+                                                 if current_sync_file else [])
+        jianguoyun_base_url = CONF.jianguoyun['base_url']
+        self.driver.create_file_if_not_exist_in_jianguoyun(
+            jianguoyun_base_url=jianguoyun_base_url,
+            jianguoyun_account=jianguoyun_account,
+            jianguoyun_token=jianguoyun_token,
+            all_sync_files=all_sync_files)
     
     def process_block(self, block_string):
         """处理子块缩进

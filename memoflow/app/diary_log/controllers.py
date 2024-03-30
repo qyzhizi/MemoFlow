@@ -724,6 +724,21 @@ class DiaryLog(wsgi.Application):
         self.diary_db_api.user_add_or_update_jianguoyun_access_data_to_db(
             user_id=user_id,
             data_dict=config_input_jianguoyun)
+
+        jianguoyun_account = config_input_jianguoyun['jianguoyun_account']
+        jianguoyun_token = config_input_jianguoyun['jianguoyun_token']
+        current_sync_file = config_input_jianguoyun['current_sync_file']
+        other_sync_file_list = config_input_jianguoyun['other_sync_file_list']
+
+        self.diary_log_api.init_sync_files_for_jianguoyun(
+                    jianguoyun_account=jianguoyun_account,
+                    jianguoyun_token=jianguoyun_token,
+                    current_sync_file=current_sync_file,
+                    other_sync_file_list=other_sync_file_list)    
+
+        self.diary_db_api.update_user_settings_to_db(
+                    user_id=user_id,
+                    user_settings={"SEND_TO_JIANGUOYUN": "True"})
         status_dict['success'] = 1
         
         return Response(json.dumps(status_dict))

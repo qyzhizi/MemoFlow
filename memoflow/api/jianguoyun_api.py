@@ -1,4 +1,5 @@
 # coding=utf-8
+from collections import OrderedDict
 import io
 from webdav4.client import Client
 
@@ -71,4 +72,38 @@ class JianGuoYunClient(object):
             if content:
                 contents[path] = content
         return contents
-    
+
+
+class LRUCache:
+    def __init__(self, max_size):
+        self.max_size = max_size
+        self.cache = OrderedDict()
+
+    def get(self, key):
+        if key not in self.cache:
+            return None
+        self.cache.move_to_end(key)
+        return self.cache[key]
+
+    def put(self, key, value):
+        if key in self.cache:
+            self.cache[key] = value
+            self.cache.move_to_end(key)
+        else:
+            if len(self.cache) >= self.max_size:
+                self.cache.popitem(last=False)
+            self.cache[key] = value
+
+
+class JianGuoYunAccountManager(LRUCache):
+    def __init__(self, base_url, token, max_size):
+        super().__init__(max_size)
+        self.base_url = base_url
+        self.token = token
+
+    def get_client(self, jianguoyun_account):
+        client = self.get(jianguoyun_account)
+        if client is None:
+            client = JianGuoYunClient(self.base_url, jianguoyun_account, self.token)
+            self.put(jianguoyun_account, client)
+        return client
