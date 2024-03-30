@@ -623,11 +623,10 @@ class DiaryLog(wsgi.Application):
         access_token = db_github_access_info.get('access_token', None)
 
         config_input_flag = (github_repo_name !='') and (current_sync_file != '') 
-        
+                             
         status_dict ={
             "success": None,
             "config_input_flag": config_input_flag,
-            "access_token":None,
             "test_github_access": None,
             "unknown_object_exception": None,
             "bad_credentials_exception":None,
@@ -690,14 +689,14 @@ class DiaryLog(wsgi.Application):
         # 将POST数据转换为JSON格式
         config_data  = json.loads(data)
         config_input_jianguoyun = {
-            "jianguoyun_count": config_data.get(
-                'github_repo_name', None).strip(),
-            "current_sync_file": config_data.get(
-                'current_sync_file', None).strip(),
-            "other_sync_file_list": config_data.get(
-                'other_sync_file_list', None).strip(),
+            "jianguoyun_account": config_data.get(
+                'jianguoyun_account', None).strip(),
             "jianguoyun_token": config_data.get(
-                'jianguoyun_token', None).strip()
+                'jianguoyun_token', None).strip(),
+            "current_sync_file": config_data.get(
+                'jianguoyun_current_sync_file', None).strip(),
+            "other_sync_file_list": config_data.get(
+                'jianguoyun_other_sync_file_list', None).strip(),
         }
         current_sync_file = config_input_jianguoyun.get(
             "current_sync_file", None)
@@ -711,10 +710,23 @@ class DiaryLog(wsgi.Application):
             other_sync_file_list.remove(current_sync_file)
         other_sync_file_list = ','.join(other_sync_file_list)
         config_input_jianguoyun["other_sync_file_list"] = other_sync_file_list
+        
+        if config_input_jianguoyun['jianguoyun_account'] == '' or \
+        config_input_jianguoyun['jianguoyun_token'] == '' or \
+            config_input_jianguoyun['current_sync_file'] == '':
+            raise Exception("jianguoyun configs is missing , "
+                    "Please retry after configuration is set up")
+
+        status_dict = {
+            'success': None,
+        }
 
         self.diary_db_api.user_add_or_update_jianguoyun_access_data_to_db(
             user_id=user_id,
             data_dict=config_input_jianguoyun)
+        status_dict['success'] = 1
+        
+        return Response(json.dumps(status_dict))
 
     @token_required
     def get_github_config(self, req):
@@ -737,7 +749,29 @@ class DiaryLog(wsgi.Application):
                 'current_sync_file', None),
             "gitOtherSyncFileName": config_input_repo_info.get(
                 'other_sync_file_list', None)
-            }))   
+            }))
+
+    @token_required
+    def get_jianguoyun_account(self, req):
+        user_id = req.environ['user_id']
+        try:
+            jianguoyun_account_info = self.diary_db_api.\
+                get_jianguoyun_access_data_by_user_id(user_id)
+        except Exception as e:
+            jianguoyun_account_info = {}
+        config_info = {
+            "jianguoyun_account": jianguoyun_account_info.get(
+            'jianguoyun_account', None),
+            "jianguoyun_token": jianguoyun_account_info.get(
+                'jianguoyun_token', None),
+            "current_sync_file": jianguoyun_account_info.get(
+                'current_sync_file', None),
+            "other_sync_file_list": jianguoyun_account_info.get(
+                'other_sync_file_list', None)
+        }
+
+        return Response(json.dumps(config_info))
+
 
     def get_access_token_by_user_id(self, user_id):
         """ get github access info by user_id from db.

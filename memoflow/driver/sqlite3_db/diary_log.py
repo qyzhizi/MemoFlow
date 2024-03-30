@@ -130,7 +130,7 @@ class DBSqliteDriver(object):
                 f"CREATE TABLE IF NOT EXISTS {jianguoyun_access_table_name} ("
                 f"id CHAR(36) PRIMARY KEY, "
                 f"user_id CHAR(36) NOT NULL, "
-                f"jianguoyun_count VARCHAR(512), "
+                f"jianguoyun_account VARCHAR(512), "
                 f"current_sync_file VARCHAR(512), "
                 f"other_sync_file_list TEXT, "
                 f"jianguoyun_token VARCHAR(255), "
@@ -246,7 +246,8 @@ class DBSqliteDriver(object):
             cursor = conn.cursor()
 
             # 查询用户设置
-            cursor.execute(f"SELECT setting_key, setting_value FROM {table_name} WHERE user_id=?", (user_id,))
+            cursor.execute(f"SELECT setting_key, setting_value FROM {table_name} "
+                           f"WHERE user_id=?", (user_id,))
             rows = cursor.fetchall()
 
             # 将查询结果转换为字典形式
@@ -268,7 +269,7 @@ class DBSqliteDriver(object):
         with sqlite3.connect(data_base_path) as conn:
             cursor = conn.cursor()
             # Check if user_id exists in the table
-            cursor.execute(f"SELECT COUNT(*) FROM {table_name}"
+            cursor.execute(f"SELECT COUNT(*) FROM {table_name} "
                            f"WHERE user_id=?", (user_id,))
             result = cursor.fetchone()
             count = result[0] if result else 0
@@ -306,7 +307,7 @@ class DBSqliteDriver(object):
         with sqlite3.connect(data_base_path) as conn:
             cursor = conn.cursor()
             # Check if user_id exists in the table
-            cursor.execute(f"SELECT COUNT(*) FROM {table_name}"
+            cursor.execute(f"SELECT COUNT(*) FROM {table_name} "
                            f"WHERE user_id=?", (user_id, ))
             result = cursor.fetchone()
             count = result[0] if result else 0
@@ -401,6 +402,12 @@ class DBSqliteDriver(object):
                 f"SELECT * FROM {table_name} WHERE {where_clause}",
                 values
             )
+            result = cursor.fetchone()
+
+            if result:
+                return dict(result)
+            else:
+                return {}
 
     @classmethod
     def delete_record_by_filters(

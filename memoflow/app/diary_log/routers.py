@@ -136,4 +136,15 @@ class Router(wsgi.ComposableRouter):
                         controller=diary_log_controller,
                         action='get_github_config',
                         conditions=dict(method=['GET']))
+        # /v1/diary-log/jianguoyun-config
+        mapper.connect('/diary-log/jianguoyun-config',
+                       controller=diary_log_controller,
+                       action='jianguoyun_config',
+                       conditions=dict(method=['POST'])
+                       )
+        # /v1/diary-log/get-jianguoyun-account
+        mapper.connect('/diary-log/get-jianguoyun-account',
+                       controller=diary_log_controller,
+                       action='get_jianguoyun_account',
+                       conditions=dict(method=['GET']))
                        
