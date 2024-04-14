@@ -57,6 +57,66 @@ async function set_user_name_and_avatar(containerId) {
 };
 
 
+async function getUserNameAndAvatar(url) {
+    // var url = '/v1/diary-log/get-user-avatar-image';
+    try {
+        // 使用 await 等待异步操作完成
+        let response = await $.ajax({
+            url: url,
+            type: 'GET'
+        });
+
+        // 处理响应
+        if (typeof response === 'string') {
+            // 如果response是字符串，尝试解析它
+            try {
+                response = JSON.parse(response);
+            } catch (e) {
+                console.error("解析错误", e);
+                throw e; // 抛出异常，以便调用者可以捕获
+            }
+        }
+        
+        var username = response.username;
+        var base64Data = response.avatar_image;
+
+        // 创建一个虚拟的 div 元素
+        // var avatarUsernameDiv = document.createElement('div');
+        var avatarUsernameDiv = $('<div></div>');
+
+        let $newSpan, $newImg;
+
+        // 检查 response 对象中是否存在 username 和 avatar_image 属性
+        if (response.username) {
+            // 创建新的span元素并设置其文本内容
+            $newSpan = $('<span>').text(username);
+        } else {
+            $newSpan = $('<span>').text("");
+        }
+        
+        if (response.avatar_image) {
+            // 创建新的img元素并设置其属性
+            $newImg = $('<img>').attr({
+                // src: 'data:image/png;base64,' + base64Data,
+                src: base64Data,
+                alt: 'Avatar'
+            });
+        } else {
+            $newImg = $('<img>').attr({
+                src: "https://via.placeholder.com/50",
+                alt: "Avatar"
+            });
+        }
+        
+        // 清空div的当前内容并添加新的img和span元素
+        avatarUsernameDiv.append($newImg, $newSpan);
+        return avatarUsernameDiv;
+
+    } catch (error) {
+        console.error("请求失败", error);
+        throw error; // 抛出异常，以便调用者可以捕获
+    }
+};
 
 // input upload file, then evt 
 function cropImage(evt) {
@@ -220,6 +280,7 @@ function addSourceDataToTargetDiv(options) {
     // 获取参数
     var sourceDivData = options.sourceDivData;
     var idInSourceDiv = options.idInSourceDiv;
+    var classInSourceDiv = options.classInSourceDiv;
     var targetDivData = options.targetDivData;
     var idInTargetDiv = options.idInTargetDiv;
     var placeFirst = options.placeFirst;
@@ -230,11 +291,16 @@ function addSourceDataToTargetDiv(options) {
     sourceDiv.innerHTML = sourceDivData;
 
     // 获取 sourceDiv 中的指定容器
-    var container = sourceDiv.querySelector('#' + idInSourceDiv);
+    var container;
+    if (idInSourceDiv){
+        container = sourceDiv.querySelector('#' + idInSourceDiv);}
+    else if (classInSourceDiv) {
+        container = sourceDiv.querySelector('.' + idInSourceDiv);}   
 
     // 如果 idInSourceDiv 所属容器不存在，那么设置为 sourceDiv
     if (!container) {
-        container = sourceDiv;
+         container = sourceDiv.querySelector('div');
+
     }
 
     // 创建一个临时 div 元素来处理 targetDivData
@@ -314,7 +380,7 @@ function checkElementExistence(element_id) {
     };
     return container_exist;
 };
-  
+
 
 export {
     set_user_name_and_avatar,
@@ -323,5 +389,6 @@ export {
     addDivInnerHTMLToBodyContainer,
     checkElementExistence,
     addSourceDataToTargetDiv,
-    fetchData
+    fetchData,
+    getUserNameAndAvatar,
 };

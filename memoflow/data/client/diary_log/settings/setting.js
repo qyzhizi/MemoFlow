@@ -1,29 +1,8 @@
 import { addDivInnerHTMLToBodyContainer, checkElementExistence,
     addSourceDataToTargetDiv, fetchData } 
     from '/v1/diary-log/static/utils.js';
-
-async function getNavSettingHtml() {
-    const sourceUrl = "/v1/diary-log/static/avatar.html";
-    const targetUrl = "/v1/diary-log/static/setting/nav_setting.html";
-
-    // const fetchedSourceUrlData = await fetchData(sourceUrl);
-    // const fetchedTargetUrlData = await fetchData(targetUrl);
-    // 同时开始两个请求
-    const [fetchedSourceUrlData, fetchedTargetUrlData] = await Promise.all([
-        fetchData(sourceUrl),
-        fetchData(targetUrl)
-    ]);
-
-    const idInSourceDiv = "user-name-avatar";
-    const idInTargetDiv = "nav-fixed-child"
-
-
-    return addSourceDataToTargetDiv({
-        sourceDivData: fetchedSourceUrlData, idInSourceDiv: idInSourceDiv,
-        targetDivData: fetchedTargetUrlData, idInTargetDiv: idInTargetDiv,
-        placeFirst: true
-    })
-};
+import { navLoadAvatarAndSetUserName
+} from '/v1/diary-log/static/setting/nav_setting.js';
 
 
 $(function() {
@@ -65,6 +44,8 @@ $(function() {
     .then(html => {
         addDivInnerHTMLToBodyContainer(
             {doc_data: html, container_id: 'nav-container-root' })
+        
+        navLoadAvatarAndSetUserName()
     })
     .catch(error => {
         console.error(error); // 错误处理
@@ -190,14 +171,11 @@ $(function() {
                         .then(module => {
                             // 模块加载成功
                             console.log('External JavaScript account-setting-content.js loaded successfully');
-                            debugger;
+                            // debugger;
                             module.loadAvatarAndSetUserName('/v1/diary-log/static/avatar.html')
-                            // module.call_set_user_name_and_avatar('#user-name-avatar')
                             
                             // 这里可以添加你的事件监听器等其他 JavaScript 代码
                             // 如果需要使用模块导出的函数或变量，可以通过 module.变量名 访问
-                            // 例如，如果 account_setting_content.js 导出了 set_user_name_and_avatar 函数，你可以这样调用它：
-                            // module.set_user_name_and_avatar();
 
                         }).catch(err => {
                             // 模块加载失败的错误处理
@@ -242,3 +220,27 @@ $(function() {
     });
 
 })
+
+
+async function getNavSettingHtml() {
+    const sourceUrl = "/v1/diary-log/static/avatar.html";
+    const targetUrl = "/v1/diary-log/static/setting/nav_setting.html";
+
+    // const fetchedSourceUrlData = await fetchData(sourceUrl);
+    // const fetchedTargetUrlData = await fetchData(targetUrl);
+    // 同时开始两个请求
+    const [fetchedSourceUrlData, fetchedTargetUrlData] = await Promise.all([
+        fetchData(sourceUrl),
+        fetchData(targetUrl)
+    ]);
+
+    debugger;
+    const idInTargetDiv = "nav-fixed-child"
+
+
+    return addSourceDataToTargetDiv({
+        sourceDivData: fetchedSourceUrlData, 
+        targetDivData: fetchedTargetUrlData, idInTargetDiv: idInTargetDiv,
+        placeFirst: true
+    })
+};

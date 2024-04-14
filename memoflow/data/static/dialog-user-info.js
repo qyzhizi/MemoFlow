@@ -169,7 +169,7 @@ $('body').on('click', '#remove-dialog-avatar',
 $('body').on('click', '#save-account-info-edit', function() {
     var url = '/v1/diary-log/set-user-account-info';
     var dialog_avatar_id = '#' + 'dialog-avatar';
-    debugger;
+    // debugger;
     // 获取具有特定 id 的输入元素
     var avatar_src_value = '';
     // 查找 id 为 "dialog-avatar" 的元素下的第一个 <img> 元素

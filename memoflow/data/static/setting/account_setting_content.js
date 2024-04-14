@@ -1,4 +1,6 @@
-import { set_user_name_and_avatar, checkElementExistence } from '/v1/diary-log/static/utils.js';
+import { set_user_name_and_avatar, checkElementExistence,
+    getUserNameAndAvatar
+} from '/v1/diary-log/static/utils.js';
 
 // account-info
 // 先使用AJAX获取数据
@@ -37,16 +39,22 @@ export function loadAvatarAndSetUserName(url){
         style.remove();
         });
 
+        // debugger;
         // 从加载的HTML中提取特定元素
-        var specificElement = tempDiv.querySelector("#user-name-avatar");
+        // var specificElement = tempDiv.querySelector("#user-name-avatar");
+        var specificElement = tempDiv.querySelector(".user-info");
+        
+        getUserNameAndAvatar(
+          '/v1/diary-log/get-user-avatar-image')
+          .then(avatarUsernameDiv => {
+            specificElement.innerHTML = avatarUsernameDiv.html()
+            // 将特定元素添加到#account-info的最前面
+            var accountInfo = document.querySelector("#account-info");
+            if (accountInfo) {
+                accountInfo.insertAdjacentElement('afterbegin', specificElement);
+            }
+          });
 
-        // 将特定元素添加到#account-info的最前面
-        var accountInfo = document.querySelector("#account-info");
-        if (accountInfo) {
-        accountInfo.insertAdjacentElement('afterbegin', specificElement);
-        }
-
-        call_set_user_name_and_avatar("#user-name-avatar")
     })
     .catch(error => {
         console.error('Error loading the HTML:', error);
@@ -54,27 +62,14 @@ export function loadAvatarAndSetUserName(url){
 };
 
 
-// set_user_name_and_avatar('#user-name-avatar')
 
 export function call_set_user_name_and_avatar(id){
-    // set_user_name_and_avatar('#user-name-avatar')
     // debugger;
     set_user_name_and_avatar(id)
 };
 
 
-// // 假设 module.fetch_avatar_html_element 已经返回了一个 Promise
-// export async function loadAvatarAndSetUserName() {
-//   try {
-//     // 等待 fetch_avatar_html_element 成功完成
-//     await module.fetch_avatar_html_element('/v1/diary-log/static/avatar.html');
-//     // 上一步成功后，执行 call_set_user_name_and_avatar
-//     call_set_user_name_and_avatar('#user-name-avatar');
-//   } catch (error) {
-//     // 如果有错误发生，可以在这里处理
-//     console.error('加载 avatar 或设置用户名时发生错误', error);
-//   }
-// }
+
 
 // 发送GET请求以获取配置信息并填充输入框
 function getUserSyncFilesConfig() {
@@ -272,12 +267,9 @@ $('#edit-account-info').on('click', function(event) {
             // module.set_user_avatar("#dialog-avatar")
             module.set_user_info_in_dialog(
                 "dialog-username", "dialog-email", "dialog-avatar")
-            // module.call_set_user_name_and_avatar()
         
             // 这里可以添加你的事件监听器等其他 JavaScript 代码
             // 如果需要使用模块导出的函数或变量，可以通过 module.变量名 访问
-            // 例如，如果 account_setting_content.js 导出了 set_user_name_and_avatar 函数，你可以这样调用它：
-            // module.set_user_name_and_avatar();
 
         }).catch(err => {
             // 模块加载失败的错误处理
@@ -366,13 +358,9 @@ $('#edit-password').on('click', function(event) {
             // 模块加载成功
             // debugger;
             console.log('External JavaScript dialog-user-password.js loaded successfully');
-            // module.set_user_avatar("#dialog-avatar")
-            // module.call_set_user_name_and_avatar()
         
             // 这里可以添加你的事件监听器等其他 JavaScript 代码
             // 如果需要使用模块导出的函数或变量，可以通过 module.变量名 访问
-            // 例如，如果 account_setting_content.js 导出了 set_user_name_and_avatar 函数，你可以这样调用它：
-            // module.set_user_name_and_avatar();
 
         }).catch(err => {
             // 模块加载失败的错误处理
