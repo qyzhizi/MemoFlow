@@ -114,6 +114,20 @@ class Router(wsgi.ComposableRouter):
                         action='github_authenticate',
                         conditions=dict(method=['GET']))
         
+        # set sync files
+        mapper.connect('/diary-log/set-user-sync-files',
+                       controller=diary_log_controller,
+                       action='set_user_sync_files',
+                       conditions=dict(method=['POST'])
+                       )
+
+        # get sync files
+        mapper.connect('/diary-log/get-user-sync-files',
+                       controller=diary_log_controller,
+                       action='get_user_sync_files',
+                       conditions=dict(method=['GET'])
+                       )
+        
         # github-authenticate-callback
         mapper.connect('/diary-log/github-authenticate-callback',
                         controller=diary_log_controller,
@@ -147,4 +161,28 @@ class Router(wsgi.ComposableRouter):
                        controller=diary_log_controller,
                        action='get_jianguoyun_account',
                        conditions=dict(method=['GET']))
-                       
+        
+        # get get_user_avatar_image 
+        mapper.connect('/diary-log/get-user-avatar-image',
+                       controller=diary_log_controller,
+                       action='get_user_avatar_image',
+                       conditions=dict(method=['GET']))
+
+        # get_user_account_info
+        mapper.connect('/diary-log/get-user-account-info',
+                       controller=diary_log_controller,
+                       action='get_user_account_info',
+                       conditions=dict(method=['GET']))
+        
+        # set set_user_info
+        mapper.connect('/diary-log/set-user-account-info',
+                       controller=diary_log_controller,
+                       action='set_user_account_info',
+                       conditions=dict(method=['POST'])
+                       )
+        # set-user-password-info                 
+        mapper.connect('/diary-log/set-user-password-info',
+                       controller=diary_log_controller,
+                       action='set_user_password_info',
+                       conditions=dict(method=['POST'])
+                       )

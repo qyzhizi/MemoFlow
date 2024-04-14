@@ -1,0 +1,170 @@
+/* .dark{
+
+} */
+.dialog-wrapper{
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    background-color: transparent;
+    padding: 4rem 1rem 2rem;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(.4,0,.2,1);
+    transition-duration: .15s;
+    -ms-overflow-style: none;
+    scrollbar-width: none;    
+}
+.dialog-wrapper.showup {
+    background-color: #0009;
+}
+.dialog-wrapper.showoff {
+    display: none
+}
+#remove-dialog-avatar.showup{
+    background-color: #0009;
+}
+#remove-dialog-avatar.showoff{
+    display: none
+}
+.dialog-wrapper>.dialog-container {
+    display: flex;
+    max-width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    border-radius: .5rem;
+    --tw-bg-opacity: 1;
+    background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+    padding: 1rem;
+    --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / .1), 0 1px 2px -1px rgb(0 0 0 / .1);
+    --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)
+}
+
+:is(.dark .dialog-wrapper>.dialog-container) {
+    --tw-bg-opacity: 1;
+    background-color: rgb(39 39 42 / var(--tw-bg-opacity));
+    --tw-text-opacity: 1;
+    color: rgb(209 213 219 / var(--tw-text-opacity))
+}    
+.dialog-wrapper>.dialog-container>.dialog-header-container {
+    margin-bottom: 1rem;
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between
+}
+.dialog-wrapper>.dialog-container>.dialog-header-container>.title-text>.icon-text {
+    margin-right: .5rem;
+    font-size: 1rem
+} 
+:is(.dark .dialog-wrapper>.dialog-container>.dialog-header-container>.title-text>.icon-text) {
+    --tw-text-opacity: 1;
+    color: rgb(209 213 219 / var(--tw-text-opacity))
+}    
+.dialog-wrapper>.dialog-container>.dialog-header-container .btn {
+    display: flex;
+    height: 1.5rem;
+    width: 1.5rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: .25rem
+}
+
+.dialog-wrapper>.dialog-container>.dialog-header-container .btn:hover {
+    --tw-bg-opacity: 1;
+    background-color: rgb(243 244 246 / var(--tw-bg-opacity));
+    --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / .1), 0 1px 2px -1px rgb(0 0 0 / .1);
+    --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)
+}
+
+:is(.dark .dialog-wrapper>.dialog-container>.dialog-header-container .btn:hover) {
+    --tw-bg-opacity: 1;
+    background-color: rgb(24 24 27 / var(--tw-bg-opacity))
+}
+
+.dialog-wrapper>.dialog-container>.dialog-content-container {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start
+}
+.dialog-username-input{
+    background-color:black;
+    width:100%;
+}
+
+/* .dialog-wrapper>.dialog-container>.dialog-footer-container {
+    margin-top: 1rem;
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end
+} */
+
+/* .common-dialog>.dialog-container {
+    width: 20rem
+}
+
+.common-dialog>.dialog-container>.dialog-content-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start
+}
+
+.common-dialog>.dialog-container>.dialog-content-container>.btns-container {
+    margin-top: 1rem;
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end
+}
+
+.common-dialog>.dialog-container>.dialog-content-container>.btns-container>.btn {
+    margin-right: .5rem;
+    cursor: pointer;
+    border-radius: .375rem;
+    padding: .25rem .75rem;
+    font-size: .875rem
+}
+
+.common-dialog>.dialog-container>.dialog-content-container>.btns-container>.btn:hover {
+    opacity: .8
+}
+
+.common-dialog>.dialog-container>.dialog-content-container>.btns-container>.btn.confirm-btn {
+    border-width: 1px;
+    border-style: solid;
+    --tw-border-opacity: 1;
+    border-color: rgb(37 99 235 / var(--tw-border-opacity));
+    --tw-bg-opacity: 1;
+    background-color: rgb(254 226 226 / var(--tw-bg-opacity));
+    --tw-text-opacity: 1;
+    color: rgb(37 99 235 / var(--tw-text-opacity))
+}
+
+.common-dialog>.dialog-container>.dialog-content-container>.btns-container>.btn.confirm-btn.warning {
+    --tw-border-opacity: 1;
+    border-color: rgb(220 38 38 / var(--tw-border-opacity));
+    --tw-text-opacity: 1;
+    color: rgb(220 38 38 / var(--tw-text-opacity))
+}
+
+.common-dialog>.dialog-container>.dialog-content-container>.content-text {
+    white-space: pre-wrap
+}     */

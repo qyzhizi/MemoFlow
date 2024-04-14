@@ -83,10 +83,16 @@ class ChromeDBCollectionHttpDriver(object):
         self._client.delete_collection(self._collection.name)    
 
     def delete_items_by_ids(self, ids: List[str]):
+        if not ids:
+            return 
         self._collection.delete(ids=ids)
 
-    def get(self, ids, include, limit=None):
-        return self._collection.get(ids=ids, limit=limit, include=include)
+    def get(self, ids=None, where=None, 
+            where_document=None, include=None,
+            limit=None):
+        return self._collection.get(
+            ids=ids, where=where, where_document=where_document,
+            limit=limit, include=include)
     
     def collection_count(self) -> int:
         return self._collection.count()

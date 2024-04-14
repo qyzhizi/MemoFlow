@@ -21,25 +21,6 @@ class DBSqliteDriver(object):
         if not os.path.exists(dir_path):
             LOG.info("同步数据库路径不存在，创建路径: %s", dir_path)
             os.makedirs(dir_path)
-        # conn = sqlite3.connect(data_base_path)
-        # c = conn.cursor()
-        # # c.execute(f'CREATE TABLE IF NOT EXISTS {table_name} (id TEXT PRIMARY KEY, content TEXT, tags TEXT)')
-        # # c.execute(
-        # # f"CREATE TABLE IF NOT EXISTS {table_name} "
-        # # f"(id CHAR(36) PRIMARY KEY, user_id CHAR(36), "
-        # # f"content TEXT, tags TEXT, sync_file VARCHAR(512))"
-        # # )
-        # c.execute(
-        #     f"CREATE TABLE IF NOT EXISTS {table_name} "
-        #     f"(id CHAR(36) PRIMARY KEY, "
-        #     f"content TEXT, "
-        #     f"tags TEXT, "
-        #     f"sync_file VARCHAR(512), "
-        #     f"update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
-        #     f"create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
-        # )
-        # conn.commit()
-        # conn.close()
 
     @classmethod
     def create_diary_log_table(cls, data_base_path, table_name):
@@ -53,6 +34,7 @@ class DBSqliteDriver(object):
                 f"content TEXT, "
                 f"tags TEXT, "
                 f"sync_file VARCHAR(512), "
+                # f"jianguoyun_sync_file VARCHAR(512), "
                 f"update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
                 f"create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
             )
@@ -70,8 +52,10 @@ class DBSqliteDriver(object):
                 f"id CHAR(36) PRIMARY KEY, "
                 f"username VARCHAR(255) NOT NULL, "
                 f"password VARCHAR(255) NOT NULL, "
+                f"salt VARCHAR(255) NOT NULL, "
                 f"email VARCHAR(255), "
-                f"diary_table_name CHAR(255) NOT NULL"
+                f"diary_table_name CHAR(255) NOT NULL, "
+                f"avatar_image TEXT"
                 f")"
             )
 
@@ -142,18 +126,37 @@ class DBSqliteDriver(object):
     @classmethod
     def add_user(cls,
                  user_id,
-                 username, password, email, diary_table_name,
+                 username, password, salt, email, diary_table_name,
                  data_base_path, table_name):
         LOG.info(f"add_user: {table_name}, 所在数据库：{data_base_path}")
         with sqlite3.connect(data_base_path) as conn:
             cursor = conn.cursor()
             cursor.execute(
                 f'INSERT INTO {table_name}'
-                f"(id, username, password, email, diary_table_name) "
-                f'VALUES (?, ?, ?, ?, ?)',
-                (user_id, username, password, email, diary_table_name)
+                f"(id, username, password, salt, email, diary_table_name) "
+                f'VALUES (?, ?, ?, ?, ?, ?)',
+                (user_id, username, password, salt, email, diary_table_name)
             )
-    
+
+    @classmethod
+    def update_users_field(cls, user_id, field_dict, data_base_path, table_name):
+        """更新用户表中的字段值"""
+        with sqlite3.connect(data_base_path) as conn:
+            cursor = conn.cursor()
+            # 检查用户是否存在
+            cursor.execute(f"SELECT id FROM {table_name} WHERE id = ?", (user_id,))
+            result = cursor.fetchone()
+            if result is None:
+                raise ValueError("用户不存在")  # 抛出异常或返回错误消息
+        
+            # 更新字段值
+            set_clause = ", ".join([f"{key} = ?" for key in field_dict.keys()])
+            values = tuple(field_dict.values()) + (user_id,)
+            cursor.execute(
+                f"UPDATE {table_name} SET {set_clause} WHERE id = ?",
+                values
+            )
+
     @classmethod
     def get_table_name_by_user_id(
         cls,
@@ -472,9 +475,11 @@ class DBSqliteDriver(object):
             return None
 
     @classmethod
-    def get_logs_by_filter(cls, filter, columns, table_name, data_base_path,
-                           order_by="create_time", ascending=False):
-        """get logs by filter
+    def get_logs_by_filter(cls,
+            filter, columns, table_name, data_base_path,
+            order_by="create_time", ascending=False,
+            page_size=None, page_number=None):
+        """get logs by filter with pagination
 
         Args:
             table_name (string): _description_
@@ -482,6 +487,8 @@ class DBSqliteDriver(object):
             columns (tuple or list): (content, tags)
             order_by (string, optional): Column name to order by. Defaults to "create_time".
             ascending (bool, optional): Whether to sort in ascending order. Defaults to False (descending).
+            page_size (int, optional): Number of records to display per page.
+            page_number (int, optional): Page number to retrieve.
 
         Returns:
             list: [[content1, tags1], [content2, tags2], ...]
@@ -502,6 +509,11 @@ class DBSqliteDriver(object):
                     order_direction = "ASC" if ascending else "DESC"
                     query += f" ORDER BY {order_by} {order_direction}"
 
+                # Add pagination if page_size and page_number are provided
+                if page_size and page_number:
+                    offset = (page_number - 1) * page_size
+                    query += f" LIMIT {page_size} OFFSET {offset}"
+
                 # Execute query
                 if filter:
                     rows = c.execute(query, tuple(filter.values())).fetchall()
@@ -511,7 +523,7 @@ class DBSqliteDriver(object):
                 return rows
         except Exception as e:
             LOG.error(f"An error occurred: {str(e)}")
-            return None 
+            return None
     
     @classmethod
     def get_log_by_id(cls, table_name, id, columns, data_base_path):
@@ -686,6 +698,8 @@ class DBSqliteDriver(object):
         data_base_path: str):
         """Batch insert records. create_time update_time is same order 
         with records"""
+        if not records:
+            return
 
         if not is_nested_list(columns, str) or not is_nested_list(records, str):
             raise ValueError("Only allow nested lists of simple non-iterated"

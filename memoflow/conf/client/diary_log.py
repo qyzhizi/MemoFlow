@@ -49,6 +49,12 @@ CONF_OPTS = [
     cfg.StrOpt('setting_js_path',
                 default="memoflow/data/client/diary_log/settings/setting.js",
                 help='settings js文件路径'),
+    cfg.StrOpt('github_setting_content_html_path',
+               default="memoflow/data/client/diary_log/settings/sub_pages/github_setting_content.html",
+               help='github_setting_content html路径'),
+    cfg.StrOpt('static_path',
+               default="memoflow/data/static",
+               help='static_path'),
 
 ]
 

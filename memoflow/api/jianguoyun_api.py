@@ -1,6 +1,7 @@
 # coding=utf-8
 from collections import OrderedDict
 import io
+import os
 from webdav4.client import Client
 
 from memoflow.conf import CONF
@@ -15,34 +16,65 @@ from typing import (
     Type,
 )
 jianguoyun_clients = {}
+JIANGUOYUN_BASE_URL = CONF.api_conf.base_url
+JIANGUOYUN_PREFIX =  CONF.api_conf.jianguoyun_prefix
 
 
 class JianGuoYunClient(object):
 
     def __init__(self, base_url: str, acount: str, token: str) -> None:
         self.client = Client(base_url=base_url, auth=(acount, token))
-        self.file_exists = {}
+        # self.file_exists = {}
 
-    def exists(self, path:str) -> bool:
-        if self.file_exists.get(path, None) is None:
-            res = self.client.exists(path=path)
-            self.file_exists[path] = res
-            return res
-        else:
-            return self.file_exists[path]
+        # mkdir JIANGUOYUN_PREFIX path
+        # if not self.client.exists(JIANGUOYUN_PREFIX):
+        #     self.client.mkdir(JIANGUOYUN_PREFIX)
+
+    def process_path(self, path):
+        directory, filename = os.path.split(path)
+        if not directory.startswith(JIANGUOYUN_PREFIX):
+            directory = os.path.join(JIANGUOYUN_PREFIX, directory.lstrip('/'))
+        dir_processed = '/'
+        for dir_path in directory.split('/')[1:]:
+            dir_processed = os.path.join(dir_processed, dir_path)
+            if not self.client.exists(dir_processed):
+                self.client.mkdir(dir_processed)
+        return os.path.join(dir_processed, filename)
+
+    # def process_path(self, path):
+    #     directory, filename = os.path.split(path)
+    #     if not directory.startswith(JIANGUOYUN_PREFIX):
+    #         if not directory.startswith('/'):
+    #             directory = '/' + directory 
+    #         path = JIANGUOYUN_PREFIX + path
+    #     if not self.client.exists(path):
+    #         self.client.mkdir(path)
+    #     return path + '/' + filename
+
+    # def exists(self, path:str) -> bool:
+    #     if self.file_exists.get(path, None) is None:
+    #         res = self.client.exists(path=path)
+    #         self.file_exists[path] = res
+    #         return res
+    #     else:
+    #         return self.file_exists[path]
     
     def upload_content_to_new_file(self, content: str, to_path: str,
                                    overwrite: bool = False,
                                    encoding='utf-8') -> None:
+        # to_path = self.process_path(to_path)
         if not self.client.exists(to_path):
             file_obj = io.BytesIO(content.encode(encoding))
             self.client.upload_fileobj(file_obj, to_path, overwrite)
             # 创建新文件后，更新file_exists，否者后续一直认为该文件不存在
-            self.file_exists[to_path] = to_path
+            # self.file_exists[to_path] = to_path
 
 
-    def add_content_to_file(self, added_content: str, file_path: str, mode: str = 'r',
-                    encoding='utf-8'):
+    def add_content_to_file(
+            self,
+            added_content: str,
+            file_path: str, mode: str = 'r', encoding='utf-8'):
+        # file_path = self.process_path(file_path)
         with self.client.open(path=file_path, mode=mode, encoding=encoding) as file:
             content = file.read()
             updated_content = added_content + "\n" + content
@@ -50,12 +82,14 @@ class JianGuoYunClient(object):
         self.client.upload_fileobj(updated_file_obj, file_path, overwrite=True)
     
     def update_whole_file(self, updated_content: str, file_path: str,
-                          encoding='utf-8'):
+                          encoding='utf-8', overwrite=True):
+        # file_path = self.process_path(file_path)
         file_obj = io.BytesIO(updated_content.encode(encoding))
-        self.client.upload_fileobj(file_obj, file_path, overwrite=True)
+        self.client.upload_fileobj(file_obj, file_path, overwrite=overwrite)
     
     def get_file_content(self, path: str, encoding='utf-8'):
-        if self.exists(path):
+        # path = self.process_path(path)
+        if self.client.exists(path):
             with self.client.open(path=path, mode='r', encoding=encoding) as file:
                 return file.read()
 
@@ -68,6 +102,9 @@ class JianGuoYunClient(object):
         """
         contents = {}
         for path in paths:
+            if not path:
+                continue
+            path = self.process_path(path)
             content = self.get_file_content(path, encoding)
             if content:
                 contents[path] = content
@@ -96,14 +133,17 @@ class LRUCache:
 
 
 class JianGuoYunAccountManager(LRUCache):
-    def __init__(self, base_url, token, max_size):
+    def __init__(self, max_size,
+                 base_url=JIANGUOYUN_BASE_URL):
         super().__init__(max_size)
         self.base_url = base_url
-        self.token = token
 
-    def get_client(self, jianguoyun_account):
-        client = self.get(jianguoyun_account)
+    def get_client(self, token, acount):
+        client = self.get(acount)
         if client is None:
-            client = JianGuoYunClient(self.base_url, jianguoyun_account, self.token)
-            self.put(jianguoyun_account, client)
+            client = JianGuoYunClient(
+                base_url=self.base_url, 
+                acount=acount,
+                token=token)
+            self.put(acount, client)
         return client

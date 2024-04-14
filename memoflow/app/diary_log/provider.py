@@ -32,6 +32,7 @@ from typing import (
 LOG = logging.getLogger(__name__)
 
 # driver_name = CONF.diary_log['driver']
+USER_TABLE_NAME = CONF.diary_log['USER_TABLE_NAME']
 SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
 SYNC_TABLE_NAME = CONF.diary_log['SYNC_TABLE_NAME']
 
@@ -44,19 +45,19 @@ class Manager(manager.Manager):
         # #debug
         # from memoflow.app.diary_log.driver.backend import DiaryLogDriver
         # self.driver = DiaryLogDriver()
-    
+
     def generate_token(self, user_id):
         return TokenManager.generate_token(user_id)
 
     def verify_token(self, token):
         return TokenManager.verify_token(token)
-    
+
     def get_access_token(self, code):
 
         CLIENT_SECRET = CONF.diary_log['CLIENT_SECRET']
         CLIENT_ID = CONF.diary_log['CLIENT_ID']
         # 回调 URL，需与 GitHub App 中设置的一致
-        # REDIRECT_URI = '/v1/diary-log/github-authenticate-callback'  
+        # REDIRECT_URI = '/v1/diary-log/github-authenticate-callback'
 
         # 使用 code 获取访问令牌
         token_url = 'https://github.com/login/oauth/access_token'
@@ -71,8 +72,12 @@ class Manager(manager.Manager):
         # 创建 POST 请求对象
         request = Request.blank(token_url, method='POST',
                                 POST=payload, headers=headers)
-        # 发送请求
-        response = request.get_response()
+        try:
+            # 发送请求
+            response = request.get_response()
+        except Exception as e:
+            LOG.error(e)
+            raise e
 
         # 解析响应内容
         if response.status_code == 200:
@@ -85,7 +90,7 @@ class Manager(manager.Manager):
             return data
         else:
             return None
-    
+
     def get_github_access_token_by_refresh_token(self, refresh_token):
         # 参考：
         # https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/refreshing-user-access-tokens
@@ -113,7 +118,7 @@ class Manager(manager.Manager):
         elif response.status_code == 401:
             return None
         return None
-    
+
     def process_github_tokens_info_to_db_format(self, github_tokens_info):
         access_token = github_tokens_info.get('access_token', None)
         github_access_token_expires_in = github_tokens_info.get('expires_in', None)
@@ -128,7 +133,7 @@ class Manager(manager.Manager):
             (seconds=(github_access_token_expires_in - 120))
         refresh_token_expires_at = current_time + timedelta\
             (seconds=(github_refresh_token_expires_in - 120))
-        
+
         github_tokens_info = {
             'access_token': access_token,
             'access_token_expires_at': access_token_expires_at,
@@ -142,11 +147,18 @@ class Manager(manager.Manager):
             access_token,
             github_repo_name
             ):
-        self.driver.test_github_access(
-            access_token=access_token,
-            github_repo_name=github_repo_name
-            )
+        return self.driver.test_github_access(
+            access_token=access_token, github_repo_name=github_repo_name)
     
+    def test_jianguoyun_access(
+            self,
+            jianguoyun_account:str,
+            jianguoyun_token: str,
+    ):
+        return self.driver.test_jianguoyun_access(
+            jianguoyun_account=jianguoyun_account,
+            jianguoyun_token=jianguoyun_token)
+
     def init_sync_files_for_github(
         self,
         access_token:str,
@@ -170,15 +182,15 @@ class Manager(manager.Manager):
         other_sync_file_list = [path.strip() for path in
                                  other_sync_file_list.split(',')] \
             if other_sync_file_list else []
-        all_sync_files = other_sync_file_list + ([current_sync_file] 
+        all_sync_files = other_sync_file_list + ([current_sync_file]
                                                  if current_sync_file else [])
         self.driver.create_file_if_not_exist_in_github(
             access_token=access_token,
             github_repo_name=github_repo_name,
             files_paths=all_sync_files)
-    
+
     def init_sync_files_for_jianguoyun(
-            self, 
+            self,
             jianguoyun_account:str,
             jianguoyun_token: str,
             current_sync_file: str,
@@ -197,17 +209,15 @@ class Manager(manager.Manager):
             other_sync_file_list (str): _description_
         """
         other_sync_file_list = [path.strip() for path in
-                                 other_sync_file_list.split(', ')] \
+                                 other_sync_file_list.split(',')] \
             if other_sync_file_list else []
         all_sync_files = other_sync_file_list + ([current_sync_file]
                                                  if current_sync_file else [])
-        jianguoyun_base_url = CONF.jianguoyun['base_url']
         self.driver.create_file_if_not_exist_in_jianguoyun(
-            jianguoyun_base_url=jianguoyun_base_url,
             jianguoyun_account=jianguoyun_account,
             jianguoyun_token=jianguoyun_token,
             all_sync_files=all_sync_files)
-    
+
     def process_block(self, block_string):
         """处理子块缩进
         block_string: 使用process_content函数处理后的字符串,它在特的行
@@ -331,7 +341,7 @@ class Manager(manager.Manager):
                 # 当前子块如果比上个子块多2个、2个以上的"\t"，进行现在，最多只能多一个"\t"
                 if i-1 >= 0 and t_num >= child_block_list[i-1][0] +1:
                     t_num = child_block_list[i-1][0] +1
-                # 判断是否为block开头标识：t_num*'\t'+ "- "                    
+                # 判断是否为block开头标识：t_num*'\t'+ "- "
                 if line_index > 0 or ans_normal_block:
                     # 软回车标识
                     pre_str = t_num*'\t'+ "  "
@@ -425,7 +435,7 @@ class Manager(manager.Manager):
                     # match_list.append(matched)
                     if content_strip_space[:len(item)] == item:
                         content = que_strings[0] + content[len(item):]
-                        content_list[i] = content 
+                        content_list[i] = content
                         que_condition_flag = True
                         break
 
@@ -552,10 +562,11 @@ class Manager(manager.Manager):
             sync_file_path_list,
             branch_name)
         return contents
-    
+
     def sync_files_to_card_contents(
             self,
-            github_access_info
+            github_access_info,
+            user_settings
             ):
         """_summary_
 
@@ -565,9 +576,9 @@ class Manager(manager.Manager):
         Returns:
             dict:: {str: list(tuple(str, str))}
         """
-            
-        current_sync_file = github_access_info['current_sync_file']
-        other_sync_file_list = github_access_info['other_sync_file_list']
+
+        current_sync_file = user_settings['current_sync_file']
+        other_sync_file_list = user_settings['other_sync_file_list']
         # if current_sync_file and other_sync_file_list:
 
         other_sync_file_list = [path.strip() for path in
@@ -576,19 +587,19 @@ class Manager(manager.Manager):
 
         sync_file_paths = [current_sync_file.strip()] + \
             other_sync_file_list
-        
+
         access_token = github_access_info['access_token']
         # repo = CONF.diary_log['GITHUB_REPO']
         repo = github_access_info['github_repo_name']
         # if not (repo and access_token):
         #     return []
         branch_name = "main"
-        
+
         contents = self.get_contents_from_github(
             access_token, repo, sync_file_paths, branch_name)
         if len(contents.keys()) != len(sync_file_paths):
             LOG.warn("contents length and len(sync_file_paths) not equal")
-        
+
         # diary_table_name = user_info['diary_table_name']
         # processed_card_contents = {}
         sync_files_to_card_contents = []
@@ -617,7 +628,8 @@ class Manager(manager.Manager):
     #             table_name=path_table_map[file_path],
     #             data_base_path=SYNC_DATA_BASE_PATH)
 
-    def sync_contents_from_jianguoyun_to_db(self, sync_file_paths, sync_table_names):
+    def sync_contents_from_jianguoyun_to_db(
+            self, sync_file_paths, sync_table_names):
         if len(sync_file_paths) != len(sync_table_names):
             raise Exception("sync_file_paths and sync_table_names length not equal")
         JIANGUOYUN_COUNT = CONF.api_conf.JIANGUOYUN_COUNT
@@ -637,6 +649,35 @@ class Manager(manager.Manager):
                 [contents[file_path]],
                 table_name=path_table_map[file_path],
                 data_base_path=SYNC_DATA_BASE_PATH)
+
+    def get_card_contents_from_jianguoyun(
+            self, access_data: Dict,
+            user_settings: Dict):
+        acount = access_data['jianguoyun_account']
+        token = access_data['jianguoyun_token']
+
+        current_sync_file = user_settings['current_sync_file']
+        other_sync_files = user_settings['other_sync_file_list']
+        other_sync_file_list = [path.strip() for path in
+                            other_sync_files.split(',')] \
+            if other_sync_files else []
+        sync_file_paths = [current_sync_file.strip()] + \
+            other_sync_file_list
+
+        sync_files_to_contents: Dict = self.driver.\
+            get_contents_from_jianguoyun(
+            acount, token, sync_file_paths)
+
+        if len(sync_files_to_contents.keys()) != len(sync_file_paths):
+            LOG.warn("contents length and len(sync_file_paths) not equal")
+
+        card_contents = [
+            (sync_file,
+            self.driver.text_to_card_contents(
+                    content=sync_files_to_contents[sync_file]))
+            for sync_file in sync_files_to_contents
+        ]
+        return card_contents
 
     # sync contents to database
     def sync_contents_to_db(self, contents, table_name, data_base_path):
@@ -710,8 +751,8 @@ class DiaryDBManager(manager.Manager):
         self.sync_data_base_path = CONF.diary_log['SYNC_DATA_BASE_PATH']
         self.jianguoyun_access_table=CONF.diary_log[
             'JIANGUOYUN_ACCESS_TABLE_NAME']
-    
-    def add_user(self, username, password, email=None):
+
+    def add_user(self, username, password, salt, email=None):
         """
         Add a user to the file sync system.
 
@@ -735,11 +776,23 @@ class DiaryDBManager(manager.Manager):
             user_id=user_id,
             username=username,
             password=password,
+            salt=salt,
             email=email,
             diary_table_name=diary_table_name,
             data_base_path=SYNC_DATA_BASE_PATH,
             table_name=USER_TABLE_NAME)
-    
+
+    def update_users_field(self,
+                       user_id,
+                       **field_dict,
+                       ):
+        self.driver.update_users_field(
+            user_id=user_id,
+            field_dict=field_dict,
+            data_base_path=SYNC_DATA_BASE_PATH,
+            table_name=USER_TABLE_NAME
+        )
+
     def create_diary_table(
             self,
             diary_table_name
@@ -748,7 +801,7 @@ class DiaryDBManager(manager.Manager):
             data_base_path=SYNC_DATA_BASE_PATH,
             table_name=diary_table_name
         )
-    
+
     def user_add_or_update_github_access_data_to_db(
             self, user_id,
             data_dict,
@@ -765,13 +818,13 @@ class DiaryDBManager(manager.Manager):
         """
         SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
         GITHUB_ACCESS_TABLE_NAME=CONF.diary_log['GITHUB_ACCESS_TABLE_NAME']
-        
+
         self.driver.user_add_or_update_github_access_data(
             user_id=user_id,
             data_dict=data_dict,
             data_base_path=SYNC_DATA_BASE_PATH,
-            table_name=GITHUB_ACCESS_TABLE_NAME)        
-        
+            table_name=GITHUB_ACCESS_TABLE_NAME)
+
     def user_add_or_update_jianguoyun_access_data_to_db(
             self, user_id,
             data_dict,
@@ -784,7 +837,7 @@ class DiaryDBManager(manager.Manager):
             data_dict=data_dict,
             data_base_path=SYNC_DATA_BASE_PATH,
             table_name=JIANGUOYUN_ACCESS_TABLE)
-    
+
     def get_jianguoyun_access_data_by_user_id(
             self, user_id):
         return self.driver.get_record_by_filters(
@@ -819,7 +872,7 @@ class DiaryDBManager(manager.Manager):
             data_base_path=SYNC_DATA_BASE_PATH,
             table_name=GITHUB_ACCESS_TABLE_NAME)
         return github_access_info
-        
+
     def get_user_info_by_username(self, username):
         SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
         USER_TABLE_NAME = CONF.diary_log['USER_TABLE_NAME']
@@ -828,7 +881,7 @@ class DiaryDBManager(manager.Manager):
             data_base_path=SYNC_DATA_BASE_PATH,
             table_name=USER_TABLE_NAME)
         return user_id
-    
+
     def get_user_info_by_id(self, user_id):
         SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
         USER_TABLE_NAME = CONF.diary_log['USER_TABLE_NAME']
@@ -837,7 +890,7 @@ class DiaryDBManager(manager.Manager):
             data_base_path=SYNC_DATA_BASE_PATH,
             table_name=USER_TABLE_NAME)
         return user_info
-    
+
     def update_user_settings_to_db(
             self, user_id:str, user_settings:dict) -> None:
         SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
@@ -865,15 +918,16 @@ class DiaryDBManager(manager.Manager):
                 user_settings[key] = True
             if value.strip().lower() == 'false':
                 user_settings[key] = False
-        
+
         return user_settings
 
-                                                
+
     def add_log(self,
                 user_id,
                 content,
                 tags,
                 sync_file=None,
+                # jianguoyun_sync_file=None,
                 data_base_path=SYNC_DATA_BASE_PATH
                 ):
         """save diary(content, tags) to table
@@ -893,9 +947,11 @@ class DiaryDBManager(manager.Manager):
             tags=tags_string,
             table_name=table_name,
             data_base_path=data_base_path,
-            sync_file=sync_file)
+            sync_file=sync_file,
+            # jianguoyun_sync_file=jianguoyun_sync_file,
+            )
         return record_id
-    
+
     def insert_batch_records(
             self,
             user_id,
@@ -909,7 +965,7 @@ class DiaryDBManager(manager.Manager):
             records=records,
             table_name=table_name,
             data_base_path=data_base_path)
-    
+
     def update_log(self,
                    id,
                    user_id,
@@ -939,7 +995,7 @@ class DiaryDBManager(manager.Manager):
             table_name=table_name,
             data_base_path=data_base_path)
         return id
-    
+
     def get_log_by_id(self,
                       user_id,
                       id,
@@ -1000,13 +1056,15 @@ class DiaryDBManager(manager.Manager):
                                         columns=columns,
                                         data_base_path=data_base_path)
         return rows
-    
+
     def get_logs_by_filter(self,
                            user_id,
                            filter={},
                            columns=['content'],
                            order_by="create_time",
                            ascending=False,
+                           page_size=None,
+                           page_number=None,
                            data_base_path=SYNC_DATA_BASE_PATH
                            ):
         """get logs by filter
@@ -1025,6 +1083,8 @@ class DiaryDBManager(manager.Manager):
             columns=columns,
             order_by=order_by,
             ascending=ascending,
+            page_size=page_size,
+            page_number=page_number,
             table_name=table_name,
             data_base_path=data_base_path)
         return rows
@@ -1046,7 +1106,7 @@ class DiaryDBManager(manager.Manager):
             id=id,
             table_name=table_name,
             data_base_path=data_base_path)
-    
+
     def delete_records_not_in_list(
             self,
             user_id,
@@ -1066,14 +1126,14 @@ class DiaryDBManager(manager.Manager):
             field_name=field_name,
             values_to_keep=values_to_keep,
             data_base_path=data_base_path)
-    
+
     def delete_log_by_filters(
             self,
             user_id,
             filters,
             data_base_path=SYNC_DATA_BASE_PATH
             ):
-            
+
         table_name = self.driver.get_table_name_by_user_id(user_id)
         self.driver.delete_records_by_filters(
             table_name=table_name,
