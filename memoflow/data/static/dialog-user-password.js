@@ -6,13 +6,11 @@ import {
 
 $('body').on('click', '#close-password-edit, #cancel-password-info-edit', 
     function() {
-        // debugger;
         showoff_class("dialog-wrapper change-password-dialog showup")
 });
 
 
 $('body').on('click', '#save-password-info-edit', function() {
-    // debugger;
     // 获取具有特定 id 的输入元素
     let new_password_value =  $('#dialog-new-password').val();
     var repeat_password_value = $('#dialog-repeat-password').val();

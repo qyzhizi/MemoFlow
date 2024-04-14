@@ -1,5 +1,5 @@
 // 获取链接元素的引用
-// debugger; // 在此处设置断点
+  // 在此处设置断点
 var link = document.getElementById('github-bind');
 
 // 添加点击事件处理程序
@@ -35,8 +35,6 @@ function getGithubConfig() {
             var jsonResponse = JSON.parse(response);
             // 请求成功处理
             $('#gitRepPathInput').val(jsonResponse.gitRepPath);
-            // $('#gitCurrentSyncFileNameInput').val(jsonResponse.gitCurrentSyncFileName);
-            // $('#gitOtherSyncFileNameInput').val(jsonResponse.gitOtherSyncFileName);
         },
         error: xhr_process_error
     });
@@ -47,7 +45,6 @@ getGithubConfig();
 
 function xhr_process_error(xhr, status, error) {
     // 读取失败时返回的内容
-    // debugger;
     var statusCode = xhr.status;
     var errorMessage = xhr.responseText;
             
@@ -79,8 +76,6 @@ function xhr_process_error(xhr, status, error) {
 $('#github-save-changes-and-test-connection').click(function() {
     // 收集输入框的值
     var gitRepPath = $('#gitRepPathInput').val();
-    // var gitCurrentSyncFileName = $('#gitCurrentSyncFileNameInput').val();
-    // var gitOtherSyncFileName = $('#gitOtherSyncFileNameInput').val();
 
     // 创建要发送的数据对象
     var data = {
@@ -96,7 +91,6 @@ $('#github-save-changes-and-test-connection').click(function() {
         contentType: 'application/json',
         data: JSON.stringify(data),
         success: function(response) {
-            // debugger;
             var jsonResponse = JSON.parse(response);
             if (jsonResponse.success === 0) {
                 if (jsonResponse.bad_credentials_exception) {

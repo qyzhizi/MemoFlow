@@ -1,31 +1,26 @@
-import { set_user_name_and_avatar } from '/v1/diary-log/static/utils.js';
+import { addDivInnerHTMLToBodyContainer } 
+    from '/v1/diary-log/static/utils.js';
+import { navLoadAvatarAndSetUserName,
+    getNavSettingHtml
+} from '/v1/diary-log/static/setting/nav_setting.js';
+
 
 $(function() {
     localStorage.setItem('page_size', null);
     localStorage.setItem('page_number', null);
     // get logs
     getLogs()
-    // debugger;
-
-    // 先使用AJAX获取数据
-    $.get("/v1/diary-log/static/avatar.html", function(data) {
-        // 创建一个临时div来存放加载的HTML，以便查询特定元素
-        var tempDiv = $('<div>').html(data);
-
-        // 提取并移除 <style> 元素
-        var styles = tempDiv.find('style').text();
-        tempDiv.find('style').remove();
+     
+    //导入导航栏
+    getNavSettingHtml()
+    .then(html => {
+        addDivInnerHTMLToBodyContainer(
+            {doc_data: html, container_id: 'nav-container-root' })
         
-        // 将 <style> 内容添加到当前文档的 <head> 中
-        $('head').append('<style>' + styles + '</style>');
-
-        // 从加载的HTML中提取特定元素
-        var specificElement = tempDiv.find("#user-name-avatar");
-
-        // 将特定元素添加到#content的最前面
-        $("#nav-fixed-child").prepend(specificElement);
-
-        set_user_name_and_avatar('#user-name-avatar')
+        navLoadAvatarAndSetUserName()
+    })
+    .catch(error => {
+        console.error(error); // 错误处理
     });
 
 

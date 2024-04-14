@@ -9,7 +9,6 @@ function set_user_avatar(containerId){
         url: url,
         type: 'GET',
         success: function(response) {
-            // debugger;
             if (typeof response === 'string') {
                 // 如果response是字符串，尝试解析它
                 try {
@@ -65,7 +64,7 @@ async function set_user_info_in_dialog(
             url: url,
             type: 'GET'
         });
-        // debugger;
+         
         if (typeof response === 'string') {
             // 如果response是字符串，尝试解析它
             try {
@@ -128,13 +127,10 @@ function remove_dialog_avatar_flag_showup(){
         ).addClass('showup');
 };
 
-// $(function() {
-//     debugger;
     
 var display_id = 'dialog-avatar';
 $('body').on('change', '#dialog-avatar-input', 
     function(evt) {
-        // debugger;
         // var display_id = 'dialog-avatar';
         cropImage(evt).then(function(newImg) {
             // 在这里可以使用处理后的图片 newImg
@@ -154,7 +150,6 @@ $('body').on('click', '#cancel-account-info-edit, #close-account-info-edit',
 
 $('body').on('click', '#remove-dialog-avatar', 
     function() {
-        // debugger;
         let $div = $('body').find('#' + display_id);
         let $newImg = $('<img>').attr({
             src: "https://via.placeholder.com/150",
@@ -169,7 +164,6 @@ $('body').on('click', '#remove-dialog-avatar',
 $('body').on('click', '#save-account-info-edit', function() {
     var url = '/v1/diary-log/set-user-account-info';
     var dialog_avatar_id = '#' + 'dialog-avatar';
-    // debugger;
     // 获取具有特定 id 的输入元素
     var avatar_src_value = '';
     // 查找 id 为 "dialog-avatar" 的元素下的第一个 <img> 元素
@@ -232,17 +226,9 @@ $('body').on('click', '#save-account-info-edit', function() {
     });
 
 
-    //     // 这里可以进行其他需要在base64转换完成后执行的操作
-    // }).catch((error) => {
-    //     // 处理转换错误
-    //     console.error('转换为base64时出错：', error);
-    //     });
 
     
 });
 
-// $('body').on('click', '#save-account-info-edit', function() {
-
-// });
 
 export { set_user_avatar, set_user_info_in_dialog };

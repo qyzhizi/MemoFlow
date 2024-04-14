@@ -10,6 +10,7 @@
     <!-- 引入 KaTeX 脚本 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro">
+    <link rel="stylesheet" href="/v1/diary-log/static/avatar.css">
     <style>
         body {
             font-family: "Source Code Pro", "Courier New", "等线", Courier, monospace;
@@ -431,57 +432,7 @@
 
 <body>
     <div class="container">
-        <div class="nav-container">
-            <div id="nav-fixed-child" class="nav-fixed-child">
-
-                <!-- <div id="user-name-avatar" class="user-info cursor-pointer">
-                    <img src="https://via.placeholder.com/150" alt="Avatar">
-                    <span>UserName</span>
-                </div> -->
-                <div class="nav-items">
-                    <a id="header-home" class="nav-item" href="/v1/diary-log" aria-current="page">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="20" width="22.5" viewBox="0 0 576 512"><path fill="#ffffff" d="M575.8 255.5c0 18-15 32.1-32 32.1h-32l.7 160.2c0 2.7-.2 5.4-.5 8.1V472c0 22.1-17.9 40-40 40H456c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1H416 392c-22.1 0-40-17.9-40-40V448 384c0-17.7-14.3-32-32-32H256c-17.7 0-32 14.3-32 32v64 24c0 22.1-17.9 40-40 40H160 128.1c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2H104c-22.1 0-40-17.9-40-40V360c0-.9 0-1.9 .1-2.8V287.6H32c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z"/></svg> Home
-                    </a>
-
-                    <a id="header-search" class="nav-item" href="/v1/diary-log/vector-search" aria-current="page">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 512 512">
-                            <path fill="#ffffff"
-                                d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />
-                        </svg> VectorSearch
-                    </a>
-
-                    <a id="header-review" class="nav-item" href="/v1/diary-log/review" aria-current="page">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="20" width="22.5" viewBox="0 0 576 512">
-                            <path fill="#cbcfd5" d="M288 80c-65.2 0-118.8 29.6-159.9 67.7C89.6 183.5 63 226 49.4
-                             256c13.6 30 40.2 72.5 78.6 108.3C169.2 402.4 222.8 432 288 432s118.8-29.6 159.9-67.7C486.4
-                              328.5 513 286 526.6 256c-13.6-30-40.2-72.5-78.6-108.3C406.8 109.6 353.2 80 288 80zM95.4 
-                              112.6C142.5 68.8 207.2 32 288 32s145.5 36.8 192.6 80.6c46.8 43.5 78.1 95.4 93 131.1c3.3 
-                              7.9 3.3 16.7 0 24.6c-14.9 35.7-46.2 87.7-93 131.1C433.5 443.2 368.8 480 288 
-                              480s-145.5-36.8-192.6-80.6C48.6 356 17.3 304 2.5 268.3c-3.3-7.9-3.3-16.7 0-24.6C17.3 208 
-                              48.6 156 95.4 112.6zM288 336c44.2 0 80-35.8 80-80s-35.8-80-80-80c-.7 0-1.3 0-2 0c1.3 5.1 2 
-                              10.5 2 16c0 35.3-28.7 64-64 64c-5.5 0-10.9-.7-16-2c0 .7 0 1.3 0 2c0 44.2 35.8 80 80 80zm0-208a128
-                               128 0 1 1 0 256 128 128 0 1 1 0-256z" />
-                        </svg> Review</a>
-
-                    <a id="header-clipboard" class="nav-item" href="/v1/diary-log/clipboard" aria-current="page">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="20" width="15" viewBox="0 0 384 512">
-                            <path fill="#cbcfd5"
-                                d="M280 64h40c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128C0 92.7 28.7 64 64 64h40 9.6C121 27.5 153.3 0 192 0s71 27.5 78.4 64H280zM64 112c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16H320c8.8 0 16-7.2 16-16V128c0-8.8-7.2-16-16-16H304v24c0 13.3-10.7 24-24 24H192 104c-13.3 0-24-10.7-24-24V112H64zm128-8a24 24 0 1 0 0-48 24 24 0 1 0 0 48z" />
-                        </svg> Clipboard</a>
-
-                    <a id="header-setting" class="nav-item" href="/v1/diary-log/setting" aria-current="page"><svg
-                            xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="lucide-settings">
-                            <path stroke="#cbcfd5"
-                                d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z">
-                            </path>
-                            <circle stroke="#cbcfd5" cx="12" cy="12" r="3"></circle>
-                        </svg> Settings</a>
-                </div>
-
-
-            </div>
+        <div id="nav-container-root" class="nav-container">
 
         </div>
 
@@ -493,15 +444,6 @@
                         <button id="submit">commit</button>
                     </form>
 
-                    <!-- <div class="links"> -->
-                        <!-- <a href="review" style="font-size: 20px; color: #c9cdd1;">review</a> -->
-                        <!-- <a href="clipboard" style="font-size: 20px; color: #c9cdd1;">clipboard</a> -->
-                        <!-- <a href="vector-search" style="font-size: 20px; color: #c9cdd1;">vector_search</a> -->
-                        <!-- <a href="pasteboard" style="font-size: 30px;" >pasteboard</a> -->
-                    <!-- </div> -->
-
-                    <!-- <h3>Logs: </h3> -->
-                    <!-- <button id="delete_all" style="font-size: 20px;">删除所有</button> -->
                     <div id="logList" ;></div>
                     <div class="w-full flex flex-row justify-center items-center my-4 .w-min-zero">
                         <button id="click-more-log" class="flex click-more-button" type="button">点击此处获取更多

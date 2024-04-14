@@ -2,32 +2,17 @@ import { set_user_name_and_avatar, checkElementExistence,
     getUserNameAndAvatar
 } from '/v1/diary-log/static/utils.js';
 
-// account-info
-// 先使用AJAX获取数据
-// $.get("/v1/diary-log/static/avatar.html", function(data) {
-//     // 创建一个临时div来存放加载的HTML，以便查询特定元素
-//     var tempDiv = $('<div>').html(data);
+$(function() {
+    // 调用函数以获取并填充配置信息
+    getUserSyncFilesConfig();   
+});
 
-//     // 提取并移除 <style> 元素
-//     var styles = tempDiv.find('style').text();
-//     tempDiv.find('style').remove();
-    
-//     // 将 <style> 内容添加到当前文档的 <head> 中
-//     $('head').append('<style>' + styles + '</style>');
-
-//     // 从加载的HTML中提取特定元素
-//     var specificElement = tempDiv.find("#user-name-avatar");
-
-//     // 将特定元素添加到#content的最前面
-//     $("#account-info").prepend(specificElement);
-// });
 export function loadAvatarAndSetUserName(url){
     // 使用fetch API获取数据
     // fetch("/v1/diary-log/static/avatar.html")
     fetch(url)
     .then(response => response.text()) // 解析响应为文本
     .then(data => {
-        // debugger;
         // 创建一个临时div来存放加载的HTML，以便查询特定元素
         var tempDiv = document.createElement('div');
         tempDiv.innerHTML = data;
@@ -39,7 +24,6 @@ export function loadAvatarAndSetUserName(url){
         style.remove();
         });
 
-        // debugger;
         // 从加载的HTML中提取特定元素
         // var specificElement = tempDiv.querySelector("#user-name-avatar");
         var specificElement = tempDiv.querySelector(".user-info");
@@ -64,11 +48,8 @@ export function loadAvatarAndSetUserName(url){
 
 
 export function call_set_user_name_and_avatar(id){
-    // debugger;
     set_user_name_and_avatar(id)
 };
-
-
 
 
 // 发送GET请求以获取配置信息并填充输入框
@@ -90,13 +71,10 @@ function getUserSyncFilesConfig() {
         }
     });
 }
-
-// 调用函数以获取并填充配置信息
-getUserSyncFilesConfig();    
+ 
 
 function xhr_process_error(xhr, status, error) {
     // 读取失败时返回的内容
-    // debugger;
     var statusCode = xhr.status;
     var errorMessage = xhr.responseText;
             
@@ -153,7 +131,6 @@ $('#save-changes-button').click(function() {
                     alert("404 unknown_object_exception");
                 }
             }
-            // debugger;
             if (jsonResponse.success === 1) {
                 alert("Success");
             }
@@ -247,9 +224,7 @@ $('#edit-account-info').on('click', function(event) {
             // 将这个包含 specificElement 的 containerDiv 添加到 body 的最后
             document.body.appendChild(containerDiv);
         };
-        // debugger;
         if (container_exsit){
-            // debugger;
             $('.dialog-wrapper.update-account-dialog.showoff'
             ).removeClass('showoff').addClass('showup');
 
@@ -262,7 +237,6 @@ $('#edit-account-info').on('click', function(event) {
         import('/v1/diary-log/static/dialog-user-info.js')
         .then(module => {
             // 模块加载成功
-            // debugger;
             console.log('External account-setting-content.js loaded successfully');
             // module.set_user_avatar("#dialog-avatar")
             module.set_user_info_in_dialog(
@@ -285,20 +259,6 @@ $('#edit-account-info').on('click', function(event) {
 
 });
 
-// function checkElementExistence(element_id) {
-//     // 获取 id 的容器
-//     var container = document.getElementById(element_id);
-//     let container_exist = null;
-//     // 检查是否找到容器
-//     if (container !== null) {
-//         console.log('找到 id 为 "' + element_id + '" 的容器。');
-//         container_exist = true;
-//     } else {
-//         container_exist = false;
-//         console.log('未找到 id 为 "' + element_id + '" 的容器。');
-//     };
-//     return container_exist;
-// };
 
 function add_div_innerHTML_to_body(data){
     // 在这里执行容器不存在时的逻辑
@@ -338,7 +298,6 @@ function showoff_class(class_name){
 };
 
 $('#edit-password').on('click', function(event) {
-    // debugger;
     // 使用fetch API获取数据
     fetch("/v1/diary-log/static/dialog-user-password.html")
     .then(response => response.text()) // 解析响应为文本
@@ -356,7 +315,6 @@ $('#edit-password').on('click', function(event) {
         import('/v1/diary-log/static/dialog-user-password.js')
         .then(module => {
             // 模块加载成功
-            // debugger;
             console.log('External JavaScript dialog-user-password.js loaded successfully');
         
             // 这里可以添加你的事件监听器等其他 JavaScript 代码
