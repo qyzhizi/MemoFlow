@@ -7,25 +7,7 @@ import { navLoadAvatarAndSetUserName,
 
 
 $(function() {
-    $.get("/v1/diary-log/static/setting/setting_content.css", 
-        function(cssContent) {
-                                
-            // 创建一个 style 元素
-            var styleElement = $("<style></style>");
-        
-            // 将 CSS 文件内容添加到 style 元素中
-            styleElement.html(cssContent);
-        
-            // 将 style 元素添加到 head 中
-            $("head").append(styleElement);
-            console.log(
-                'External setting_content css file loaded successfully');
-        }
-    );
-
-
     //导入导航栏
-     
     getNavSettingHtml()
     .then(html => {
         addDivInnerHTMLToBodyContainer(
@@ -36,7 +18,6 @@ $(function() {
     .catch(error => {
         console.error(error); // 错误处理
     });
-    
 
     // 使用 $() 函数获取元素
     var MainSettingContentContainer = $('#main-setting-content');
@@ -53,7 +34,6 @@ $(function() {
             return; // 不执行后续步骤
         }
     
-    
         // 创建 XMLHttpRequest 对象
         var xhr = new XMLHttpRequest();
         if (containerId === 'github-setting-content') {
@@ -67,7 +47,6 @@ $(function() {
             xhr.open('GET', 
             '/v1/diary-log/static/setting/account_setting_content.html', true);
         }
-        
     
         // 定义请求完成时的处理函数
         xhr.onload = function() {
@@ -143,19 +122,13 @@ $(function() {
     // github setting content listener click
     $('.nav-setting-opt').on('click', function(event) {
 
-
         // 获取对应的容器元素的id
         var targetId = $(this).data("target");
 
         switchContainer(targetId);
-
     
         // 隐藏其他容器元素，显示对应的容器元素
         // $("#" + targetId).show().siblings(".setting-content").hide();
     });
 
 })
-
-
-
-

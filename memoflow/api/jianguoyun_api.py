@@ -1,5 +1,6 @@
 # coding=utf-8
 from collections import OrderedDict
+import logging
 import io
 import os
 from webdav4.client import Client
@@ -18,7 +19,7 @@ from typing import (
 jianguoyun_clients = {}
 JIANGUOYUN_BASE_URL = CONF.api_conf.base_url
 JIANGUOYUN_PREFIX =  CONF.api_conf.jianguoyun_prefix
-
+LOG = logging.getLogger(__name__)
 
 class JianGuoYunClient(object):
 
@@ -39,6 +40,7 @@ class JianGuoYunClient(object):
             dir_processed = os.path.join(dir_processed, dir_path)
             if not self.client.exists(dir_processed):
                 self.client.mkdir(dir_processed)
+                LOG.info(f"JianGuoYunClient.process_path mkdir : {dir_processed}")
         return os.path.join(dir_processed, filename)
 
     # def process_path(self, path):
@@ -104,8 +106,8 @@ class JianGuoYunClient(object):
         for path in paths:
             if not path:
                 continue
-            path = self.process_path(path)
-            content = self.get_file_content(path, encoding)
+            full_path = self.process_path(path)
+            content = self.get_file_content(full_path, encoding)
             if content:
                 contents[path] = content
         return contents

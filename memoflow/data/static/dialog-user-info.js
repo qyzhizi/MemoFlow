@@ -213,7 +213,8 @@ $('body').on('click', '#save-account-info-edit', function() {
             console.log('上传成功');
             // 在这里处理上传成功后的操作
             dialog_wrapper_showoff()
-            set_user_name_and_avatar('#user-name-avatar')
+            set_user_name_and_avatar('account-info')
+            set_user_name_and_avatar('nav-fixed-child')
             // .then(() => alert('Success!'))
             .then(() => showNotification('Success!'))
             .catch(error => console.error("操作失败", error));

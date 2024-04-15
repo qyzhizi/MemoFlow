@@ -1,39 +1,8 @@
-body {
-    font-family: "Source Code Pro", "Courier New", "等线", Courier, monospace;
-    padding: 10px;
-    /* background-color: #333; */
-    background-color: rgb(24, 24, 27);
-    color: #cbcfd5;
-}
-
-html,
-body {
-    margin: 0;
-    padding: 0;
-    font-size: 16px;
-    /* 设置根元素的字体大小为16像素 */
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    border-radius: 6px;
-}
-
-.container {
-    display: flex;
-    height: 100%;
-    min-height: 100vh;
-    position: relative;
-    /* overflow-x: hidden; 隐藏水平溢出 */
-}
-
 .nav-container {
     flex: 0 0 200px;
     /* 设置左边容器的固定宽度为200像素 */
     background-color: rgb(29, 29, 32);
 }
-
 .nav-fixed-child {
     position: fixed;
     top: 30px;
@@ -45,12 +14,10 @@ body {
     /* 继承父容器的宽度 */
     background-color: inherit;
     /* 继承父容器的背景颜色 */
-    z-index: 1000;
+    /* z-index: 1000; */
     /* 可以根据需要调整 z-index */
     /* 其他样式 */
 }
-
-
 .nav-items {
     background-color: inherit;
     margin-top: 10px;
@@ -58,7 +25,6 @@ body {
     flex-direction: column;
 
 }
-
 .nav-item {
     padding: 10px;
     display: flex;
@@ -72,85 +38,26 @@ body {
     border-radius: 10px;
     width: 100%;
 
-}
+    text-decoration: none;
+    border: 1px;
+    color: #DDE7EE;
+    cursor: pointer;
+    margin-top: 10px;
 
+}
+.nav-item:hover {
+    /* color: yellow;  */
+    /* 设置鼠标悬停时超链接的颜色
+    /* text-decoration: underline; */
+    /* 添加下划线效果 */
+    background-color: rgb(23, 26, 28);
+    /* background-color: rgb(41, 144, 59); */
+    
+}        
 .action {
     margin-top: 40px;
     width: 100%;
     display: flex;
-}
-
-/* #pull {
-    align-self: flex-end;
-    font-size: 20px;
-    color: #cbcfd5;
-    background-color: rgb(39, 39, 42);
-    height: 40px;
-    width: 100%;
-} */
-
-.contents-container {
-    flex: 1;
-    /* 让容器占据剩余空间 */
-    width: 100%;
-    min-width: 0;
-    transition: width 0.5s;
-    position: relative;
-    /* 让容器成为相对定位的父元素 */
-    display: flex;
-    /* 设置容器内部为弹性布局 */
-    align-items: stretch;
-    /* 将子元素在交叉轴上拉伸以填充整个容器的高度 */
-}
-
-.section-container {
-    padding-top: 30px;
-    padding-bottom: 60px;
-    display: flex;
-    justify-content: center;
-    /* 水平居中 */
-    width: 100%;
-    min-width: 0;
-    /* 设置最大宽度为150ch */
-    height: 100%;
-    align-items: stretch;
-    /* 将子元素在交叉轴上拉伸以填充整个容器的高度 */
-}
-
-.section2 {
-    padding-left: 40px;
-    padding-right: 40px;
-    display: flex;
-    width: 100%;
-    max-width: 100ch;
-    height: 100%;
-    min-width: 0;
-    transition: width 0.5s;
-    align-items: stretch;
-    /* 将子元素在交叉轴上拉伸以填充整个容器的高度 */
-}
-
-.setting-container {
-    padding-top: 1ch;
-    padding-bottom: 1ch;
-    padding-left: 1ch;
-    padding-right: 1ch;
-    display: flex;
-    /* 可选：设置列之间的间距 */
-    grid-gap: 10px; 
-
-    flex: 1;
-    width: 100%;
-    min-width: 0;
-    /* max-width: 100ch; */
-    background-color: rgb(39, 39, 42);
-    transition: width 0.5s;
-    align-items: stretch;
-    /* 将子元素在交叉轴上拉伸以填充整个容器的高度 */
-}
-.text-gray-600{
-    --tw-text-opacity: 1;
-    color: rgb(156 163 175 / var(--tw-text-opacity));
 }
 
 .nav-setting{
@@ -167,27 +74,8 @@ body {
     gap: 3px;
     cursor:pointer;
 }
-
-/* 媒体查询 */
-@media (max-width: 110ch) {
-
-    .nav-container {
-        display: none;
-        /* 在小屏幕下隐藏导航容器 */
-    }
-}
-
-.flex{
-    display: flex;
-}
-.flex-row{
-    flex-direction: row;
-}
 .flex-column{
     flex-direction: column;
-}
-.items-center{
-    align-items: center;
 }
 .justify-content-center{
     justify-content: center;
@@ -195,12 +83,6 @@ body {
 /* justify-content: space-evenly */
 .justify-content-space_evenly{
     justify-content: space-evenly
-}
-.w-auto{
-    width: auto;
-}
-.w-full{
-    width: 100%;
 }
 .text-sm{
     font-size: .875rem;
@@ -212,34 +94,3 @@ body {
     --tw-text-opacity: 1;
     color: rgb(107 114 128 / var(--tw-text-opacity));
 }
-/* 设置超链接的默认样式 */
-a {
-    text-decoration: none;
-    /* 去除超链接的下划线 */
-    display: inline-block;
-    padding: 5px 5px;
-    /* background-color: rgb(29, 29, 32); */
-    /* background-color: transparent; */
-    background-color: rgb(35, 134, 54);
-    border: 1px;
-    border-style: solid;
-    border-color: #32383E;
-    /* color: white; */
-    color: #DDE7EE;
-    text-decoration: none;
-    /* border: none; */
-    /* border-radius: 4px; */
-    cursor: pointer;
-    width: fit-content;
-    margin-top: 10px;
-}
-/* 设置超链接的:hover伪类样式，当鼠标悬停在超链接上时的样式 */
-a:hover {
-    /* color: yellow;  */
-    /* 设置鼠标悬停时超链接的颜色
-    /* text-decoration: underline; */
-    /* 添加下划线效果 */
-    background-color: rgb(23, 26, 28);
-    /* background-color: rgb(41, 144, 59); */
-    
-}        

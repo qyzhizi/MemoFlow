@@ -78,7 +78,7 @@ a:hover {
 
 /* Button Styles */
 button {
-    background-color: rgb(11, 107, 203);
+    /* background-color: rgb(11, 107, 203); */
     color: white;
     padding: 10px 20px;
     border: none;

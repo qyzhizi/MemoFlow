@@ -114,6 +114,8 @@ class ChromeDBCollectionHttpDriver(object):
         Returns:
             List[str]: List of IDs of the added texts.
         """
+        if not texts:
+            return
         if ids is None:
             ids = [str(uuid.uuid1()) for _ in texts]
         embeddings = None
@@ -182,6 +184,8 @@ class ChromeDBCollectionHttpDriver(object):
         Returns:
             List[str]: List of IDs of the updated texts.
         """
+        if not texts:
+            return
         if ids is None:
             raise ValueError("ids must be specified for update_texts")
         if len(ids) != len(texts):

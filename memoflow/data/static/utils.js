@@ -21,7 +21,7 @@ async function set_user_name_and_avatar(containerId) {
         var username = response.username;
         var base64Data = response.avatar_image;
         // 使用jQuery选择器获取div元素
-        let $div = $(containerId);
+        let $div = $("#" + containerId).find('.user-info').first();;
 
         let $newSpan, $newImg;
 

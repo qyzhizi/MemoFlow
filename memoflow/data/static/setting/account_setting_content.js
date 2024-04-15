@@ -46,12 +46,6 @@ export function loadAvatarAndSetUserName(url){
 };
 
 
-
-export function call_set_user_name_and_avatar(id){
-    set_user_name_and_avatar(id)
-};
-
-
 // 发送GET请求以获取配置信息并填充输入框
 function getUserSyncFilesConfig() {
     $.ajax({

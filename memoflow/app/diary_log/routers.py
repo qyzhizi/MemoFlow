@@ -10,6 +10,10 @@ class Router(wsgi.ComposableRouter):
                        controller=diary_log_controller,
                        action='login',
                        conditions=dict(method=['POST']))
+        mapper.connect('/diary-log/logout',
+                       controller=diary_log_controller,
+                       action='logout',
+                       conditions=dict(method=['GET']))
         mapper.connect('/diary-log/register',
                        controller=diary_log_controller,
                        action='register',

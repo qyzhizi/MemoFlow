@@ -57,6 +57,8 @@ def celery_update_file_to_github(token, repo, file_path, added_content,
     # if github_api_instance.get(repo, None) is None:
     #     github_api_instance[repo] = github_api.GitHupApi(token=token, repo=repo)
     # my_api_instance = github_api_instance[repo]
+    if file_path.startswith('/'):
+        file_path = file_path[1:]
     my_api_instance = github_api.GitHupApi(token=token, repo=repo)
     my_api_instance.update_file(file_path=file_path,
                                 added_content=added_content,
@@ -70,6 +72,8 @@ def celery_push_updatedfile_to_github(token, repo, file_path, updated_content,
     # if github_api_instance.get(repo, None) is None:
     #     github_api_instance[repo] = github_api.GitHupApi(token=token, repo=repo)
     # my_api_instance = github_api_instance[repo]
+    if file_path.startswith('/'):
+        file_path = file_path[1:]
     my_api_instance = github_api.GitHupApi(token=token, repo=repo)
     my_api_instance.update_file(file_path=file_path,
                                 updated_content=updated_content,
@@ -104,8 +108,7 @@ def celery_push_updatedfile_to_jianguoyun(acount: str, token: str,
         token=token,
         acount=acount)
     to_path = my_client.process_path(to_path)
-    if my_client.client.exists(to_path):
-        my_client.update_whole_file(updated_content=content, file_path=to_path)
+    my_client.update_whole_file(updated_content=content, file_path=to_path)
 
 
 @celery.task

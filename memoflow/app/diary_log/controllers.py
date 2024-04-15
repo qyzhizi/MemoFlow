@@ -13,8 +13,6 @@ from webob import exc
 from github.GithubException import UnknownObjectException
 from github.GithubException import BadCredentialsException
 
-# import time
-
 from memoflow.conf import CONF
 from memoflow.core import wsgi
 from memoflow.core import dependency
@@ -139,8 +137,32 @@ class DiaryLog(wsgi.Application):
             response.set_cookie('Authorization', 'Bearer ' + token)
 
             return response
+        else:
+            raise VisibleException(
+                f"User: {username} not exist or Password not correct!")
 
         return response
+    
+    def logout(self, req):
+        ''' 清除用户身份验证信息并注销会话 '''
+        # 获取请求中的 Cookie
+        cookies = req.cookies
+
+        # 检查是否存在名为 "Authorization" 的 Cookie
+        if 'Authorization' in cookies:
+            # 创建响应对象
+            response = Response()
+
+            # 清除名为 "Authorization" 的 Cookie
+            response.delete_cookie('Authorization')
+
+            # 可选：将用户从任何其他会话数据中注销，如数据库中的活动会话表
+
+            # 返回注销成功的响应
+            return response
+        else:
+            # 如果用户尚未登录，返回错误响应
+            return Response("User not logged in", status=401)
     
     # @token_required
     # def set_user_avatar(self, req):
@@ -425,14 +447,17 @@ class DiaryLog(wsgi.Application):
             where=where,
         )
 
+        res = self.diary_db_api.delete_log(user_id=user_id, id=record_id)
+        if res:
+            LOG.info(f"delete diary log success, id: {record_id}")
+
         user_settings = self.diary_db_api.get_user_settings(user_id)
+        updated_contents = None
         # 向github仓库（logseq 笔记软件）发送更新后的数据
         if user_settings.get('SEND_TO_GITHUB', None) == True:
-
             # file_path = CONF.diary_log['GITHUB_CURRENT_SYNC_FILE_PATH']
             github_access_info = self.get_access_token_by_user_id(
                 user_id=user_id)
-            
             # default order_by create_time DESC descending sort
             rows = self.diary_db_api.get_logs_by_filter(
                 user_id=user_id,
@@ -442,7 +467,7 @@ class DiaryLog(wsgi.Application):
                 ascending=False
             )
             updated_contents = [row[0] for row in rows]
-            updated_content = "\n".join(updated_contents)
+            updated_contents = "\n".join(updated_contents)
 
             file_path = sync_file
             commit_message = "commit by memoflow"
@@ -453,7 +478,7 @@ class DiaryLog(wsgi.Application):
             # repo = CONF.diary_log['GITHUB_REPO']
 
             self.asyn_task_api.celery_push_updatedfile_to_github(
-                token, repo, file_path, updated_content, commit_message,
+                token, repo, file_path, updated_contents, commit_message,
                 branch_name)
             
         if user_settings.get('SEND_TO_JIANGUOYUN', None) == True:
@@ -462,7 +487,7 @@ class DiaryLog(wsgi.Application):
                 user_id=user_id)
             # jianguoyun_sync_file = jianguoyun_access_data['current_sync_file']
             if user_settings.get('SEND_TO_GITHUB', None) != True \
-                or not updated_content:
+                or not updated_contents:
                 rows = self.diary_db_api.get_logs_by_filter(
                     user_id=user_id,
                     filter={"sync_file": sync_file},
@@ -472,16 +497,16 @@ class DiaryLog(wsgi.Application):
                 )
                 updated_contents = [row[0] for row in rows]
                 updated_contents.reverse()
-                updated_content = "\n".join(updated_contents)
+                updated_contents = "\n".join(updated_contents)
             self.asyn_task_api.celery_push_updatedfile_to_jianguoyun(
                 acount=jianguoyun_access_data['jianguoyun_account'],
                 token=jianguoyun_access_data['jianguoyun_token'],
                 to_path=sync_file,
-                content=updated_content)
+                content=updated_contents)
 
-        res = self.diary_db_api.delete_log(user_id=user_id, id=record_id)
-        if res:
-            LOG.info(f"delete diary log success, id: {record_id}")
+        # res = self.diary_db_api.delete_log(user_id=user_id, id=record_id)
+        # if res:
+        #     LOG.info(f"delete diary log success, id: {record_id}")
 
     def delete_all_log(self, req):
         return self.diary_db_api.delete_all_log()
