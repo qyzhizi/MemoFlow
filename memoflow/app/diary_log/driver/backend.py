@@ -113,6 +113,7 @@ class DiaryLogDriver(object):
             acount=jianguoyun_account)
 
         for sync_file_path in all_sync_files:
+            sync_file_path = my_client.process_path(sync_file_path)
             my_client.upload_content_to_new_file(
                 content='',
                 to_path=sync_file_path)

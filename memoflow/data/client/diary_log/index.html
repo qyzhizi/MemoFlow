@@ -4,6 +4,7 @@
 <head>
     <title>MemoFlow</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- 引入 KaTeX 样式 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css">
@@ -25,10 +26,17 @@
         <div class="contents-container">
             <div class="section-container">
                 <div class="diary-container">
-                    <form>
+                    <!-- <form>
                         <textarea id="log" name="log"></textarea>
                         <button id="submit">commit</button>
-                    </form>
+                    </form> -->
+                    <div class="mb-2 relative w-full flex flex-col justify-start items-start bg-white dark:bg-zinc-800 px-4 pt-4 rounded-lg border border-gray-200 dark:border-zinc-700" tabindex="0">
+                        <div class="flex flex-col justify-start items-start relative w-full h-auto bg-inherit dark:text-gray-300">
+                            <textarea id="log" name="log" class="w-full h-full max-h-[300px] my-1 text-base resize-none overflow-x-hidden overflow-y-auto bg-transparent outline-none whitespace-pre-wrap word-break" rows="1" placeholder="any things ..." style="height: 0px;"></textarea>
+                            <button id="submit">commit</button>
+                        </div>
+
+                    </div>
 
                     <div id="logList" ;></div>
                     <div class="w-full flex flex-row justify-center items-center my-4 .w-min-zero">
@@ -41,7 +49,7 @@
                         <div class="modal-content">
                             <span class="close">&times;</span>
                             <!-- <h3>Edit Log Entry</h3> -->
-                            <textarea id="editLog"></textarea>
+                            <textarea id="editLog" class="w-full h-full max-h-[600px] my-1 text-base resize-none overflow-x-hidden overflow-y-auto bg-transparent outline-none whitespace-pre-wrap word-break" rows="1" placeholder="any things ..." style="height: 300px;"></textarea>
                             <hr class="hr_2">
                             <!-- <button id="saveChangesBtn">Save</button> -->
 

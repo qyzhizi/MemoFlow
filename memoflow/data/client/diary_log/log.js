@@ -12,6 +12,21 @@ if (function() { return !this; }()) {
 
 
 $(function() {
+    const log_textarea = document.getElementById('log');
+    const edit_textarea = document.getElementById('editLog');
+    // 绑定 input 事件监听器，以便在输入时调整高度
+    // log_textarea.addEventListener('input', autoResize);
+    log_textarea.addEventListener('input', function(event) {
+        autoResize('log');
+    });
+    // edit_textarea.addEventListener('input', autoResize);
+    edit_textarea.addEventListener('input', function(event) {
+        autoResize('editLog');
+    });
+    // debugger;
+    autoResize('log')
+    // autoResize('editLog')
+
     localStorage.setItem('page_size', null);
     localStorage.setItem('page_number', null);
     // get logs
@@ -83,6 +98,17 @@ $(function() {
     });
 
 });
+
+
+function autoResize(textarea_id) {
+    // debugger;
+    const textarea = document.getElementById(textarea_id);
+    // 设置高度为 auto，以获取正确的 scrollHeight
+    textarea.style.height = 'auto';
+    // 设置高度为 scrollHeight，可能需要加上边框的高度（如果有的话）
+    textarea.style.height = `${textarea.scrollHeight}px`;
+}
+
 
 
 function addLogEntry(logText, record_id, reverse=true) {
@@ -457,6 +483,7 @@ saveChangesBtn.onclick = function() {
 
 
 function editLogEntry(pre, record_id) {
+    
     // 获取编辑框元素
     var modal = document.getElementById('editLogModal');
 
@@ -565,6 +592,8 @@ function editLogEntry(pre, record_id) {
     var pre_text = getOriginTextFromPre(pre);
     pre_text = restoreLatexFromRendered(pre)
     editLog.value = removeLogseqMatches(pre_text);
+    // debugger;
+    autoResize('editLog')
 }
 
 // 删除日志条目函数

@@ -790,6 +790,10 @@ img,video {
     max-height: 300px
 }
 
+.max-h-\[600px\] {
+    max-height: 600px
+}
+
 .max-h-screen {
     max-height: 100vh
 }

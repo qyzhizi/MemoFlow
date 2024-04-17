@@ -68,11 +68,7 @@ a:hover {
     max-width: 100%;
 }
 
-.nav-container {
-    flex: 0 0 200px;
-    /* 设置左边容器的固定宽度为200像素 */
-    background-color: rgb(29, 29, 32);
-}
+
 .action {
     margin-top: 40px;
     width: 100%;
@@ -116,16 +112,28 @@ a:hover {
     flex: 0 0 200px;
     /* 设置tags容器的固定宽度为200像素 */
     background-color: rgb(24, 24, 27);
+    display:none
+}
+
+.nav-container {
+    flex: 0 0 200px;
+    /* 设置左边容器的固定宽度为200像素 */
+    background-color: rgb(29, 29, 32);
+    display: none;
 }
 
 /* 媒体查询 */
-@media (max-width: 110ch) {
+@media (min-width: 825px) {
+    html,body{
+        font-size: 16px;
+    }
+
     .tags-container {
-        display: none;
+        display: block;
     }
 
     .nav-container {
-        display: none;
+        display: block;
         /* 在小屏幕下隐藏导航容器 */
     }
 }
@@ -138,10 +146,10 @@ form {
     flex-direction: column;
 }
 
-textarea:focus {
+textarea_old:focus {
     outline: none;
 }
-textarea {
+textarea_old {
     width: 100%;
     height: 50vh;
     /* 设置高度 */
@@ -185,7 +193,7 @@ pre {
     margin-bottom: 10px;
     /* 设置下边距为 10 像素 */
     width: 100%;
-    font-size: 20px;
+    font-size: 1rem;
     border: 0px solid hsl(0, 0%, 0%);
     /* 设置边框样式 */
     /* margin: 0 auto 10px; 设置外边距 */
@@ -201,9 +209,6 @@ pre {
     /* background-color: #27272A; */
 }
 
-#log {
-    font-size: 20px;
-}
 
 #submit {
     align-self: flex-end;
