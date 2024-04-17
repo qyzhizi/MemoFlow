@@ -210,12 +210,6 @@ pre {
 }
 
 
-#submit {
-    align-self: flex-end;
-    font-size: 20px;
-    color: #cbcfd5;
-    background-color: rgb(39, 39, 42);
-}
 
 
 .log-entry-container {
@@ -302,8 +296,8 @@ pre {
     border: none;
     background-color: rgba(159 166 173 /0.16);
     block-size: 1.5px;
-    margin-top: 0.2rem !important;
-    margin-bottom: 0.5rem !important;
+    /* margin-top: 0.2rem !important;
+    margin-bottom: 0.2rem !important; */
 }
 
 .close {
@@ -330,13 +324,19 @@ button {
     border: none;
     cursor: pointer;
 }
-#saveChangesBtn{
+.css-button-save{
     background-color: rgb(11, 107, 203);
     line-height: 0.5rem;
+    padding-inline: 0.75rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+.css-button-save:hover{
+    background-color: rgb(24, 94, 165);
 }
 
 button:hover {
-    background-color: #316c34;
+    background-color: rgb(24, 94, 165);
 }
 .click-more-button{
     --joy-fontSize-sm: 0.875rem;
