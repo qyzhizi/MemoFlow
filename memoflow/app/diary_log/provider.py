@@ -1057,9 +1057,9 @@ class DiaryDBManager(manager.Manager):
                                         data_base_path=data_base_path)
         return rows
 
-    def get_logs_by_filter(self,
+    def get_logs_by_filters(self,
                            user_id,
-                           filter={},
+                           filters={},
                            columns=['content'],
                            order_by="create_time",
                            ascending=False,
@@ -1078,8 +1078,8 @@ class DiaryDBManager(manager.Manager):
             string: json string
         """
         table_name = self.driver.get_table_name_by_user_id(user_id)
-        rows = self.driver.get_logs_by_filter(
-            filter=filter,
+        rows = self.driver.get_logs_by_filters(
+            filters=filters,
             columns=columns,
             order_by=order_by,
             ascending=ascending,

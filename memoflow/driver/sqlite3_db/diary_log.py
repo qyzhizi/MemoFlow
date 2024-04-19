@@ -12,6 +12,8 @@ USER_TABLE_NAME = CONF.diary_log['USER_TABLE_NAME']
 SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
 
 class DBSqliteDriver(object):
+    safe_table_names = []
+    safe_table_columns = set()
     @classmethod
     def init_db_diary_log(cls, data_base_path):
         # 初始化数据库
@@ -23,21 +25,44 @@ class DBSqliteDriver(object):
             os.makedirs(dir_path)
 
     @classmethod
+    def create_table(cls, conn, table_name, table_columns):
+        """Create the table based on the columns defined in table_columns."""
+        columns_sql = ", ".join([" ".join(column) for column in table_columns])
+        table_creation_sql = \
+            f"CREATE TABLE IF NOT EXISTS {table_name} ({columns_sql})"
+        
+        try:
+            c = conn.cursor()
+            c.execute(table_creation_sql)
+        except sqlite3.Error as e:
+            LOG.error("Error creating table %s: %s", table_name, e)
+            raise
+    
+    @classmethod
+    def initialize_table(cls, database_path, table_name, table_columns):
+        """Initialize the table by creating it if it doesn't exist."""
+        LOG.info("Initializing table in database: %s", database_path)
+        try:
+            with sqlite3.connect(database_path) as conn:
+                cls.create_table(conn, table_name, table_columns)
+            LOG.info("Table %s created or already exists.", table_name)
+        except sqlite3.Error as e:
+            LOG.error("Failed to initialize table %s: %s", table_name, e)
+    
+    @classmethod
     def create_diary_log_table(cls, data_base_path, table_name):
         """Create table."""
         LOG.info("Initializing database path: %s", data_base_path)
-        with sqlite3.connect(data_base_path) as conn:
-            c = conn.cursor()
-            c.execute(
-                f"CREATE TABLE IF NOT EXISTS {table_name} "
-                f"(id CHAR(36) PRIMARY KEY, "
-                f"content TEXT, "
-                f"tags TEXT, "
-                f"sync_file VARCHAR(512), "
-                # f"jianguoyun_sync_file VARCHAR(512), "
-                f"update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
-                f"create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
-            )
+        
+        table_columns = [
+            ('id', 'CHAR(36) PRIMARY KEY'),
+            ('content', 'TEXT'),
+            ('tags', 'TEXT'),
+            ('sync_file', 'VARCHAR(512)'),
+            ('update_time', 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP'),
+            ('create_time', 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
+        ]
+        cls.initialize_table(data_base_path, table_name, table_columns)
         LOG.info("Table created successfully: %s", table_name)
     
     @classmethod
@@ -413,6 +438,27 @@ class DBSqliteDriver(object):
                 return {}
 
     @classmethod
+    def search_content_by_string(
+        cls, data_base_path, table_name, search_string):
+        """Search for records where content contains a specific string."""
+        LOG.info("Searching for records containing: %s", search_string)
+        with sqlite3.connect(data_base_path) as conn:
+            c = conn.cursor()
+            # 使用参数化查询来防止SQL注入
+            query = f"SELECT * FROM {table_name} WHERE content LIKE ?"
+            c.execute(query, (f"%{search_string}%",))
+            results = c.fetchall()
+
+        if results:
+            LOG.info("Found %d records containing the string: %s", 
+                     len(results), search_string)
+        else:
+            LOG.info("No records found containing the string: %s", 
+                     search_string)
+
+        return results
+
+    @classmethod
     def delete_record_by_filters(
         cls, filters:dict, data_base_path: str, table_name: str):
         with sqlite3.connect(data_base_path) as conn:
@@ -475,52 +521,73 @@ class DBSqliteDriver(object):
             return None
 
     @classmethod
-    def get_logs_by_filter(cls,
-            filter, columns, table_name, data_base_path,
+    def get_logs_by_filters(cls,
+            filters, columns, table_name, data_base_path,
             order_by="create_time", ascending=False,
             page_size=None, page_number=None):
-        """get logs by filter with pagination
+        """get logs by filters with pagination
 
         Args:
             table_name (string): _description_
-            filter (dict): {key: value}
+            filters (dict): {key: value}
             columns (tuple or list): (content, tags)
-            order_by (string, optional): Column name to order by. Defaults to "create_time".
-            ascending (bool, optional): Whether to sort in ascending order. Defaults to False (descending).
+            order_by (string, optional): Column name to order by.
+                Defaults to "create_time".
+            ascending (bool, optional): Whether to sort in ascending order.
+                Defaults to False (descending).
             page_size (int, optional): Number of records to display per page.
             page_number (int, optional): Page number to retrieve.
 
         Returns:
             list: [[content1, tags1], [content2, tags2], ...]
         """
+        # # 校验列名
+        # for column in columns:
+        #     if column not in cls.safe_table_columns:
+        #         raise ValueError(f"Unsafe column name: {column}")
+        # # 校验表名
+        # if table_name not in cls.safe_table_names:
+        #     raise ValueError(f"Unsafe table name: {table_name}")
+        
+        # # Construct SQL query
+        if filters:
+            condition_clause = []
+            for key, value in filters.items():
+                # # 校验列名是否安全 最好是本表的列名
+                # if key not in cls.safe_table_columns:
+                #     raise ValueError(
+                #         f"Unsafe column name in filters: {key}")
+                        
+                if "%" in value:
+                    condition_clause.append(f"{key} LIKE ?")
+                else:
+                    condition_clause.append(f"{key} = ?")
+            conditions = ' AND '.join(condition_clause)
+            query = \
+                f"SELECT {', '.join(columns)} FROM {table_name} WHERE {conditions}"
+            parameters = tuple(filters.values())
+        else:
+            query = f"SELECT {', '.join(columns)} FROM {table_name}"
+            parameters = ()
+
+        # Add ORDER BY clause if order_by is provided
+        if order_by:
+            order_direction = "ASC" if ascending else "DESC"
+            query += f" ORDER BY {order_by} {order_direction}"
+
+        # Add pagination if page_size and page_number are provided
+        if page_size and page_number:
+            offset = (page_number - 1) * page_size
+            query += f" LIMIT {page_size} OFFSET {offset}"
+
         try:
             with sqlite3.connect(data_base_path) as conn:
+                conn.row_factory = sqlite3.Row  # 设置行格式为字典
                 c = conn.cursor()
-
-                # Construct SQL query
-                if filter:
-                    condition_clause = ' AND '.join([f"{key} = ?" for key in filter.keys()])
-                    query = f"SELECT {', '.join(columns)} FROM {table_name} WHERE {condition_clause}"
-                else:
-                    query = f"SELECT {', '.join(columns)} FROM {table_name}"
-
-                # Add ORDER BY clause if order_by is provided
-                if order_by:
-                    order_direction = "ASC" if ascending else "DESC"
-                    query += f" ORDER BY {order_by} {order_direction}"
-
-                # Add pagination if page_size and page_number are provided
-                if page_size and page_number:
-                    offset = (page_number - 1) * page_size
-                    query += f" LIMIT {page_size} OFFSET {offset}"
-
                 # Execute query
-                if filter:
-                    rows = c.execute(query, tuple(filter.values())).fetchall()
-                else:
-                    rows = c.execute(query).fetchall()
+                rows = c.execute(query, parameters).fetchall()
 
-                return rows
+                return [dict(row) for row in rows]
         except Exception as e:
             LOG.error(f"An error occurred: {str(e)}")
             return None
@@ -588,7 +655,7 @@ class DBSqliteDriver(object):
     
     @classmethod
     def delete_records_by_filters(cls, data_base_path, table_name, filters):
-        """Delete records based on multiple filter conditions."""
+        """Delete records based on multiple filters conditions."""
         with sqlite3.connect(data_base_path) as conn:
             c = conn.cursor()
 

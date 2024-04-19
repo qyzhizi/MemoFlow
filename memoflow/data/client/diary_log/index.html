@@ -23,14 +23,16 @@
     <div class="container">
         <div id="nav-container-root" class="nav-container"> </div>
 
-        <div class="contents-container">
-            <div class="section-container">
+        <!-- <div class="contents-container"> -->
+        <div class="min-w-0 w-full h-auto flex-grow shrink flex justify-start items-center flex-col">
+            <!-- <div class="section-container"> -->
+            <div class=" w-full flex flex-row justify-start items-start px-1 sm:px-4 gap-1">
                 <div class="diary-container">
                     <!-- <form>
                         <textarea id="log" name="log"></textarea>
                         <button id="submit">commit</button>
                     </form> -->
-                    <div class="mb-2 relative w-full flex flex-col justify-start items-start bg-white dark:bg-zinc-800 px-4 pt-4 rounded-lg border border-gray-200 dark:border-zinc-700" tabindex="0">
+                    <div class="mb-2 relative w-full flex flex-col justify-start items-start bg-white dark:bg-zinc-800 px-1 pt-2 rounded-lg border border-gray-200 dark:border-zinc-700" tabindex="0">
                         <div class="flex flex-col justify-start items-start relative w-full h-auto bg-inherit dark:text-gray-300">
                             <textarea id="log" name="log" class="w-full h-full max-h-[300px] my-1 text-base resize-none overflow-x-hidden overflow-y-auto bg-transparent outline-none whitespace-pre-wrap word-break" rows="1" placeholder="any things ..." style="height: 0px;"></textarea>
                         </div>
@@ -60,7 +62,7 @@
                             <hr class="hr_2">
                             <!-- <button id="saveChangesBtn">Save</button> -->
 
-                            <div class="shrink-0 flex flex-row justify-end items-center">
+                            <div class="shrink-0 flex flex-row justify-end items-center py-1">
                                 <button id="saveChangesBtn" class="flex flex-row items-center justify-center css-button-save" type="button">保存
                                     <span class="flex flex-row"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send w-4 h-auto"><path d="m22 2-7 20-4-9-9-4Z"></path><path d="M22 2 11 13"></path></svg></span></button>
                             </div>
@@ -70,7 +72,19 @@
 
                 </div>
 
-                <div class="tags-container">
+                <div class="sticky top-0  shrink-0  w-56 h-full  hidden display-hidden-container">
+                    <aside class="relative w-full h-auto max-h-screen overflow-auto hide-scrollbar flex flex-col justify-start items-start py-4">
+                        <div class="w-full h-9 flex flex-row justify-start items-center">
+                            <div class="w-full !text-sm !shadow-none !border-gray-200 dark:!border-zinc-800 css-search-input gap-1" >
+                                <div class="flex items-center cursor-initial" >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search w-4 h-auto opacity-30">
+                                        <circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+                                </div>
+                                <input id="search-input" placeholder="搜索" class="bg-transparent outline-none" value="">
+                            </div>
+                        </div>
+                        
+                    </aside>
                 </div>
 
             </div>

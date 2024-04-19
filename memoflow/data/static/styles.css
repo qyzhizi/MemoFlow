@@ -208,6 +208,10 @@ img,svg,video,canvas,audio,iframe,embed,object {
     vertical-align: middle
 }
 
+hidden {
+    display: none
+}
+
 img,video {
     max-width: 100%;
     height: auto
@@ -962,6 +966,9 @@ img,video {
 .min-w-full {
     min-width: 100%
 }
+.min-w-0{
+min-width: 0;
+}
 
 .max-w-5xl {
     max-width: 64rem
@@ -1057,6 +1064,10 @@ img,video {
 
 .cursor-pointer {
     cursor: pointer
+}
+
+.cursor-initial {
+    cursor: initial
 }
 
 .select-none {

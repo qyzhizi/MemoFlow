@@ -53,6 +53,10 @@ $(function() {
         event.preventDefault();
         addLog()
     });
+
+    // search-input
+    inputSearchHandler()
+
     $('#click-more-log').on('click', function(event) {
         event.preventDefault();
         // 从 localStorage 中读取 page_size 和 page_number
@@ -99,6 +103,60 @@ $(function() {
 
 });
 
+// 定义一个防抖函数
+function debounce(func, delay) {
+    let timeoutId;
+    return function() {
+        const context = this;
+        const args = arguments;
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            func.apply(context, args);
+        }, delay);
+    };
+}
+
+function inputSearchHandler() {
+    const inputElement = document.getElementById('search-input');
+
+    // 定义一个处理输入事件的函数
+    const handleInput = debounce(function() {
+        const inputValue = inputElement.value.trim(); // 获取输入值并去除首尾空格
+
+        if (inputValue) {
+            // 如果有输入值，则发送请求
+            console.log("发送请求，搜索关键词为:", inputValue);
+
+            // 示例：发送GET请求
+            // 注意：这里的URL需要替换成你的实际请求URL
+            // 同时，这里的请求仅为示例，具体实现可能需要根据实际API进行调整
+            fetch('/v1/diary-log/list-log', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(
+                    { filters: {content : '%' + inputValue + '%'} }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("请求结果:", data);
+                    // 处理请求结果
+                    // debugger;
+                    document.getElementById("logList").innerHTML = "";
+                    for (var i = 0; i < data.logs.length; i++) {
+                        addLogEntry(data.logs[i], data.ids[i], false);
+                    }
+                })
+                .catch(error => {
+                    console.error("请求失败:", error);
+                });
+        }
+    }, 1000); // 延迟1000毫秒
+
+    // 监听输入事件，并应用防抖处理
+    inputElement.addEventListener('input', handleInput);
+}
 
 function autoResize(textarea_id) {
     // debugger;
@@ -849,7 +907,7 @@ function tab_to_space(event) {
             var indentedText = selectedText.split('\n').map(function(line) {
                 let i = 0;
                 while (line[i] === '\t') {i++;}
-                j = i+1 // 使用4个空格进行正向缩进
+                var j = i+1 // 使用4个空格进行正向缩进
                 const leadingSpaces = ' '.repeat(tab_to_space_num).repeat(j); // 生成 i 个空格的字符串
                 return leadingSpaces + line.substring(i); // 将生成的空格字符串和剩余的字符串拼接返回
             }).join('\n');

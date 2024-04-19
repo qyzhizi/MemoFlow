@@ -95,9 +95,9 @@ a:hover {
     height: 100%;
 }
 .diary-container {
-    margin-top: 1ch;
-    margin-left: 2ch;
-    margin-right: 2ch;
+    margin-top: 1rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
     flex-grow: 1;
     /* 让日记容器占据剩余空间 */
     width: 100%;
@@ -128,7 +128,7 @@ a:hover {
         font-size: 16px;
     }
 
-    .tags-container {
+    .display-hidden-container {
         display: block;
     }
 
@@ -351,4 +351,15 @@ button:hover {
     text-decoration: none;
     line-height: 1.5;
     color: #97C3F0;
+}
+.css-search-input{
+    cursor: text;
+    position: relative;
+    display: flex;
+    background-color: #0B0D0E;
+    padding-inline: 0.75rem;
+    border-radius: 6px;
+    line-height: 1.5rem;
+    min-width: 0px;
+    min-height: 2.25rem;
 }

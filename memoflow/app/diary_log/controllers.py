@@ -364,7 +364,7 @@ class DiaryLog(wsgi.Application):
 
         contents = []
         ids = []
-        rows = self.diary_db_api.get_logs_by_filter(
+        rows = self.diary_db_api.get_logs_by_filters(
             user_id=user_id,
             columns=['content', 'id'],
             order_by="create_time",
@@ -373,11 +373,43 @@ class DiaryLog(wsgi.Application):
             page_number=page_number
         )
 
-        contents.extend([row[0] for row in rows])
-        ids.extend([row[1] for row in rows])
+        contents.extend([row['content'] for row in rows])
+        ids.extend([row['id'] for row in rows])
         return json.dumps({'logs': contents, 'ids': ids,
                            'page_size': page_size,
                            'page_number': page_number})
+
+    @token_required
+    def list_log(self, req):
+        req_data = req.json
+        user_id = req.environ['user_id']
+        # 获取page_size和page_number参数
+        _page_size = req.GET.get('page_size', None)
+        _page_number = req.GET.get('page_number', None)
+        page_size = int(_page_size) if _page_size else None
+        page_number = int(_page_number) if _page_number else None
+
+        rows = self.diary_db_api.get_logs_by_filters(
+            user_id=user_id,
+            filters=req_data.get('filters',{}),
+            columns=req_data.get('columns', ['content', 'id', 'tags']),
+            order_by=req_data.get('order_by', "create_time"),
+            ascending=req_data.get('ascending', False),
+            page_size=page_size,
+            page_number=page_number
+        )
+        # 使用字典推导和列表推导结合的方式进行转换
+        if rows:
+            res = {key: [d[key] for d in rows] for key in rows[0]}
+        else:
+            res = {}
+        
+        return json.dumps({
+            'logs': res.get('content', None),
+            'ids': res.get('id', None),
+            'tags': res.get('tags', None),
+            'page_size': page_size,
+            'page_number': page_number})
 
     @token_required
     def update_log(self, req):
@@ -459,14 +491,14 @@ class DiaryLog(wsgi.Application):
             github_access_info = self.get_access_token_by_user_id(
                 user_id=user_id)
             # default order_by create_time DESC descending sort
-            rows = self.diary_db_api.get_logs_by_filter(
+            rows = self.diary_db_api.get_logs_by_filters(
                 user_id=user_id,
-                filter={"sync_file": sync_file},
+                filters={"sync_file": sync_file},
                 columns=['content'],
                 order_by="create_time",
                 ascending=False
             )
-            updated_contents = [row[0] for row in rows]
+            updated_contents = [row['content'] for row in rows]
             updated_contents = "\n".join(updated_contents)
 
             file_path = sync_file
@@ -488,14 +520,14 @@ class DiaryLog(wsgi.Application):
             # jianguoyun_sync_file = jianguoyun_access_data['current_sync_file']
             if user_settings.get('SEND_TO_GITHUB', None) != True \
                 or not updated_contents:
-                rows = self.diary_db_api.get_logs_by_filter(
+                rows = self.diary_db_api.get_logs_by_filters(
                     user_id=user_id,
-                    filter={"sync_file": sync_file},
+                    filters={"sync_file": sync_file},
                     columns=['content'],
                     order_by="create_time",
                     ascending=False
                 )
-                updated_contents = [row[0] for row in rows]
+                updated_contents = [row['content'] for row in rows]
                 updated_contents.reverse()
                 updated_contents = "\n".join(updated_contents)
             self.asyn_task_api.celery_push_updatedfile_to_jianguoyun(
@@ -1125,14 +1157,14 @@ class DiaryLog(wsgi.Application):
                 user_id=user_id)
 
             # default order_by create_time DESC descending sort
-            rows = self.diary_db_api.get_logs_by_filter(
+            rows = self.diary_db_api.get_logs_by_filters(
                 user_id=user_id,
-                filter={"sync_file": sync_file},
+                filters={"sync_file": sync_file},
                 columns=['content'],
                 order_by="create_time",
                 ascending=False
             )
-            updated_contents = [row[0] for row in rows]
+            updated_contents = [row['content'] for row in rows]
             # updated_contents.reverse()
             updated_content = "\n".join(updated_contents)
             file_path = sync_file
@@ -1158,14 +1190,14 @@ class DiaryLog(wsgi.Application):
             # other_table_path_map = JianguoyunTablePathMap.other_table_path_map
             if user_settings.get('SEND_TO_GITHUB', None) != True \
                 or not updated_content:
-                rows = self.diary_db_api.get_logs_by_filter(
+                rows = self.diary_db_api.get_logs_by_filters(
                     user_id=user_id,
-                    filter={"sync_file": sync_file},
+                    filters={"sync_file": sync_file},
                     columns=['content'],
                     order_by="create_time",
                     ascending=False
                 )
-                updated_contents = [row[0] for row in rows]
+                updated_contents = [row['content'] for row in rows]
                 # updated_contents.reverse()
                 updated_content = "\n".join(updated_contents)
             self.asyn_task_api.celery_push_updatedfile_to_jianguoyun(
