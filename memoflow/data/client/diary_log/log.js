@@ -143,6 +143,9 @@ function inputSearchHandler() {
                     console.log("请求结果:", data);
                     // 处理请求结果
                     // debugger;
+                    
+                    var clickMoreLog = document.getElementById("click-more-log");
+                    clickMoreLog.classList.add('!hidden');
                     document.getElementById("logList").innerHTML = "";
                     for (var i = 0; i < data.logs.length; i++) {
                         addLogEntry(data.logs[i], data.ids[i], false);
