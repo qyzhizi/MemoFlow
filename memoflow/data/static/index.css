@@ -123,7 +123,21 @@ a:hover {
 }
 
 /* 媒体查询 */
-@media (min-width: 825px) {
+@media (min-width: 853px) {
+    html,body{
+        font-size: 16px;
+    }
+
+    .display-hidden-container {
+        display: block;
+    }
+
+    /* .nav-container {
+        display: block;
+    } */
+}
+/* 媒体查询 */
+@media (min-width: 1000px) {
     html,body{
         font-size: 16px;
     }
@@ -134,7 +148,6 @@ a:hover {
 
     .nav-container {
         display: block;
-        /* 在小屏幕下隐藏导航容器 */
     }
 }
 

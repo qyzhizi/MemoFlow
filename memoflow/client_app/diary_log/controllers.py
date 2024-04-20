@@ -5,6 +5,7 @@ from datetime import datetime
 import logging
 import os
 from webob import Response
+from webob.exc import HTTPFound
 
 from memoflow.conf import CONF
 from memoflow.core import wsgi
@@ -50,6 +51,10 @@ class DiaryLog(wsgi.Application):
 
     def get_html(self, req):
         return self.diary_log_client_api.get_html(index_html_path=INDEX_HTML_PATH)
+
+    def redirect_get_html(self, req):
+        response = HTTPFound(location='/v1/diary-log')
+        return response
 
     def get_index_css(self, req):
         LOG.info("get index css file")
