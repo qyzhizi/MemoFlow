@@ -796,8 +796,8 @@ class DBSqliteDriver(object):
         time_values = []
         if no_create_time or no_update_time:
             # Calculate the initial time
-            current_time = datetime.now().replace(microsecond=0)+\
-                 timedelta(seconds=1) 
+            current_time = datetime.now().replace(microsecond=0)-\
+                 timedelta(seconds=len(records)) 
             time_values = [(current_time + timedelta(seconds=i),
                             current_time + timedelta(seconds=i)) 
                            for i in range(len(records))]
