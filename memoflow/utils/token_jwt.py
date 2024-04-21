@@ -1,3 +1,4 @@
+import logging
 import jwt
 import datetime
 import secrets
@@ -6,6 +7,8 @@ from functools import wraps
 from webob.exc import HTTPUnauthorized
 from webob import Request 
 
+from memoflow.conf import CONF
+LOG = logging.getLogger(__name__)
 
 class TokenManager:
     secret_key = secrets.token_urlsafe(32)  # 类属性
@@ -48,8 +51,10 @@ def token_required(func):
             token = req.cookies.get('Authorization')
 
         if not token:
+            LOG.error("error: Token is missing")
             return HTTPUnauthorized(json.dumps({"error": "Token is missing"}))
         if not token.startswith('Bearer '):
+            LOG.error("error: Unauthorized - Invalid token format")
             return HTTPUnauthorized(json.dumps({'error': 'Unauthorized - Invalid token format'}))
 
         decoded_data = TokenManager.verify_token(token[7:])
@@ -57,6 +62,7 @@ def token_required(func):
             req.environ['user_id'] = decoded_data.get('user_id', None)
             return func(*args, **kwargs)
         else:
+            LOG.error("error: Invalid credentials")
             raise HTTPUnauthorized(json.dumps({"error": "Invalid credentials"}))
 
     return decorated_func
