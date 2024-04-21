@@ -3,6 +3,10 @@ import { addDivInnerHTMLToBodyContainer }
 import { navLoadAvatarAndSetUserName,
     getNavSettingHtml
 } from '/v1/diary-log/static/setting/nav_setting.js';
+import {  getSmHeadNavHtml
+} from '/v1/diary-log/static/sm_head_nav.js';
+import {  getSmSearchDivHtml
+} from '/v1/diary-log/static/sm_head_search.js';
 
 if (function() { return !this; }()) {
     console.log("严格模式下运行");
@@ -23,7 +27,6 @@ $(function() {
     edit_textarea.addEventListener('input', function(event) {
         autoResize('editLog');
     });
-    // debugger;
     autoResize('log')
     // autoResize('editLog')
 
@@ -42,11 +45,12 @@ $(function() {
         // var userInfoDiv = document.getElementById('nav-container-root').querySelector('.user-info')
         // userInfoDiv.classList.add('cursor-pointer');
 
-        navLoadAvatarAndSetUserName()
+        navLoadAvatarAndSetUserName('nav-container-root')
     })
     .catch(error => {
         console.error(error); // 错误处理
     });
+
 
 
     $('#submit').on('click', function(event) {
@@ -55,7 +59,11 @@ $(function() {
     });
 
     // search-input
-    inputSearchHandler()
+    inputSearchHandler(document.getElementById('search-input'))
+    showSmHeadNavHandler()
+    // show sm-width search sidebar
+    showSmHeadSearchAndTagsHandler()
+
 
     $('#click-more-log').on('click', function(event) {
         event.preventDefault();
@@ -116,8 +124,9 @@ function debounce(func, delay) {
     };
 }
 
-function inputSearchHandler() {
-    const inputElement = document.getElementById('search-input');
+function inputSearchHandler(inputElement) {
+    // const inputElement = document.getElementById('search-input');
+    // const inputElement = document.getElementById(inputSearchID);
 
     // 定义一个处理输入事件的函数
     const handleInput = debounce(function() {
@@ -140,9 +149,8 @@ function inputSearchHandler() {
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log("请求结果:", data);
+                    // console.log("请求结果:", data);
                     // 处理请求结果
-                    // debugger;
                     
                     var clickMoreLog = document.getElementById("click-more-log");
                     clickMoreLog.classList.add('!hidden');
@@ -161,8 +169,96 @@ function inputSearchHandler() {
     inputElement.addEventListener('input', handleInput);
 }
 
+
+function showSmHeadNavHandler() {
+    $('#SmHeadNavButton').on('click', function(event) {
+        event.preventDefault();
+        var SmHead = document.getElementById('SmHeadRoot').querySelector(".SmHead");
+
+        if (SmHead) {
+            console.log("SmHead 存在");
+            SmHead.classList.remove('!hidden')
+        } else {
+            console.log("SmHead 不存在");
+            getSmHeadNavHtml()
+                .then(html => {
+                    addDivInnerHTMLToBodyContainer({
+                        doc_data: html,
+                        container_id: 'SmHeadRoot'
+                    });
+
+                    navLoadAvatarAndSetUserName('SmHeadRoot')
+                    var SmHead = document.getElementById('SmHeadRoot').querySelector(".SmHead");
+                    // 监听 SmHead 的点击事件
+                    SmHead.addEventListener('click', function(event) {
+                        // 检查点击是否在 nav-fixed-child 或其子元素上
+                        var clickedElement = event.target;
+                        var navFixedChild = SmHead.querySelector('.nav-fixed-child');
+
+                        // 如果 navFixedChild 存在并且点击的不是 nav-fixed-child 或其子元素
+                        if (navFixedChild && !navFixedChild.contains(clickedElement)) {
+                            // 隐藏 SmHead
+                            SmHead.classList.add('!hidden');
+                        }
+                    });
+
+                })
+                .catch(error => {
+                    console.error(error); // 错误处理
+                });
+        }
+    });
+}
+
+function showSmHeadSearchAndTagsHandler() {
+    $('#SmHedadSearchButton').on('click', function(event) {
+        event.preventDefault();
+        // debugger;
+        let smSerchSidebarModule = document.getElementById(
+            'SmSearchRoot').querySelector(".smSerchSidebarModule");
+
+        if (smSerchSidebarModule) {
+            console.log("smSerchSidebarModule 存在");
+            smSerchSidebarModule.classList.remove('!hidden')
+        } else {
+            console.log("smSerchSidebarModule 不存在");
+            getSmSearchDivHtml()
+                .then(html => {
+                    addDivInnerHTMLToBodyContainer({
+                        doc_data: html,
+                        container_id: 'SmSearchRoot'
+                    });
+
+                    let smSerchSidebarModule = document.getElementById(
+                        'SmSearchRoot').querySelector(".smSerchSidebarModule");
+                    // 监听 SmHead 的点击事件
+                    smSerchSidebarModule.addEventListener(
+                        'click', function(event) {
+                        // 检查点击是否在 SmSearchContent 或其子元素上
+                        var clickedElement = event.target;
+                        var SmSearchContent = smSerchSidebarModule.querySelector('.SmSearchContent');
+
+                        // 如果 SmSearchContent 存在并且点击的不是 SmSearchContent 或其子元素
+                        if (SmSearchContent && !SmSearchContent.contains(clickedElement)) {
+                            // 隐藏 SmHead
+                            smSerchSidebarModule.classList.add('!hidden');
+                        }
+                    });
+                    // 监听 smSearchInput 搜索事件
+                    inputSearchHandler(document.getElementById(
+                        'SmSearchRoot').querySelector(".smSearchInput"))
+
+                })
+                .catch(error => {
+                    console.error(error); // 错误处理
+                });
+        }
+    });
+}
+
+
 function autoResize(textarea_id) {
-    // debugger;
+    //  
     const textarea = document.getElementById(textarea_id);
     // 设置高度为 auto，以获取正确的 scrollHeight
     textarea.style.height = 'auto';
@@ -441,7 +537,7 @@ modal.addEventListener('mouseup', function(event) {
     console.log("enter addEventListener modal mouseup ")
     if (!modalContent.contains(event.target) && isModalMouseDown) {
         event.preventDefault(); // 阻止默认的操作
-        // debugger;
+        //  
         var confirmation = confirm("是否关闭编辑页面？");
         console.log("关闭编辑页面？")
 
@@ -653,7 +749,7 @@ function editLogEntry(pre, record_id) {
     var pre_text = getOriginTextFromPre(pre);
     pre_text = restoreLatexFromRendered(pre)
     editLog.value = removeLogseqMatches(pre_text);
-    // debugger;
+    //  
     autoResize('editLog')
 }
 

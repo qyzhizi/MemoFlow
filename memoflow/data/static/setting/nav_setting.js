@@ -4,14 +4,23 @@ import { getUserNameAndAvatar,
 } from '/v1/diary-log/static/utils.js';
 
 
-export function navLoadAvatarAndSetUserName(){
+export function navLoadAvatarAndSetUserName(containerId){
     const getUserAvatarImageUrl = '/v1/diary-log/get-user-avatar-image'
     const avatarClass = ".user-info"
-    const navInsertToDiv = "nav-fixed-child"
-    const navLogOut = "navLogOut"
+    // const navInsertToDiv = "nav-fixed-child"
+    // const navInsertToDivClass = "nav-fixed-child"
+    const navLogOutClass = ".navLogOut"
 
-    var originAvatarDiv = document.getElementById(
-        navInsertToDiv).querySelector(avatarClass);
+    // var originAvatarDiv = document.getElementById(
+    //     navInsertToDiv).querySelector(avatarClass);
+    let originAvatarDiv = document.getElementById(
+        containerId).querySelector(avatarClass); 
+     
+    let navLogOutDiv = document.getElementById(
+        containerId).querySelector(navLogOutClass);
+        // document.getElementById(
+        //     containerId).querySelector(".navLogOut")
+
     getUserNameAndAvatar(getUserAvatarImageUrl)
         .then(avatarUsernameDiv => {
         originAvatarDiv.innerHTML = avatarUsernameDiv.html()
@@ -20,16 +29,21 @@ export function navLoadAvatarAndSetUserName(){
     originAvatarDiv.classList.add('cursor-pointer');
     // 添加点击事件监听器
     originAvatarDiv.addEventListener('click', function() {
-        var navLogOutDiv = document.getElementById(
-            navLogOut);
+        // var navLogOutDiv = document.getElementById(
+        //     navLogOut);
+        // var navLogOutDiv = document.getElementById(
+        //     containerId).querySelector(navLogOutClass); 
+
         navLogOutDiv.classList.remove('!hidden')
 
     });
-    var navLogOutDiv = document.getElementById('navLogOut');
+    // var navLogOutDiv = document.getElementById('navLogOut');
+    // var navLogOutDiv = document.getElementById(
+    //     containerId).querySelector(navLogOutClass); 
     document.addEventListener('click', function(event) {
         // var navLogOutDiv = document.getElementById('navLogOut');
         var originAvatarDiv = document.getElementById(
-            navInsertToDiv).querySelector(avatarClass);
+            containerId).querySelector(avatarClass);
     
         // 检查点击的元素是否是 navLogOutDiv 或其内部元素
         if (event.target !== navLogOutDiv && !navLogOutDiv.contains(event.target) &&
@@ -72,13 +86,13 @@ export async function getNavSettingHtml() {
         fetchData(targetUrl)
     ]);
 
-     
-    const idInTargetDiv = "nav-fixed-child"
+    // const idInTargetDiv = "nav-fixed-child"
+    const TargetDivClass = "nav-fixed-child"
 
 
     return addSourceDataToTargetDiv({
         sourceDivData: fetchedSourceUrlData, 
-        targetDivData: fetchedTargetUrlData, idInTargetDiv: idInTargetDiv,
+        targetDivData: fetchedTargetUrlData, TargetDivClass: TargetDivClass,
         placeFirst: true
     })
 };

@@ -13,7 +13,7 @@ $(function() {
         addDivInnerHTMLToBodyContainer(
             {doc_data: html, container_id: 'nav-container-root' })
         
-        navLoadAvatarAndSetUserName()
+        navLoadAvatarAndSetUserName('nav-container-root')
     })
     .catch(error => {
         console.error(error); // 错误处理

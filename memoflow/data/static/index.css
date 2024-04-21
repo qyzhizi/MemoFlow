@@ -26,9 +26,9 @@ body {
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
-.flex {
+/* .flex {
     display: flex;
-}
+} */
 .w-full {
     width: 100%;
 }
@@ -95,9 +95,9 @@ a:hover {
     height: 100%;
 }
 .diary-container {
-    margin-top: 1rem;
-    margin-left: 1rem;
-    margin-right: 1rem;
+    /* margin-top: 1rem; */
+    /* margin-left: 1rem; */
+    /* margin-right: 1rem; */
     flex-grow: 1;
     /* 让日记容器占据剩余空间 */
     width: 100%;
@@ -111,7 +111,7 @@ a:hover {
 .tags-container {
     flex: 0 0 200px;
     /* 设置tags容器的固定宽度为200像素 */
-    background-color: rgb(24, 24, 27);
+    background-color: rgb(29, 29, 32);
     display:none
 }
 
@@ -123,21 +123,22 @@ a:hover {
 }
 
 /* 媒体查询 */
-@media (min-width: 853px) {
+/* @media (min-width: 853px) { */
+@media (min-width: 640px) {
     html,body{
         font-size: 16px;
     }
 
-    .display-hidden-container {
-        display: block;
-    }
-
-    /* .nav-container {
+    /* .display-hidden-container {
         display: block;
     } */
+
+    .nav-container {
+        display: block;
+    }
 }
 /* 媒体查询 */
-@media (min-width: 1000px) {
+@media (min-width: 768px) {
     html,body{
         font-size: 16px;
     }
@@ -376,3 +377,4 @@ button:hover {
     min-width: 0px;
     min-height: 2.25rem;
 }
+

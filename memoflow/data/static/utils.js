@@ -275,7 +275,9 @@ async function fetchData(url) {
 // // 调用函数开始获取并处理数据
 // processData();
 
-
+// param: sourceDivData classInSourceDiv targetDivData TargetDivClass
+// process: sourceDivData.classInSourceDiv -> targetDivData.TargetDivClass
+// return targetDivData innerHTML
 function addSourceDataToTargetDiv(options) {
     // 获取参数
     var sourceDivData = options.sourceDivData;
@@ -283,6 +285,7 @@ function addSourceDataToTargetDiv(options) {
     var classInSourceDiv = options.classInSourceDiv;
     var targetDivData = options.targetDivData;
     var idInTargetDiv = options.idInTargetDiv;
+    var TargetDivClass = options.TargetDivClass;
     var placeFirst = options.placeFirst;
     var placeLast = options.placeLast;
 
@@ -295,9 +298,9 @@ function addSourceDataToTargetDiv(options) {
     if (idInSourceDiv){
         container = sourceDiv.querySelector('#' + idInSourceDiv);}
     else if (classInSourceDiv) {
-        container = sourceDiv.querySelector('.' + idInSourceDiv);}   
+        container = sourceDiv.querySelector('.' + classInSourceDiv);}   
 
-    // 如果 idInSourceDiv 所属容器不存在，那么设置为 sourceDiv
+    // 如果 idInSourceDiv or classInSourceDiv 所属容器不存在，那么设置为 sourceDiv
     if (!container) {
          container = sourceDiv.querySelector('div');
 
@@ -308,13 +311,16 @@ function addSourceDataToTargetDiv(options) {
     targetDiv.innerHTML = targetDivData;
 
     // 获取 targetDiv 中的指定容器
-    var targetContainer = targetDiv.querySelector('#' + idInTargetDiv);
+    if (idInTargetDiv){
+        var targetContainer = targetDiv.querySelector('#' + idInTargetDiv);}
+    else if (TargetDivClass) {
+        var targetContainer = targetDiv.querySelector('.' + TargetDivClass);}
 
     // 将 sourceDiv 中指定容器的内容添加到另一个 div 的指定容器中
     if (!targetContainer) {
         targetContainer = document.createElement('div');
-        if (idInTargetDiv) {
-            targetContainer.id = idInTargetDiv;
+        if (TargetDivClass) {
+            targetContainer.className = TargetDivClass;
         }
         // if (placeLast) {targetDiv.appendChild(targetContainer)}
         // if (placeFirst) {targetDiv.insertBefore(targetContainer, targetDiv.firstChild)}

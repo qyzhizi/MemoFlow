@@ -5,18 +5,21 @@
 }
 .nav-fixed-child {
     position: fixed;
-    top: 30px;
+    /* top: 30px; */
     /* 可以根据需要调整位置 */
-    margin-left: 10px;
+    /* margin-left: 10px; */
     left: 0;
     /* 可以根据需要调整位置 */
     width: 180px;
     /* 继承父容器的宽度 */
-    background-color: inherit;
+    /* background-color: inherit; */
+    /* background-color: rgb(24, 24, 27); */ 
+    background-color: rgb(29, 29, 32);
     /* 继承父容器的背景颜色 */
     /* z-index: 1000; */
     /* 可以根据需要调整 z-index */
     /* 其他样式 */
+    height: 100vh;
 }
 .nav-items {
     background-color: inherit;

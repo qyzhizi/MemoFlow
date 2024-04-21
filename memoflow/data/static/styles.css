@@ -1653,6 +1653,10 @@ min-width: 0;
     padding-top: 0
 }
 
+.pt-1 {
+    padding-top: .25rem
+}
+
 .pt-2 {
     padding-top: .5rem
 }
@@ -2243,6 +2247,7 @@ min-width: 0;
 }
 
 @media (min-width: 640px) {
+/* @media (min-width: 853px){ */
     .sm\:left-2 {
         left:.5rem
     }
@@ -2329,6 +2334,25 @@ min-width: 0;
         padding-left: 14rem
     }
 
+    .sm\:px-1 {
+        padding-left: .25rem;
+        padding-right: .25rem
+    }
+
+    .sm\:px-2 {
+        padding-left: .5rem;
+        padding-right: .5rem
+    }
+
+    .sm\:px-4 {
+        padding-left: 1rem;
+        padding-right: 1rem
+    }
+
+    .sm\:pt-1 {
+        padding-top: .25rem
+    }
+
     .sm\:pt-2 {
         padding-top: .5rem
     }
@@ -2343,6 +2367,7 @@ min-width: 0;
 }
 
 @media (min-width: 768px) {
+/* @media (min-width: 1000px) { */
     .md\:\!mb-8 {
         margin-bottom:2rem!important
     }
@@ -2362,6 +2387,26 @@ min-width: 0;
     .md\:pt-6 {
         padding-top: 1.5rem
     }
+
+    .md\:px-1 {
+        padding-left: .5rem;
+        padding-right: .5rem;
+    }    
+
+    .md\:px-2 {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }    
+
+    .md\:px-3 {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }    
+
+    .md\:px-4 {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }    
 }
 
 html.dark pre code.hljs {

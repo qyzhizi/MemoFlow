@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" class="dark" dir="ltr">
+<html lang="en" class="dark" data-joy-color-scheme="dark" dir="ltr">
 
 <head>
     <title>MemoFlow</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"> -->
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- 引入 KaTeX 样式 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css">
@@ -12,10 +13,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro">
 
+    <link rel="stylesheet" href="/v1/diary-log/static/root.css">
+    <link rel="stylesheet" href="/v1/diary-log/static/data-joy-color-scheme-dark.css">
     <link rel="stylesheet" href="/v1/diary-log/static/avatar.css">
     <link rel="stylesheet" href="/v1/diary-log/static/styles.css">
     <link rel="stylesheet" href="/v1/diary-log/static/setting/nav_setting.css">
     <link rel="stylesheet" href="/v1/diary-log/static/index.css">
+    <link rel="stylesheet" href="/v1/diary-log/static/sm_head.css">
+    <link rel="stylesheet" href="/v1/diary-log/static/data-joy-color-scheme-dark.css">
+    
 
 </head>
 
@@ -27,7 +33,19 @@
         <div class="min-w-0 w-full h-auto flex-grow shrink flex justify-start items-center flex-col">
             <!-- <div class="section-container"> -->
             <div class=" w-full flex flex-row justify-start items-start px-1 sm:px-4 gap-1">
-                <div class="diary-container">
+                <div class="diary-container pt-1 sm:pt-2 md:pt-3 pb-8 px-1 sm:px-1 md:px-2">
+                    <!-- sm:pt-1 px-4 sm:px-1 pt-3 pb-2 sm:mb-1 -->
+                    <div id="SmHeard" class="sticky top-0 bg-zinc-100 dark:bg-zinc-900 bg-opacity-80 backdrop-blur-lg flex md:hidden flex-row justify-between items-center w-full h-auto flex-nowrap shrink-0 z-1">
+                        
+                        <div class="flex flex-row justify-start items-center mr-2 shrink-0 overflow-hidden">
+                            <button id="SmHeadNavButton" class="px-1 sm:hidden" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu w-5 h-auto dark:text-gray-400"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button>
+                            <span class="font-bold text-lg leading-10 mr-1 text-ellipsis shrink-0 overflow-hidden text-gray-700 dark:text-gray-300">Memos</span>
+                        </div>
+                        <div class="flex flex-row justify-end items-center">
+                            <button id="SmHedadSearchButton" class="css-1vgb0z0" type="button">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search w-5 h-auto dark:text-gray-400"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg></button>
+                        </div>
+                    </div>
                     <!-- <form>
                         <textarea id="log" name="log"></textarea>
                         <button id="submit">commit</button>
@@ -92,6 +110,8 @@
 
         </div>
     </div>
+    <div id="SmHeadRoot"> </div>
+    <div id="SmSearchRoot"> </div>
 
 
     <!-- 指定script标签的type为module -->
