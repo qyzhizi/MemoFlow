@@ -34,7 +34,6 @@ LOG = logging.getLogger(__name__)
 # driver_name = CONF.diary_log['driver']
 USER_TABLE_NAME = CONF.diary_log['USER_TABLE_NAME']
 SYNC_DATA_BASE_PATH = CONF.diary_log['SYNC_DATA_BASE_PATH']
-SYNC_TABLE_NAME = CONF.diary_log['SYNC_TABLE_NAME']
 
 @dependency.provider('diary_log_api')
 class Manager(manager.Manager):
@@ -935,7 +934,6 @@ class DiaryDBManager(manager.Manager):
         Args:
             content (string): 笔记内容
             tags (list): 笔记的标签，例如：[a,b,c]
-            table_name (string, optional): 表名. Defaults to SYNC_TABLE_NAME.
         """
 
         # user_info = self.get_user_info_by_id(
@@ -978,7 +976,6 @@ class DiaryDBManager(manager.Manager):
             id (int): diary log id
             content (string): diary log content
             tags (list): diary log tags
-            table_name (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
             data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
         """
         table_name = self.driver.get_table_name_by_user_id(user_id)
@@ -1005,7 +1002,6 @@ class DiaryDBManager(manager.Manager):
 
         Args:
             id (int): diary log id
-            table_name (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
             columns (list, optional): _description_. Defaults to ['contents'].
             data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
 
@@ -1017,25 +1013,6 @@ class DiaryDBManager(manager.Manager):
                                         data_base_path=data_base_path)
         return row
 
-    # def get_all_logs(self,
-    #                  table=SYNC_TABLE_NAME,
-    #                  columns=['content'],
-    #                  data_base_path=SYNC_DATA_BASE_PATH):
-    #     """get all diary logs
-
-    #     Args:
-    #         table (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
-    #         columns (list, optional): _description_. Defaults to ['contents'].
-    #         data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
-
-    #     Returns:
-    #         string: json string
-    #     """
-    #     rows = self.driver.get_all_logs(table_name=table,
-    #                                     columns=columns,
-    #                                     data_base_path=data_base_path)
-    #     return rows
-
     def get_all_logs(self,
                  user_id,
                  columns=['content'],
@@ -1043,7 +1020,6 @@ class DiaryDBManager(manager.Manager):
         """get all diary logs
 
         Args:
-            table (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
             columns (list, optional): _description_. Defaults to ['contents'].
             data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
 
@@ -1070,7 +1046,6 @@ class DiaryDBManager(manager.Manager):
         """get logs by filter
 
         Args:
-            table (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
             columns (list, optional): _description_. Defaults to ['contents'].
             data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
 
@@ -1097,7 +1072,6 @@ class DiaryDBManager(manager.Manager):
 
         Args:
             id (int): diary log id
-            table (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
             data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
         """
 
@@ -1141,13 +1115,14 @@ class DiaryDBManager(manager.Manager):
             data_base_path=data_base_path)
 
     def delete_all_log(self,
+                       table,
                        data_base_path=SYNC_DATA_BASE_PATH,
-                       table=SYNC_TABLE_NAME):
+                       ):
         """delete all diary logs of one table
 
         Args:
             data_base_path (string, optional): 数据库地址. Defaults to SYNC_DATA_BASE_PATH.
-            table (string, optional): 表名. Defaults to SYNC_TABLE_NAME.
+            table (string, optional): 表名
         """
 
         self.driver.delete_all_log(table_name=table,
@@ -1158,7 +1133,7 @@ class DiaryDBManager(manager.Manager):
         """get all diary logs
 
         Args:
-            table (string, optional): _description_. Defaults to SYNC_TABLE_NAME.
+            table (string, optional): _description_ 
             columns (list, optional): _description_. Defaults to ['contents'].
             data_base_path (string, optional): _description_. Defaults to SYNC_DATA_BASE_PATH.
 
@@ -1176,7 +1151,7 @@ class DiaryDBManager(manager.Manager):
 
         Args:
             data_base_path (string, optional): 数据库地址. Defaults to SYNC_DATA_BASE_PATH.
-            table (string, optional): 表名. Defaults to SYNC_TABLE_NAME.
+            table (string, optional): 表名.
         """
         self.driver.delete_all_log(table_name=table, data_base_path=data_base_path)
 
