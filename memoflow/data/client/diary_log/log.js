@@ -602,9 +602,9 @@ saveChangesBtn.onclick = function() {
     $.ajax({
         url: '/v1/diary-log/updatelog',
         type: 'POST',
-        headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
-        },
+        // headers: {
+        //     'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+        // },
         contentType: 'application/json',
         data: JSON.stringify({content: editedText, record_id: curRecordId}),
         success: function(response) {
@@ -759,9 +759,9 @@ function deleteLogEntry(record_id, logentrycontainer) {
     $.ajax({
         url: '/v1/diary-log/deletelog/' + record_id,
         type: 'DELETE',
-        headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
-        },
+        // headers: {
+        //     'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+        // },
         success: function(response) {
             // 请求成功时的处理
             console.log('Logs deleted successfully.');
@@ -904,9 +904,9 @@ function getLogs(page_size = null, page_number = null) {
     $.ajax({
         url: get_log_url,
         type: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
-        },
+        // headers: {
+        //     'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+        // },
         success: function(response) {
             response = JSON.parse(response);
             page_size = response.page_size;

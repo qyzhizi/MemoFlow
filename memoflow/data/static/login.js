@@ -24,7 +24,7 @@ $(document).ready(function() {
                 console.log(response);
                 // 注册成功后跳转到主页页面
                 // Save the token to localStorage
-                localStorage.setItem('jwtToken', response.token);
+                // localStorage.setItem('jwtToken', response.token);
                 window.location.href = '/v1/diary-log'; // 请根据实际情况修改登录页面的 URL
             },
             error: function(xhr, status, error) {

@@ -2,9 +2,9 @@ $(function() {
     $.ajax({
         url: '/v1/diary-log/get_review_logs',
         type: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
-        },
+        // headers: {
+        //     'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+        // },
         success: function(response) {
             // console.log(response);
             response = JSON.parse(response)
@@ -26,9 +26,9 @@ $(function() {
         $.ajax({
             url: '/v1/diary-log/delete_all_review_log',
             type: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
-            },
+            // headers: {
+            //     'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+            // },
             success: function(response) {
                 var logList= $('#logList');
                 logList.html("");

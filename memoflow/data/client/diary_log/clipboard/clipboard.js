@@ -14,9 +14,9 @@ $(function() {
         $.ajax({
             url: '/v1/diary-log/clipboard_addlog',
             type: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
-            },
+            // headers: {
+            //     'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+            // },
             contentType: 'application/json',
             data: JSON.stringify({content: log}),
             success: function(response) {
@@ -40,9 +40,9 @@ $(function() {
     $.ajax({
         url: '/v1/diary-log/get_clipboard_logs',
         type: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
-        },
+        // headers: {
+        //     'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+        // },
         success: function(response) {
             // console.log(response);
             response = JSON.parse(response)
