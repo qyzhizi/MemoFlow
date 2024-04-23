@@ -286,7 +286,7 @@ pre {
     /* 将左侧定位到页面左侧 */
     /* Set padding top, right, bottom, and left */
     /* padding: 2rem 1rem 2rem 1rem; */
-    padding: 5vh 1rem 2rem 1rem;
+    padding: 5vh 0rem 2rem 0rem;
     box-sizing: border-box;
     /* 让 padding 不会增加容器的实际尺寸 */
     /* display: flex; */
