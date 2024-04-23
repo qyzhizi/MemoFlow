@@ -41,9 +41,9 @@ $(function() {
         $.ajax({
             url: '/v1/diary-log/update_all_que_to_vector_db',
             type: 'PUT',
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
-            },
+            // headers: {
+            //     'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+            // },
             success: function(response) {
                 console.log(response);
                 // pop up a dialog

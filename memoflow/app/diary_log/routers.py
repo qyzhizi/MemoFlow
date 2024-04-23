@@ -10,6 +10,10 @@ class Router(wsgi.ComposableRouter):
                        controller=diary_log_controller,
                        action='login',
                        conditions=dict(method=['POST']))
+        mapper.connect('/diary-log/logout',
+                       controller=diary_log_controller,
+                       action='logout',
+                       conditions=dict(method=['GET']))
         mapper.connect('/diary-log/register',
                        controller=diary_log_controller,
                        action='register',
@@ -18,6 +22,10 @@ class Router(wsgi.ComposableRouter):
                        controller=diary_log_controller,
                        action='get_logs',
                        conditions=dict(method=['GET']))
+        mapper.connect('/diary-log/list-log',
+                       controller=diary_log_controller,
+                       action='list_log',
+                       conditions=dict(method=['POST']))        
         mapper.connect('/diary-log/addlog',
                        controller=diary_log_controller,
                        action='add_log',
@@ -114,6 +122,20 @@ class Router(wsgi.ComposableRouter):
                         action='github_authenticate',
                         conditions=dict(method=['GET']))
         
+        # set sync files
+        mapper.connect('/diary-log/set-user-sync-files',
+                       controller=diary_log_controller,
+                       action='set_user_sync_files',
+                       conditions=dict(method=['POST'])
+                       )
+
+        # get sync files
+        mapper.connect('/diary-log/get-user-sync-files',
+                       controller=diary_log_controller,
+                       action='get_user_sync_files',
+                       conditions=dict(method=['GET'])
+                       )
+        
         # github-authenticate-callback
         mapper.connect('/diary-log/github-authenticate-callback',
                         controller=diary_log_controller,
@@ -136,4 +158,39 @@ class Router(wsgi.ComposableRouter):
                         controller=diary_log_controller,
                         action='get_github_config',
                         conditions=dict(method=['GET']))
-                       
+        # /v1/diary-log/jianguoyun-config
+        mapper.connect('/diary-log/jianguoyun-config',
+                       controller=diary_log_controller,
+                       action='jianguoyun_config',
+                       conditions=dict(method=['POST'])
+                       )
+        # /v1/diary-log/get-jianguoyun-account
+        mapper.connect('/diary-log/get-jianguoyun-account',
+                       controller=diary_log_controller,
+                       action='get_jianguoyun_account',
+                       conditions=dict(method=['GET']))
+        
+        # get get_user_avatar_image 
+        mapper.connect('/diary-log/get-user-avatar-image',
+                       controller=diary_log_controller,
+                       action='get_user_avatar_image',
+                       conditions=dict(method=['GET']))
+
+        # get_user_account_info
+        mapper.connect('/diary-log/get-user-account-info',
+                       controller=diary_log_controller,
+                       action='get_user_account_info',
+                       conditions=dict(method=['GET']))
+        
+        # set set_user_info
+        mapper.connect('/diary-log/set-user-account-info',
+                       controller=diary_log_controller,
+                       action='set_user_account_info',
+                       conditions=dict(method=['POST'])
+                       )
+        # set-user-password-info                 
+        mapper.connect('/diary-log/set-user-password-info',
+                       controller=diary_log_controller,
+                       action='set_user_password_info',
+                       conditions=dict(method=['POST'])
+                       )

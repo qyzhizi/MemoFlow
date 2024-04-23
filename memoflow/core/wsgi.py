@@ -29,7 +29,9 @@ import json
 import six
 from six.moves import http_client
 import webob.dec
-#import webob.exc
+import webob.exc
+from memoflow.exception.visiable_exc import VisibleException
+from memoflow.exception.visiable_exc import VisibleResponse
 
 LOG = log.getLogger(__name__)
 
@@ -286,7 +288,10 @@ class Application(BaseApplication):
 
         params = self._normalize_dict(params)
 
-        result = method(req, **params)
+        try:
+            result = method(req, **params)
+        except VisibleException as e:
+            return VisibleResponse(str(e), status=e.status)
 
         if result is None:
             return render_response(
@@ -298,6 +303,13 @@ class Application(BaseApplication):
             return result
         elif isinstance(result, webob.exc.WSGIHTTPException):
             return result
+        # 添加的部分来检查result是否为字典
+        elif isinstance(result, dict):  # 检查result是否为字典类型
+            # 将字典转换为JSON字符串
+            json_body = json.dumps(result)
+            # 创建一个webob.Response对象，将内容类型设置为application/json
+            response = webob.Response(body=json_body, content_type='application/json', charset='UTF-8')
+            return response
 
 
     def _normalize_arg(self, arg):

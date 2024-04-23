@@ -5,6 +5,7 @@ env_vars = dotenv_values(find_dotenv())
 import os
 
 BASE_URL = 'https://dav.jianguoyun.com/dav/'
+JIANGUOYUN_PREFIX = '/memoflow'
 JIANGUOYUN_COUNT = env_vars.get("JIANGUOYUN_COUNT",  None)
 JIANGUOYUN_TOKEN = env_vars.get("JIANGUOYUN_TOKEN",  None)
 JIANGUOYUN_CURRENT_SYNC_FILE_PATH = env_vars.get("JIANGUOYUN_CURRENT_SYNC_FILE_PATH",  None)
@@ -26,6 +27,9 @@ CONF_OPTS = [
     cfg.StrOpt('base_url',
                default=BASE_URL,
                help='坚果云的基地址'),
+    cfg.StrOpt('jianguoyun_prefix',
+               default=JIANGUOYUN_PREFIX,
+               help='坚果云文件路径前缀'),    
     cfg.StrOpt('JIANGUOYUN_COUNT',
                 default=JIANGUOYUN_COUNT,
                 help='坚果云账号'),

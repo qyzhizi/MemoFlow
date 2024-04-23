@@ -1,106 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <title>MemoFlow</title>
+    <title>Settings</title>
     <meta charset="UTF-8">
-    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"> -->
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="/v1/diary-log/static/styles.css">
+    <style>
+        body {
+            font-family: "Source Code Pro", "Courier New", "等线", Courier, monospace;
+            padding: 10px;
+            /* background-color: #333; */
+            background-color: rgb(24, 24, 27);
+            color: #cbcfd5;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            font-size: 16px;
+            /* 设置根元素的字体大小为16像素 */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            border-radius: 6px;
+        }
+
+        .root {
+            display: flex;
+            height: 100%;
+            min-height: 100vh;
+            position: relative;            
+        }
+        .container1 {
+            display: flex;
+            flex: 1;
+            max-width: 320px;
+            height: 100vh;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            margin-left: auto;
+            margin-right: auto;
+            justify-content: flex-start;
+            align-items: center;
+
+        }
+        .container2{
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            justify-content: center;
+            align-items: center;
+        }
+        .container3{
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .weblogo{
+            border-radius: 9999px;
+            width: auto;
+            height: 3.5rem;
+            max-width: 100%;
+            display: block;
+        }
+        .memoflowtext{
+            margin-left: 0.5rem;
+            font-size: 2.5rem;
+            opacity: .8;
+            --tw-text-opacity: 1;
+            color: rgb(229 231 235 / var(--tw-text-opacity));
+        }
+        .create_your_account{
+            --tw-text-opacity: 1;
+            color: rgb(107 114 128 / var(--tw-text-opacity));
+            font-size: 1.5rem;
+            width: 100%;
+            margin-top: 0.5rem;
+
+        }
+        .login_form{
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        .container4{
+            gap: 1rem;
+            justify-content: flex-start;
+            align-items: flex-start;
+            flex-direction: column;
+            width: 100%;
+            display: flex;
+        }
+        .container4_1{
+            gap: 0.5em;
+            justify-content: flex-start;
+            align-items: flex-start;
+            flex-direction: column;
+            width: 100%;
+            display: flex;
+        }
+        .befor_input_text{
+            --tw-text-opacity: 1;
+            color: rgb(75 85 99 / var(--tw-text-opacity));
+            line-height: 2rem;
+        }
+        .input_div{
+            width: 100%;
+            --Input-minHeight: 2.75rem;
+            --joy-lineHeight-md: 1.5;
+            --joy-palette-neutral-900: #0B0D0E;
+            --joy-palette-background-surface: var(--joy-palette-neutral-900, #0B0D0E);
+            --Input-paddingInline: 1rem;
+            --joy-radius-sm: 6px;
+            --Input-radius: var(--joy-radius-sm);
+            min-height: var(--Input-minHeight);
+            cursor: text;
+            position: relative;
+            display: flex;
+            font-size:  1.125rem;
+            line-height: var(--joy-lineHeight-md, 1.5);
+            color: #DDE7EE;
+            --variant-borderWidth: 1px;
+            background-color: var(--joy-palette-background-surface);
+            padding-inline: var(--Input-paddingInline);
+            border-radius: var(--Input-radius);
+        }
+        .input_text{
+            border: none;
+            min-width: 0px;
+            outline: 0px;
+            padding: 0px;
+            flex: 1 1 0%;
+            color: inherit;
+            background-color: transparent;
+            font-family: inherit;
+            font-size: inherit;
+            font-style: inherit;
+            font-weight: inherit;
+            line-height: inherit;
+            text-overflow: ellipsis;
+
+            --Input-paddingInline:1rem;
+            --Input-paddingInline:1rem;
+            --Input-radius:6px;
+            --variant-borderWidth:1px;
+            margin-inline-start: calc(-1* var(--Input-paddingInline));
+            padding-inline-start: var(--Input-paddingInline);
+            border-top-left-radius: calc(var(--Input-radius) - var(--variant-borderWidth, 0px));
+            border-bottom-left-radius: calc(var(--Input-radius) - var(--variant-borderWidth, 0px));
+            margin-inline-end: calc(-1* var(--Input-paddingInline));
+            padding-inline-end: var(--Input-paddingInline);
+            border-top-right-radius: calc(var(--Input-radius) - var(--variant-borderWidth, 0px));
+            border-bottom-right-radius: calc(var(--Input-radius) - var(--variant-borderWidth, 0px));
+        }
+        .container5{
+            justify-content: flex-end;
+            align-items: center;
+            flex-direction: row;
+            width: 100%;
+            display: flex;
+            margin-top: 1.5rem;
+
+        }
+        .submit{
+            min-height: 2.25rem;
+            --joy-fontSize-sm: 0.875rem;
+            font-size: var(--joy-fontSize-sm);
+            padding-block: 0.375rem;
+            padding-inline: 1rem;
+            --joy-radius-sm: 6px;
+            border-radius: var(--joy-radius-sm);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            -webkit-box-align: center;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            --joy-fontFamily-body: "Inter", var(--joy-fontFamily-fallback, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol");
+            font-family: var(--joy-fontFamily-body);
+            color:  #FFF;
+            background-color:  #0B6BCB;
+            width: 100%;
+}
+
+    </style>
 </head>
-<style>
-    body {
-        font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
-        padding: 10px;
-        background-color: #333;
-        color: #c9cdd1;
-    }
-    .container {
-        max-width: 50ch;
-        margin-left: auto;
-        margin-right: auto;
-    }               
-    form {
-        width: 100%;
-        font-size: 15px;
-        margin-bottom: 5px;
-        display: flex;
-        flex-direction: column;
-        }
-    div{
-            max-width: 100ch;
-        }
-    button {
-        align-self: flex-start;
-        font-size: 20px;
-        color: rgb(211, 198, 129);
-        background-color: #565755;
-    }
-    input {
-                width: 100%;
-                height: 5vh; /* 设置高度 */
-                font-size: 20px;
-                border: 2px solid hwb(216 76% 20% / 0.922); /* 设置边框样式 */ 
-                margin: 0 auto 10px; /* 设置外边距 */
-                font-family: "Source Code Pro","Courier New","等线", Courier, monospace;
-                text-rendering: geometricPrecision;
-                line-height: 1.35;
-                display: block; /* 设置为块级元素 */
-                background-color: #131415;
-                color: #fff;
-                border: 1px solid #999;
-            }
-</style>
+
 <body>
+    <div class="root">
+        <div class="container1">
+            <div class="container2">
+                <div class="container3">
+                    <img class=weblogo src="https://via.placeholder.com/150" alt="Avatar">
+                    <p class="memoflowtext">MemoFlow</p>
 
-    <!-- <h2>Login</h2> -->
-    <div class="container">
-    <form id="loginForm">
-        <label for="username" style="font-size: 20px; color: rgb(176, 177, 170);">Username:</label>
-        <input type="text" id="username" name="username" required>
-        <br>
-        <label for="password" style="font-size: 20px; color: rgb(176, 177, 170);">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br>
-        <button type="button" onclick="login()">Login</button>
-    </form>
+                </div>
+                <p class="create_your_account">
+                    Login
+                </p>
+                <form class="login_form">
+                    <div class="container4">
+                        <div class="container4_1">
+                            <span class="befor_input_text">
+                                Username
+                            </span>
+                            <div class="input_div">
+                                <input placeholder="Username" type="text" required class="input_text" value>
+                            </div>
+                        </div>
+                        <div class="container4_1">
+                            <span class="befor_input_text">
+                                Password
+                            </span>
+                            <div class="input_div">
+                                <input placeholder="Password" type="password" required class="input_text" value>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container5">
+                        <button type="submit" class="submit">
+                            Login
+                        </button>
+                    </div>
+                </form>
+                <p class="w-full mt-4 text-sm"><span class="dark:text-gray-500">Don't have an account yet?</span><a class="cursor-pointer ml-2 text-blue-600 hover:underline" href="/v1/diary-log/register">Sign up</a></p>
+
+            </div>
+
+        </div>
     </div>
-
-    <script>
-        function login() {
-            var username = document.getElementById("username").value;
-            var password = document.getElementById("password").value;
-
-            // Make a POST request to the login endpoint
-            fetch('/v1/diary-log/login', {
-                method: 'POST',
-                // mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json; charset=UTF-8',
-                },
-                body: JSON.stringify({ username: username, password: password }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    console.error("Login failed:", data.error);
-                } else {
-                    console.log("Login successful! Token:", data.token);
-
-                    // Save the token to localStorage
-                    localStorage.setItem('jwtToken', data.token);
-
-                    // Call a function to send protected requests
-                    // sendProtectedRequest();
-
-                    // Redirect to the main page after successful login
-                    window.location.href = '/v1/diary-log';
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-        }
-
-    </script>
+    <script src="/v1/diary-log/static/login.js"></script>
 
 </body>
+
 </html>

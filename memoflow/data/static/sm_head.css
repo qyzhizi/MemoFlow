@@ -1,0 +1,65 @@
+.css-1bkszek {
+    /* --joy-zIndex-modal: 1300;
+    --unstable_popup-zIndex: calc(var(--joy-zIndex-modal) + 1); */
+    position: fixed;
+    z-index: var(--joy-zIndex-modal);
+    inset: 0px;
+    --Drawer-transitionDuration: 0.3s;
+    --Drawer-transitionFunction: ease;
+    --ModalClose-radius: max((var(--Drawer-contentRadius) - var(--variant-borderWidth, 0px)) - var(--ModalClose-inset), min(var(--ModalClose-inset) / 2,(var(--Drawer-contentRadius) - var(--variant-borderWidth, 0px)) / 2));
+    --ModalClose-inset: 0.5rem;
+    --Drawer-verticalSize: clamp(350px, 30%, 100%);
+    --Drawer-horizontalSize: clamp(256px, 20%, 100%);
+    --Drawer-titleMargin: 0.625rem 0.75rem calc(0.625rem / 2);
+    transition-property: visibility;
+    transition-delay: 0s;
+}
+
+.css-4t8k54 {
+    z-index: -1;
+    position: fixed;
+    inset: 0px;
+    background-color: var(--joy-palette-background-backdrop);
+    -webkit-tap-highlight-color: transparent;
+    backdrop-filter: blur(8px);
+    opacity: 1;
+    transition: opacity var(--Drawer-transitionDuration) ease-in-out;
+}
+
+.css-evg8oc {
+
+    /* --joy-shadowRing: 0 0 #000;
+    --joy-shadowChannel: 0 0 0;
+    --joy-shadowOpacity: 0.6; */
+    font-family: var(--joy-fontFamily-body, "Inter", var(--joy-fontFamily-fallback, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"));
+    font-size: var(--joy-fontSize-sm, 0.875rem);
+    line-height: var(--joy-lineHeight-md, 1.5);
+    color: var(--variant-plainColor, var(--joy-palette-neutral-plainColor, var(--joy-palette-neutral-700, #32383E)));
+    box-shadow: var(--joy-shadowRing, 0 0 #000), 0px 2px 8px -2px rgba(var(--joy-shadowChannel, 21 21 21) / var(--joy-shadowOpacity, 0.08)), 0px 6px 12px -2px rgba(var(--joy-shadowChannel, 21 21 21) / var(--joy-shadowOpacity, 0.08));
+    background-color: #0B0D0E;
+    outline: 0px;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    box-sizing: border-box;
+    overflow: auto;
+    top: 0px;
+    right: 0px;
+    transform: translateX(0px);
+    height: 100%;
+    width: min(100vw, var(--Drawer-horizontalSize));
+    transition: transform var(--Drawer-transitionDuration) var(--Drawer-transitionFunction);
+    --variant-borderWidth: 0px;
+}
+
+.css-search-input{
+    cursor: text;
+    position: relative;
+    display: flex;
+    background-color: #0B0D0E;
+    padding-inline: 0.75rem;
+    border-radius: 6px;
+    line-height: 1.5rem;
+    min-width: 0px;
+    min-height: 2.25rem;
+}

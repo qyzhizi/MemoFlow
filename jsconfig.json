@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+      "baseUrl": "./",
+      "paths": {
+        "/v1/diary-log/static/*": ["./memoflow/data/static/*"]
+      }
+    },
+    "exclude": ["node_modules"]
+}
+   

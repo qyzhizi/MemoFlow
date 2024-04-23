@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Settings</title>
+    <meta charset="UTF-8">
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro"> -->
+
+</head>
+
+<body>
+    <div id="jianguoyun-setting-content" class="setting-content">
+        <div class="flex flex-row items-center justify-content-center">
+            <svg fill="#000000" height="50" width="50" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#ffffff" d="M394.86,136.98c-39.168-36.505-90.246-56.611-143.812-56.611c-56.993,0-108.743,22.754-146.744,59.608
+                C93.39,126.618,60,77.501,98.835,15.37c2.938-4.704,1.511-10.899-3.198-13.843c-4.694-2.938-10.899-1.511-13.843,3.198
+                C34.512,80.378,78.6,140.691,90.492,154.708c-31.396,36.841-50.407,84.542-50.407,136.625c0,53.575,20.107,105.046,56.611,144.204
+                c1.859,1.996,4.449,3.595,7.172,3.595c0.059,0,0.118,0,0.177,0c2.663,0,5.219-1.452,7.103-3.341L395.115,151.63
+                c1.928-1.928,2.987-4.751,2.943-7.478C398.009,141.424,396.857,138.839,394.86,136.98z M104.495,413.63
+                c-28.651-34.278-44.319-77.311-44.319-122.297c0-105.247,85.626-190.872,190.872-190.872c44.976,0,88.014,15.667,122.302,44.319
+                L104.495,413.63z"/>
+                <path fill="#ffffff" d="M470.097,338.35c-7-51.809-33.65-103.137-75.045-144.528c-3.924-3.924-10.281-3.924-14.206,0L153.533,421.13
+                c-1.884,1.884-2.943,4.439-2.943,7.103c0,2.663,1.06,5.219,2.943,7.103C203.831,485.634,267.099,512,324.308,512
+                c40.812,0,78.543-13.421,106.262-41.145C463.2,438.23,477.239,391.169,470.097,338.35z M423.119,449.197l-14.279-14.278
+                c-3.924-3.924-10.281-3.924-14.205,0c-3.924,3.924-3.924,10.281,0,14.205l14.276,14.276
+                c-58.436,48.948-159.361,33.934-233.938-35.299l212.843-212.838c34.317,36.932,56.356,81.25,62.37,125.775
+                C455.933,383.565,446.319,421.528,423.119,449.197z"/>
+            </svg>
+
+        </div>
+        <hr class="setting_hr">
+        <div class="setting-title">
+            <div class="flex flex-row items-center">
+                <div class="w-auto flex items-center">
+                    <span class="text-sm mr-1">
+                        (1) Jianguoyun Account
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="css-setting-content w-full">
+            <!-- <input placeholder="e.g.: Username/RepoName" class="css-setting-input" value> -->
+            <input id="jianguoyun_account" placeholder="e.g.: test@gmail.com" class="css-setting-input" value>
+        </div>
+
+        <!-- <hr class="setting_hr"> -->
+        <div class="setting-title">
+            <div class="flex flex-row items-center">
+                <div class="w-auto flex items-center">
+                    <span class="text-sm mr-1">
+                        (2) Jianguoyun Token
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="css-setting-content w-full">
+            <input id="jianguoyun_token" type="password" placeholder="e.g.: a4v92kkwibt9jni4" class="css-setting-input" value>
+        </div>
+        <div class="flex">
+        <input type="checkbox" id="showToken">
+        <label for="showToken">Show Token</label>
+        </div>
+        
+
+        <!-- <div class="setting-title">
+            <div class="flex flex-row items-center">
+                <div class="w-auto flex items-center">
+                    <span class="text-sm mr-1">
+                        (3) Current Sync file
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="css-setting-content w-full">
+            <input id="jianguoyun_current_sync_file" placeholder="e.g.: /path/to/file_name.md" class="css-setting-input" value>
+        </div>
+
+        <div class="setting-title">
+            <div class="flex flex-row items-center">
+                <div class="w-auto flex items-center">
+                    <span class="text-sm mr-1">
+                        (4) Other Sync File List
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="css-setting-content w-full">
+            <input id="jianguoyun_other_sync_file_list" placeholder="e.g.: /path/to/1.md, /path/to/2.md" class="css-setting-input" value>
+        </div> -->
+
+        <!-- <div class="setting-title">
+            <button id="jianguoyun_save_changes_button" class="css-button" type="button">Save Changes</button>
+        </div> -->
+
+        <div class="setting-title">
+            <button id="jianguoyun-save-changes-and-test-connection" 
+            class="css-button" 
+            type="button">Save Changes and Test Connection</button>
+        </div>
+
+        
+
+    </div>
+</body>
+</html>
