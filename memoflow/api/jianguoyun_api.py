@@ -33,8 +33,10 @@ class JianGuoYunClient(object):
 
     def process_path(self, path):
         directory, filename = os.path.split(path)
-        if not directory.startswith(JIANGUOYUN_PREFIX):
-            directory = os.path.join(JIANGUOYUN_PREFIX, directory.lstrip('/'))
+        # if not directory.startswith(JIANGUOYUN_PREFIX) and not directory:
+        if  not directory:
+            # directory = os.path.join(JIANGUOYUN_PREFIX, directory.lstrip('/'))
+            directory = JIANGUOYUN_PREFIX
         dir_processed = '/'
         for dir_path in directory.split('/')[1:]:
             dir_processed = os.path.join(dir_processed, dir_path)

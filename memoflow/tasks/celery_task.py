@@ -154,13 +154,13 @@ def update_texts_to_vector_db_coll(
 #                                       data_base_path=SYNC_DATA_BASE_PATH)
 
 
-celery.conf.beat_schedule = {
-    'run-every-12*60*60-seconds': {
-        'task': 'memoflow.tasks.celery_task.time_task',
-        'schedule': 12*60*60
-    },
-   'time_get_diary_log_task': {
-   'task': 'memoflow.tasks.celery_task.time_get_diary_log_task',
-   'schedule': 1*60*60
-   }
-}
+# celery.conf.beat_schedule = {
+#     'run-every-12*60*60-seconds': {
+#         'task': 'memoflow.tasks.celery_task.time_task',
+#         'schedule': 12*60*60
+#     },
+#    'time_get_diary_log_task': {
+#    'task': 'memoflow.tasks.celery_task.time_get_diary_log_task',
+#    'schedule': 1*60*60
+#    }
+# }
