@@ -10,7 +10,8 @@ html,
 body {
     margin: 0;
     padding: 0;
-    font-size: 16px;
+    font-size: 13px;
+    /* font-size: 16px; */
     /* 设置根元素的字体大小为16像素 */
 }
 
