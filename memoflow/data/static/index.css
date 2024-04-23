@@ -124,7 +124,7 @@ a:hover {
 
 /* 媒体查询 */
 /* @media (min-width: 853px) { */
-@media (min-width: 640px) {
+@media (min-width: 873px) {
     html,body{
         font-size: 16px;
     }
@@ -138,7 +138,7 @@ a:hover {
     }
 }
 /* 媒体查询 */
-@media (min-width: 768px) {
+@media (min-width: 1000px) {
     html,body{
         font-size: 16px;
     }
@@ -284,7 +284,8 @@ pre {
     left: 0;
     /* 将左侧定位到页面左侧 */
     /* Set padding top, right, bottom, and left */
-    padding: 4rem 1rem 2rem 1rem;
+    /* padding: 2rem 1rem 2rem 1rem; */
+    padding: 5vh 1rem 2rem 1rem;
     box-sizing: border-box;
     /* 让 padding 不会增加容器的实际尺寸 */
     /* display: flex; */
