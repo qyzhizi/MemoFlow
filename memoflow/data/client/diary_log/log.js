@@ -454,7 +454,7 @@ function removeLogseqMatches(inputString) {
     var pattern_logseq_mian = /^[\x20]{0,}\t{0,}-[\x20]/gm
     var pattern_logseq_child = /^[\x20]{0,}\t{0,}[\x20]{2}/gm;
     var result1 = splitStringWithPattern(inputString, pattern_logseq_mian);
-    if (inputString && !result1){
+    if ( result1 && result1.length === 0){
         return inputString
     }
     inputString = processInputAndReturnString(result1, pattern_logseq_child)
