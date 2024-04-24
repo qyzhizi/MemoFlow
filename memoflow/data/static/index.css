@@ -272,7 +272,8 @@ pre {
 .modal {
     display: none;
     z-index: 1000;
-    width: 100vw;
+    /* width: 100vw; */
+    width: calc(100vw - var(--scrollbar-width));
     /* Set width to 100% to fill the entire width of the viewport */
     height: 100vh;
     /* Set height to 100% to fill the entire height of the viewport */
@@ -286,7 +287,7 @@ pre {
     /* 将左侧定位到页面左侧 */
     /* Set padding top, right, bottom, and left */
     /* padding: 2rem 1rem 2rem 1rem; */
-    padding: 5vh 0rem 2rem 0rem;
+    padding: 3vh 0rem 2rem 0rem;
     box-sizing: border-box;
     /* 让 padding 不会增加容器的实际尺寸 */
     /* display: flex; */
@@ -297,7 +298,9 @@ pre {
 }
 
 .modal-content {
-    width: 100ch;
+    /* width: 100ch; */
+    width: 100%;
+    max-width: 70rem;
     height: fit-content;
     /* background-color: rgb(39, 45, 45); */
     background-color: rgb(39, 39, 42);

@@ -16,6 +16,9 @@ if (function() { return !this; }()) {
 
 
 $(function() {
+    window.onload = adjustLayout;
+    window.onresize = adjustLayout;
+
     const log_textarea = document.getElementById('log');
     const edit_textarea = document.getElementById('editLog');
     // 绑定 input 事件监听器，以便在输入时调整高度
@@ -111,6 +114,11 @@ $(function() {
 
 });
 
+function adjustLayout() {
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.documentElement.style.setProperty('--scrollbar-width', `${scrollbarWidth}px`);
+}
+  
 // 定义一个防抖函数
 function debounce(func, delay) {
     let timeoutId;
@@ -446,6 +454,9 @@ function removeLogseqMatches(inputString) {
     var pattern_logseq_mian = /^[\x20]{0,}\t{0,}-[\x20]/gm
     var pattern_logseq_child = /^[\x20]{0,}\t{0,}[\x20]{2}/gm;
     var result1 = splitStringWithPattern(inputString, pattern_logseq_mian);
+    if (inputString && !result){
+        return inputString
+    }
     inputString = processInputAndReturnString(result1, pattern_logseq_child)
 
     // 匹配行首的 "  " "\t  " "\t\t  " "\t\t\t  " 等等, 替换为空串
