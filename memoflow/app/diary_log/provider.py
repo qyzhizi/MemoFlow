@@ -17,6 +17,7 @@ from memoflow.api import notion_api
 from memoflow.utils.token_jwt import TokenManager
 from memoflow.api.github_api import GitHupApi
 from memoflow.utils.common import username_to_table_name
+from memoflow.exception.visiable_exc import VisibleException
 
 from typing import (
     Any,
@@ -356,6 +357,36 @@ class Manager(manager.Manager):
                 processed_result.append(pre_str + line)
         return "\n".join(processed_result)
 
+    def find_code_blocks(self, text):
+        pattern = re.compile(r'```')
+        matches = list(pattern.finditer(text))
+        if len(matches) % 2 != 0:
+            raise VisibleException("代码块没有正确闭合", status=400)
+        pair_positions = []
+        for i in range(0, len(matches), 2):
+            pair_positions.append((matches[i].start(), matches[i+1].start()+3))
+        return pair_positions
+
+    def replace_outside_code_blocks(self, text):
+        code_blocks = self.find_code_blocks(text)
+        # 找到所有 # 的位置
+        # hash_positions = [m.start() for m in re.finditer(
+        #     r'(\t{0,}-{0,}[\x20]{1,})(#{1,}[\x20]{1,})', text)]
+        hash_positions = [(m.start(), m.end())for m in re.finditer(
+            r'#{1,}[\x20]{1,}', text)]
+        if hash_positions and hash_positions[0][0]==0:
+            hash_positions = hash_positions[1:]
+
+        # 初始化新文本
+        new_text = list(text)
+        for pos_start, pos_end in hash_positions:
+            # 检查 # 是否在任何一个代码块内
+            if not any(start <= pos_start < end for start, end in code_blocks):
+                # 如果不在代码块内，替换为 @
+                new_text[pos_start:pos_end] = '@'*(pos_end - pos_start - 1) + ' '
+        # 返回新文本
+        return ''.join(new_text)
+
     def process_content(self, content):
         """
         用于生成卡片笔记
@@ -418,7 +449,7 @@ class Manager(manager.Manager):
                     todo_key[1]:todo_value[0],
                     todo_key[2]:todo_value[1],
                     todo_key[3]:todo_value[1]}
-
+        content = self.replace_outside_code_blocks(content)
         content_list = content.split('\n')
         for i, content in enumerate(content_list):
             if i == 0 and content.strip()[:len(title_string)] == title_string:
