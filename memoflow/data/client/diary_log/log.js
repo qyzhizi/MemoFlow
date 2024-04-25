@@ -631,20 +631,7 @@ saveChangesBtn.onclick = function() {
             // 关闭模态框
             modal.style.display = "none";
         },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.log(jqXHR);
-
-            if (jqXHR.status === 401) {
-                // 提示登录已过期
-                alert("登录已过期，请重新登录");
-                // HTTPUnauthorized error
-                console.log("Unauthorized - Redirecting to login page");
-                window.location.href = '/v1/diary-log/login';
-            } else {
-                // Handle other error types as needed
-                console.log("Other error:", textStatus, errorThrown);
-            }
-        }
+        error: xhr_process_error
     });
 
 }
@@ -671,90 +658,6 @@ function editLogEntry(pre, record_id) {
     // 显示模态框
     // modal.style.display = "block";
     modal.style.display = "flex";
-
-    // // 获取保存按钮
-    // var saveChangesBtn = document.getElementById('saveChangesBtn');
-
-    // // 获取关闭按钮，并为其添加点击事件处理程序
-    // var closeBtn = document.getElementsByClassName("close")[0];
-    // closeBtn.onclick = function() {
-    //     // 弹出窗口提示是否提交
-    //     var confirmation = confirm("是否关闭编辑页面？");
-
-    //     // 如果用户点击确定按钮
-    //     if (confirmation) {
-    //         // 清空编辑框
-    //         editLog.value = '';
-    //         // 关闭模态框
-    //         modal.style.display = "none";
-    //     } 
-
-    // }
-
-    // 当用户点击模态框外部区域时，关闭模态框
-    // var modal = document.getElementById('editLogModal');
-    
-    
-    
-    
-    // modal.addEventListener('mousedown', function(event) {
-    //     if (!modalContent.contains(event.target)) {
-    //         console.log("isMouseDown = true;")
-    //         isMouseDown = true;
-    //     }
-    //     event.stopPropagation(); // 阻止事件冒泡
-    // });
-    
-
-
-
-    // // 当用户点击保存按钮时
-    // saveChangesBtn.onclick = function() {
-    //     // 获取编辑后的日志内容
-    //     var editedText = editLog.value;
-
-    //     // 这里可以发送请求到后端，保存编辑后的日志内容
-    //     if (editedText === '') {
-    //         console.log("log is none")
-    //         return; // 退出函数
-    //     }
-
-    //     $.ajax({
-    //         url: '/v1/diary-log/updatelog',
-    //         type: 'POST',
-    //         headers: {
-    //             'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
-    //         },
-    //         contentType: 'application/json',
-    //         data: JSON.stringify({content: editedText, record_id: record_id}),
-    //         success: function(response) {
-    //             response = JSON.parse(response)
-    //             const reponseText = response.content
-    //             // 更新原始的日志内容
-    //             pre.text(reponseText);
-    //             replaceURLsWithLinks(pre)
-    //             // 清空编辑框
-    //             editLog.value = '';
-    //             // 关闭模态框
-    //             modal.style.display = "none";
-    //         },
-    //         error: function(jqXHR, textStatus, errorThrown) {
-    //             console.log(jqXHR);
-
-    //             if (jqXHR.status === 401) {
-    //                 // 提示登录已过期
-    //                 alert("登录已过期，请重新登录");
-    //                 // HTTPUnauthorized error
-    //                 console.log("Unauthorized - Redirecting to login page");
-    //                 window.location.href = '/v1/diary-log/login';
-    //             } else {
-    //                 // Handle other error types as needed
-    //                 console.log("Other error:", textStatus, errorThrown);
-    //             }
-    //         }
-    //     });
-
-    // }
 
     // 将原始日志内容填充到编辑框中
     var pre_text = getOriginTextFromPre(pre);
@@ -872,6 +775,41 @@ function getOriginTextFromPre(element) {
 // 假设有一个 id 为 logList 的容器，你可以调用 addLogEntry 函数来添加日志条目。
 // 例如：
 // addLogEntry('这是一条日志信息');
+function xhr_process_error(xhr, status, error) {
+    // 读取失败时返回的内容
+    var statusCode = xhr.status;
+    var errorMessage = xhr.responseText;
+
+    if (statusCode === 401) {
+        alert("登录已过期，请重新登录");
+        console.log("Unauthorized - Redirecting to login page");
+        window.location.href = '/v1/diary-log/login';
+    } 
+
+    // 检查状态码是否为 4xx
+    if (statusCode >= 400 && statusCode < 500) {
+        // 如果返回的内容是 JSON 格式，可以尝试解析
+        try {
+            var errorData = JSON.parse(errorMessage);
+            if ('VisibleError' in errorData) {
+                alert('error: ' + errorData.VisibleError)}
+        } catch (e) {
+            console.error('Failed to parse error data:', e);
+        }
+    } else if(statusCode >= 500){
+        // 如果返回的内容是 JSON 格式，可以尝试解析
+        try {
+            var errorData = JSON.parse(errorMessage);
+            if ('VisibleError' in errorData) {
+                alert('error: ' + errorData.VisibleError)}
+        } catch (e) {
+            console.error('Failed to parse error data:', e);
+        }
+    }
+    else {
+        console.log('Not a 4xx error, skipping parsing.');
+    }
+}
 
 function addLog() {
     const now = new Date();
@@ -896,9 +834,7 @@ function addLog() {
             $('#log').val('');
             // console.log(response);
         },
-        error: function(error) {
-            console.log(error);
-        }
+        error: xhr_process_error
     });
 }
 
