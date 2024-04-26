@@ -41,7 +41,7 @@ $('body').on('click', '#save-password-info-edit', function() {
         success: function(response){
             // 在这里处理上传成功后的操作
             showoff_class("dialog-wrapper change-password-dialog showup")
-            showNotification('Success!');
+            showNotification('Success!', 1000);
 
         },
         error: function(xhr, status, error){

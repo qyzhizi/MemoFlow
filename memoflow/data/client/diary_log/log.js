@@ -7,6 +7,9 @@ import {  getSmHeadNavHtml
 } from '/v1/diary-log/static/sm_head_nav.js';
 import {  getSmSearchDivHtml
 } from '/v1/diary-log/static/sm_head_search.js';
+import {
+    showNotification
+} from '/v1/diary-log/static/utils.js';
 
 if (function() { return !this; }()) {
     console.log("严格模式下运行");
@@ -111,6 +114,7 @@ $(function() {
             event.returnValue = " ";
         }
     });
+    // copyIconSvgButtonListener();
 
 });
 
@@ -277,10 +281,11 @@ function autoResize(textarea_id) {
 
 
 function addLogEntry(logText, record_id, reverse=true) {
-    var pre = $('<pre class="log-entry"></pre>'); // 添加一个类以便样式控制
-    // 将 pre 元素的内容添加到 pre 中
-    pre.text(logText);
-    replaceURLsWithLinks(pre);
+    var log_entry = $('<div class="log_entry"></div>'); // 添加一个类以便样式控制
+    // 将 log_entry 元素的内容添加到 log_entry 中
+    log_entry.text(logText);
+    log_entry.data('logText', logText);
+    processLogEntryText(log_entry);
     // 创建一个包含下拉菜单的容器
     var logEntryContainer = $('<div class="log-entry-container"></div>');
     // 下拉菜单图标容器
@@ -317,8 +322,8 @@ function addLogEntry(logText, record_id, reverse=true) {
     dropdownContainer.append(dropdownMenu);
     // 将 dropdownContainer 添加到 logEntryContainer 中
     logEntryContainer.append(dropdownContainer);
-    // 将 pre 添加到 logEntryContainer 中
-    logEntryContainer.append(pre);
+    // 将 log_entry 添加到 logEntryContainer 中
+    logEntryContainer.append(log_entry);
     // 将 logEntryContainer 添加到 logList 中
     var logList= $('#logList');
     if(reverse == true){
@@ -343,7 +348,9 @@ function addLogEntry(logText, record_id, reverse=true) {
     // 添加复制选项点击事件处理程序
     copyOption.click(function() {
         // 复制日志文本到剪贴板
-        copyToClipboard(removeLogseqMatches(pre.text()));
+        // copyToClipboard(removeLogseqMatches(pre.text()));
+        copyToClipboard(removeLogseqMatches(
+            log_entry.data('logText')));
         // 隐藏下拉菜单
         dropdownMenu.hide()
     });
@@ -353,7 +360,7 @@ function addLogEntry(logText, record_id, reverse=true) {
         record_id = dropdownMenu.data('record_id')
         console.log("record_id : ", record_id)
         // 编辑日志条目
-        editLogEntry(pre, record_id);
+        editLogEntry(log_entry, record_id);
         // 隐藏下拉菜单
         dropdownMenu.hide();
     });
@@ -374,7 +381,7 @@ function addLogEntry(logText, record_id, reverse=true) {
     // latexView 选项点击事件处理程序
     latexView.click(function() {
         // 渲染当前笔记中出现的公式
-        renderLatexInLog(pre);
+        renderLatexInLog(log_entry);
         // 隐藏下拉菜单
         dropdownMenu.hide();
     });
@@ -600,7 +607,7 @@ saveChangesBtn.onclick = function() {
 
     // 获取cur_record_id属性的值
     var curRecordId = editLog.getAttribute('cur_record_id');
-    var pre = editLog.curPreObject;
+    var log_entry = editLog.curPreObject;
     // 获取编辑后的日志内容
     var editedText = editLog.value;
 
@@ -620,10 +627,12 @@ saveChangesBtn.onclick = function() {
         data: JSON.stringify({content: editedText, record_id: curRecordId}),
         success: function(response) {
             response = JSON.parse(response)
-            const reponseText = response.content
+            const logText = response.content
             // 更新原始的日志内容
-            pre.text(reponseText);
-            replaceURLsWithLinks(pre)
+            log_entry.text(logText);
+            log_entry.data('logText', logText);
+            debugger;
+            processLogEntryText(log_entry)
             // 清空编辑框
             editLog.value = '';
             editLog.curPreObject = null;
@@ -637,7 +646,7 @@ saveChangesBtn.onclick = function() {
 }
 
 
-function editLogEntry(pre, record_id) {
+function editLogEntry(log_entry, record_id) {
     
     // 获取编辑框元素
     var modal = document.getElementById('editLogModal');
@@ -652,17 +661,18 @@ function editLogEntry(pre, record_id) {
 
     // 将record_id赋值给editLog的cur_record_id属性
     editLog.setAttribute('cur_record_id', record_id);
-    // 将 pre 赋值给 editLog 
-    editLog.curPreObject = pre;
+    // 将 log_entry 赋值给 editLog 
+    editLog.curPreObject = log_entry;
 
     // 显示模态框
     // modal.style.display = "block";
     modal.style.display = "flex";
 
     // 将原始日志内容填充到编辑框中
-    var pre_text = getOriginTextFromPre(pre);
-    pre_text = restoreLatexFromRendered(pre)
-    editLog.value = removeLogseqMatches(pre_text);
+    // var pre_text = getOriginTextFromPre(log_entry);
+    // pre_text = restoreLatexFromRendered(log_entry)
+    let log_text = log_entry.data('logText')
+    editLog.value = removeLogseqMatches(log_text);
     //  
     autoResize('editLog')
 }
@@ -700,9 +710,9 @@ function deleteLogEntry(record_id, logentrycontainer) {
 
 
 // 渲染 Latex 公式
-function renderLatexInLog(pre){
+function renderLatexInLog(log_entry){
     // 获取原始的 LaTeX 公式内容
-    var latexContent = pre.html();
+    var latexContent = log_entry.html();
     // 提取 LaTeX 公式
     var latexEquations = latexContent.match(
         /(\s\$\$[\s\S]*?\$\$|\s\$[\s\S]*?\$)/g);
@@ -723,7 +733,7 @@ function renderLatexInLog(pre){
         latexContent = latexContent.replace(eq, span.outerHTML);
     });
     // 将替换后的内容放回原始元素中
-    pre.html(latexContent);
+    log_entry.html(latexContent);
 }
 
 
@@ -741,19 +751,228 @@ function restoreLatexFromRendered(element) {
 }
 
 
-// Function to replace URLs with hyperlinks within a <pre> element
-function replaceURLsWithLinks(pre_element) {
+// Function to replace URLs with hyperlinks within a <log_entry> element
+function replaceURLsWithLinks(log_entry) {
     // element 是 jQuery 对象
-    // Get the text content of the <pre> element
-    var content = pre_element.html();
+    // Get the text content of the <log_entry> element
+    var content = log_entry.html();
     // Regular expression to find URLs within the text
     var urlRegex = /(?<=^|\s)(https?:\/\/[^\s]+)/g;
     // Replace URLs with hyperlinks
     content = content.replace(urlRegex, function(url) {
       return '<a href="' + url + '">' + url + '</a>';
     });
-    // Set the HTML content of the <pre> element with the replaced content
-    pre_element.html(content);
+    // Set the HTML content of the <log_entry> element with the replaced content
+    log_entry.html(content);
+}
+
+
+// function replaceCodeWithPre(log_entry) {
+//     // debugger;
+//     var copyIcon = $(<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy w-4 h-auto"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>)
+
+//     // 获取<log_entry>元素的文本内容
+//     var content = log_entry.html();
+    
+//     // 定义匹配三个反引号包围的代码段的正则表达式
+//     var codeRegex = /```([\s\S]*?)```/g;
+
+//     content = content.replace(codeRegex, function(match, code) {
+//         // 移除代码段开头的换行符
+//         code = code.replace(/^\n+/, '');
+//         code = code.trimEnd();
+    
+//         if (code.length === 0) {
+//             // 空代码段处理方式1：替换为空白
+//             return '<pre></pre>';
+//         }
+    
+//         // 使用<pre>标签包裹代码段
+//         return '<pre>' + code + '</pre>';
+//     });    
+
+//     // 设置<log_entry>元素的HTML内容为替换后的内容
+//     log_entry.html(content);
+// }
+
+function copyIconSvgButtonListener(button) {
+    // debugger;
+    // 为所有的.copyIconSvgButton按钮添加点击事件监听器
+    button.click(function () {
+        // debugger;
+
+        // 获取点击按钮所在的code-container元素
+        var codeContainer = $(this).closest('.code-container');
+
+        // 获取code-container中的pre元素的文本内容
+        var code = codeContainer.find('pre').text();
+        copyToClipboard(removeMinimumIndentation(code))
+        showNotification('Success!', 700);
+
+        // alert('代码已复制到剪贴板！');
+    });
+}
+
+
+function replaceCodeWithPre(log_entry) {
+    // 定义语言映射表
+    const languageMap = {
+        'python': 'Python',
+        'c': 'C',
+        'make': 'Makefile',
+        'cmd': 'CMD',
+        'sql': 'SQL',
+        'db': 'Database',
+        'mongodb': 'MongoDB',
+        'c#': 'C#',
+        'c++': 'C++',
+        'objective-c': 'Objective-C',
+        'objective-c++': 'Objective-C++',
+        'js': 'JavaScript',
+        'javascript': 'JavaScript',
+        'css': 'CSS',
+        'html': 'HTML',
+        'php': 'PHP',
+        'go': 'Go',
+        'ruby': 'Ruby',
+        'rust': 'Rust',
+        'java': 'Java',
+        'shell': 'Shell',
+        'sh': 'Shell',
+        'code': 'Code',
+        'py': 'Python'
+    };
+    // 复制图标的HTML字符串
+    var copyIcon = $(`<div class="copyIcon"> 
+    <span class="codeTag">Code</span>
+    <button class="copyIconSvgButton">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy w-4 h-auto"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+    </button>
+    </div>`);
+    
+    // 获取<log_entry>元素的文本内容
+    var content = log_entry.html();
+    
+    // 定义匹配三个反引号包围的代码段的正则表达式
+    // var codeRegex = /```([\s\S]*?)```/g;
+    // var codeRegex = /```(python|c|c\+\+|js|css|html|go|ruby|java)\s*\n([\s\S]*?)```/g;
+    // var codeRegex = /```(python|c|c\+\+|js|css|html|go|ruby|java|(?=))\s*\n([\s\S]*?)```/g
+    // var codeRegex = /```((?:python|c|c\+\+|js|css|html|go|ruby|java)?)\s*\n([\s\S]*?)```/g
+    // const codeRegex = /```(objective-c\+*|\w*)([^]*)```/gi;
+    const codeRegex = /```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```/gi;
+    content = content.replace(codeRegex, function(match, language, code) {
+        language = language.toLowerCase();
+        let languageName = languageMap[language];
+      //   let languageName = languageMap[language] || 'None';
+        
+        // 如果找不到对应的语言名称，将匹配项合并到代码中
+        if (!languageName) {
+          code = language + code;
+        }
+        // 移除代码段开头和结尾的换行符
+        code = code.replace(/^\n+/, '').trimEnd();
+    
+        if (code.length === 0) {
+            // 空代码段处理方式1：替换为空白
+            return '<div class="code-container"><pre></pre></div>';
+        }
+        if (languageName){
+            copyIcon.find('span').text(languageName);
+        }
+
+    
+        // 使用<div>标签包裹复制图标和<pre>标签
+        return `<div class="code-container">${copyIcon.prop('outerHTML')}<pre>${code}</pre></div>`;
+    });  
+
+    const singleLineCode = /`([^`]+)`/g;
+    content = content.replace(singleLineCode, function(match, code) {
+        return `<span class="singleLineCode">${code}</span>`;
+
+    });
+
+    const tagRegex = /(^|\s)#\w+\b/g;
+    content = content.replace(tagRegex, function(match) {
+        return `<span class="tag">${match}</span>`;
+
+    });
+
+    // 设置<log_entry>元素的HTML内容为替换后的内容
+    log_entry.html(content);
+
+    // 获取替换后的代码块元素
+    var codeContainers = log_entry.find('.code-container');
+
+    // 为每个代码块元素添加点击事件监听器
+    codeContainers.each(function() {
+        var button = $(this).find('.copyIconSvgButton');
+        copyIconSvgButtonListener(button);
+    });
+}
+
+
+function replaceTabWithSpace(log_entry) {
+    // 获取<log_entry>元素的文本内容
+    var content = log_entry.html();
+    
+    // 定义匹配\t的正则表达式
+    var tabRegex = /\t{1,}/g;
+
+    content = content.replace(tabRegex, function(match) {
+        // 使用空格替换
+        return '  '.repeat(match.length);
+    });    
+
+    // 设置<log_entry>元素的HTML内容为替换后的内容
+    log_entry.html(content);
+}
+
+
+function removeMinimumIndentation(text) {
+    // 将文本分割成行数组
+    const lines = text.split('\n');
+
+    // 初始化最小缩进量为一个较大的值
+    let minIndentation = Infinity;
+
+    // 遍历每一行，找到最小缩进量，但不处理空行
+    for (const line of lines) {
+        if (line.trim() === '') {
+            continue;
+        }
+
+        let indentation = 0;
+        while (line[indentation] === ' ') {
+            indentation++;
+        }
+
+        if (indentation < minIndentation) {
+            minIndentation = indentation;
+        }
+    }
+
+    // 如果所有行都是空行或没有缩进，设置最小缩进为0
+    if (minIndentation === Infinity) {
+        minIndentation = 0;
+    }
+
+    // 去除每行的最小缩进量空格，并忽略完全是空格的行
+    const result = lines.map(line => {
+        if (line.trim() === '') {
+            return line;
+        } else {
+            return line.slice(minIndentation);
+        }
+    }).join('\n');
+
+    return result;
+}
+
+  
+function processLogEntryText(log_entry){
+    replaceURLsWithLinks(log_entry);
+    replaceTabWithSpace(log_entry);
+    replaceCodeWithPre(log_entry);
 }
 
 

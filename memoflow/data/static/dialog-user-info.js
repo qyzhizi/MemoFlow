@@ -216,7 +216,7 @@ $('body').on('click', '#save-account-info-edit', function() {
             set_user_name_and_avatar('account-info')
             set_user_name_and_avatar('nav-fixed-child')
             // .then(() => alert('Success!'))
-            .then(() => showNotification('Success!'))
+            .then(() => showNotification('Success!', 1000))
             .catch(error => console.error("操作失败", error));
 
         },

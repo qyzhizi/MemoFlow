@@ -53,6 +53,7 @@ a {
     /* color: yellowgreen; */
     color: rgb(96 165 250);
     text-decoration: none;
+    text-decoration-line: underline;
 }
 a:hover {
     /* color: yellow; */
@@ -199,7 +200,7 @@ h3 {
     color: coral;
 }
 
-pre {
+.log_entry {
     white-space: pre-wrap;
     word-wrap: break-word;
     /* padding: 2px;  */
@@ -222,6 +223,70 @@ pre {
     border-radius: 6px;
     /* 设置所有四个角的圆角大小为 10 像素 */
     /* background-color: #27272A; */
+}
+
+pre{
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    /* color: white; */
+    background-color: rgb(63, 63, 70);
+}
+
+.code-container{
+display: flex;
+flex-direction: column;
+background-color: rgb(63, 63, 70);
+/* align-items: end; */
+}
+.singleLineCode{
+    color:rgb(184, 187, 38);
+    background-color: rgb(63, 63, 70);
+    border-radius: 2px;
+}
+
+.tag{
+    color:rgb(254, 121, 45);
+    background-color: rgb(63, 63, 70);
+    border-radius: 2px;
+}
+.copyIcon{
+    align-items: center;
+    justify-content: space-between;
+    display: flex;
+}
+.codeTag{
+    /* color: yellowgreen */
+    color: rgb(142, 192, 124)
+}
+.copyIconSvgButton{
+    --Icon-margin: initial;
+    --Icon-color: var(--joy-palette-text-icon);
+    --Icon-fontSize: calc(var(--IconButton-size, 2rem) / 1.6);
+    --CircularProgress-size: 20px;
+    --CircularProgress-thickness: 2px;
+    min-width: var(--IconButton-size, 2rem);
+    min-height: var(--IconButton-size, 2rem);
+    font-size: var(--joy-fontSize-sm);
+    padding-inline: 2px;
+    -webkit-tap-highlight-color: transparent;
+    padding-block: 0px;
+    font-family: var(--joy-fontFamily-body);
+    font-weight: var(--joy-fontWeight-md);
+    margin: var(--IconButton-margin);
+    border-radius: var(--IconButton-radius, var(--joy-radius-sm));
+    border: none;
+    box-sizing: border-box;
+    background-color: transparent;
+    cursor: pointer;
+    display: inline-flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    position: relative;
+    --variant-borderWidth: 0px;
+    color: var(--variant-plainColor, var(--joy-palette-neutral-plainColor, var(--joy-palette-neutral-700, #32383E)));
+    --IconButton-size: 24px;   
 }
 
 

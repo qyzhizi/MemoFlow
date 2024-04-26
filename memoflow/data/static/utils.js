@@ -219,7 +219,7 @@ function showoff_class(class_name){
 //       document.body.removeChild(notification);
 //     }, 3000); // 3秒后自动消失
 //   }
-function showNotification(message) {
+function showNotification(message, time) {
     const notification = document.createElement("div");
     notification.style.position = "fixed";
     notification.style.top = "20px";
@@ -251,7 +251,7 @@ function showNotification(message) {
   
     setTimeout(() => {
       document.body.removeChild(notification);
-    }, 3000); // 3秒后自动消失
+    }, time); // 3秒后自动消失
 }
 
 
