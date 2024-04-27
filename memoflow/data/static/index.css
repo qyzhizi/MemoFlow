@@ -290,6 +290,13 @@ background-color: rgb(63, 63, 70);
 }
 
 
+.latexMath {
+    font-size: 12px;
+    overflow-x: hidden; /* 隐藏水平滚动条 */
+    width: auto; /* 根据内容自动调整宽度 */
+    /* white-space: nowrap; */
+    /* display: inline-block; 将span元素转换为块级元素，以便设置宽度 */
+}
 
 
 .log-entry-container {

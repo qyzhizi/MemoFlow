@@ -314,7 +314,7 @@ function addLogEntry(logText, record_id, reverse=true) {
     // 添加删除选项
     var deleteOption = $('<div class="dropdown-option delete-option">删除</div>');
     // 添加LatexView选项
-    var latexView = $('<div class="dropdown-option delete-option">latexView</div>');
+    var latexView = $('<div class="dropdown-option latexView-option">latexView</div>');
 
     // 将下拉菜单图标添加到 dropdownContainer 中
     dropdownContainer.append(dropdownIcon);
@@ -382,6 +382,15 @@ function addLogEntry(logText, record_id, reverse=true) {
     latexView.click(function() {
         // 渲染当前笔记中出现的公式
         renderLatexInLog(log_entry);
+        
+        // renderLatexInLog 这里 重置了 html, 需要重新设置监听函数
+        // 获取替换后的代码块元素
+        var codeContainers = log_entry.find('.code-container');
+        // 为每个代码块元素添加点击事件监听器
+        codeContainers.each(function() {
+            var button = $(this).find('.copyIconSvgButton');
+            copyIconSvgButtonListener(button);
+        });
         // 隐藏下拉菜单
         dropdownMenu.hide();
     });
@@ -709,30 +718,27 @@ function deleteLogEntry(record_id, logentrycontainer) {
 }
 
 
-// 渲染 Latex 公式
-function renderLatexInLog(log_entry){
-    // 获取原始的 LaTeX 公式内容
+// latexContent = latexContent.replace(/(\s[\$]{1,2}[\s\S]*?[\$]{1,2}|\s\$[\s\S]*?\$)/g, 
+function renderLatexInLog(log_entry) {
+    // 获取原始的 HTML 内容
     var latexContent = log_entry.html();
-    // 提取 LaTeX 公式
-    var latexEquations = latexContent.match(
-        /(\s\$\$[\s\S]*?\$\$|\s\$[\s\S]*?\$)/g);
-    // 判断 latexEquations 是否为 null
-    if (latexEquations === null) {
-        return;
-    }
-    // 渲染 LaTeX 公式
-    latexEquations.forEach(function(eq) {
-        var equation = eq.substring(1, eq.length); // 去除开头的空白符号
-        equation = equation.replace(/^(\$+)|(\$+)$/g, '');// 去除 "$$" 符号
-        equation = equation.trim(); // 去除前后空白字符
-        var span = document.createElement('span');
-        katex.render(equation, span);
-        span.className = 'katex';
-        // 为 span 元素添加 data-latex 属性以存储原始的 LaTeX 代码
-        span.setAttribute('data-latex', equation);
-        latexContent = latexContent.replace(eq, span.outerHTML);
-    });
+
+    // 匹配所有 LaTeX 公式并渲染
+    var latexContent = latexContent.replace(/(\$\$[\s\S]*?\$\$|\$[\s\S]*?\$)/g,
+        function(match) {
+            var equationHtml = $("<div>").html(match).text(); // 将 HTML 字符串解析为文本
+            var equation = equationHtml.trim().replace(/^\$+|\$+$/g, ''); // 去除首尾的 "$" 符号
+            var span = document.createElement('span');
+            // 为 span 元素添加 data-latex 属性以存储原始的 LaTeX 代码
+            span.setAttribute('data-latex', match);
+            span.classList.add('latexMath'); // 添加类名
+            katex.render(equation, span);
+            return span.outerHTML;
+        }
+    );
+
     // 将替换后的内容放回原始元素中
+    log_entry.data('LatexParsed', true);
     log_entry.html(latexContent);
 }
 
