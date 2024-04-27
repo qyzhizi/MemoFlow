@@ -346,13 +346,32 @@ function addLogEntry(logText, record_id, reverse=true) {
     });
 
     // 添加复制选项点击事件处理程序
-    copyOption.click(function() {
-        // 复制日志文本到剪贴板
-        // copyToClipboard(removeLogseqMatches(pre.text()));
-        copyToClipboard(removeLogseqMatches(
-            log_entry.data('logText')));
-        // 隐藏下拉菜单
-        dropdownMenu.hide()
+    // copyOption.click(function() {
+    //     // 复制日志文本到剪贴板
+    //     // copyToClipboard(removeLogseqMatches(pre.text()));
+    //     copyToClipboard(removeLogseqMatches(
+    //         log_entry.data('logText')));
+    //     // 隐藏下拉菜单
+    //     dropdownMenu.hide()
+    // });
+    // 获取 copyOption 元素对应的 DOM 元素
+    let copyOptionDOM = copyOption.get(0);
+    let clipboard = new ClipboardJS(copyOptionDOM, {
+        text: function(trigger) {
+          return removeLogseqMatches(
+            log_entry.data('logText'));
+        }
+      });
+    // 处理复制成功事件（可选）
+    clipboard.on('success', function(e) {
+        console.log('复制成功');
+        showNotification('Copy Success!', 700);
+        e.clearSelection();
+    });
+    
+    // 处理复制失败事件（可选）
+    clipboard.on('error', function(e) {
+        console.error('复制失败：', e.action);
     });
 
     // 添加编辑选项点击事件处理程序
@@ -527,17 +546,26 @@ function removeLogseqMatches(inputString) {
 }
 
 // 复制到剪贴板函数
-function copyToClipboard(text) {
-    // 创建一个新的 ClipboardItem 对象
-    const clipboardItem = new ClipboardItem({ "text/plain": new Blob([text], { type: "text/plain" }) });
+// function copyToClipboard(text) {
+//     // 创建一个新的 ClipboardItem 对象
+//     const clipboardItem = new ClipboardItem({ "text/plain": new Blob([text], { type: "text/plain" }) });
   
-    // 将文本添加到剪贴板
-    navigator.clipboard.write([clipboardItem]).then(function() {
-      console.log('文本已成功复制到剪贴板');
-    }).catch(function(err) {
-      console.error('复制失败:', err);
-    });
-  }
+//     // 将文本添加到剪贴板
+//     navigator.clipboard.write([clipboardItem]).then(function() {
+//       console.log('文本已成功复制到剪贴板');
+//     }).catch(function(err) {
+//       console.error('复制失败:', err);
+//     });
+//   }
+
+// function copyToClipboard(text) {
+//     var tempInput = document.createElement("input");
+//     tempInput.value = text;
+//     document.body.appendChild(tempInput);
+//     tempInput.select();
+//     document.execCommand("copy");
+//     document.body.removeChild(tempInput);
+// }
 
 
 // let modalMousedownisListenerAttached = false;
@@ -802,22 +830,47 @@ function replaceURLsWithLinks(log_entry) {
 //     log_entry.html(content);
 // }
 
+// function copyIconSvgButtonListener(button) {
+//     // debugger;
+//     // 为所有的.copyIconSvgButton按钮添加点击事件监听器
+//     button.click(function () {
+//         // debugger;
+
+//         // 获取点击按钮所在的code-container元素
+//         var codeContainer = $(this).closest('.code-container');
+
+//         // 获取code-container中的pre元素的文本内容
+//         var code = codeContainer.find('pre').text();
+//         copyToClipboard(removeMinimumIndentation(code))
+//         showNotification('Success!', 700);
+
+//         // alert('代码已复制到剪贴板！');
+//     });
+// }
+
+
 function copyIconSvgButtonListener(button) {
-    // debugger;
-    // 为所有的.copyIconSvgButton按钮添加点击事件监听器
-    button.click(function () {
-        // debugger;
-
-        // 获取点击按钮所在的code-container元素
-        var codeContainer = $(this).closest('.code-container');
-
-        // 获取code-container中的pre元素的文本内容
-        var code = codeContainer.find('pre').text();
-        copyToClipboard(removeMinimumIndentation(code))
-        showNotification('Success!', 700);
-
-        // alert('代码已复制到剪贴板！');
+    button = button.get(0)
+    let clipboard = new ClipboardJS(button,{
+        text: function(trigger){
+            // trigger DOM 元素
+            var codeContainer =  trigger.closest('.code-container');
+            var code = codeContainer.querySelector('pre').textContent;
+            return removeMinimumIndentation(code)
+        }
     });
+    // 处理复制成功事件（可选）
+    clipboard.on('success', function(e) {
+        console.log('复制成功');
+        showNotification('Copy Success!', 700);
+        e.clearSelection();
+    });
+    
+    // 处理复制失败事件（可选）
+    clipboard.on('error', function(e) {
+        console.error('复制失败：', e.action);
+    });
+    
 }
 
 
