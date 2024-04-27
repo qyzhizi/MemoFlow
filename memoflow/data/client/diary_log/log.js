@@ -723,11 +723,12 @@ function renderLatexInLog(log_entry) {
     // 获取原始的 HTML 内容
     var latexContent = log_entry.html();
 
-    // 匹配所有 LaTeX 公式并渲染
-    var latexContent = latexContent.replace(/(\$\$[\s\S]*?\$\$|\$[\s\S]*?\$)/g,
+    // 匹配所有 LaTeX 公式并渲染, "$" "\[" "\]" "\(" "\)"
+    var latexContent = latexContent.replace(/(\$\$[\s\S]*?\$\$|\$[\s\S]*?\$|\\\[([\s\S]*?)\\\]|\\\(([\s\S]*?)\\\))/g,
         function(match) {
             var equationHtml = $("<div>").html(match).text(); // 将 HTML 字符串解析为文本
-            var equation = equationHtml.trim().replace(/^\$+|\$+$/g, ''); // 去除首尾的 "$" 符号
+            // 去除首尾的 "$" "\[" "\]" "\(" "\)" 符号
+            var equation = equationHtml.trim().replace(/^\$+|\$+$|^\\\[|\\\]+$|^\\\(|\\\)+$/g, ''); 
             var span = document.createElement('span');
             // 为 span 元素添加 data-latex 属性以存储原始的 LaTeX 代码
             span.setAttribute('data-latex', match);
