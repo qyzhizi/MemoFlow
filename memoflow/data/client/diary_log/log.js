@@ -399,6 +399,11 @@ function addLogEntry(logText, record_id, reverse=true) {
 
     // latexView 选项点击事件处理程序
     latexView.click(function() {
+        // 判断是否已经解析过, 否则再次解析会解析错误
+        if (log_entry.data('LatexParsed')){
+            console.log("Latex Already Parsed")
+            return;
+        }
         // 渲染当前笔记中出现的公式
         renderLatexInLog(log_entry);
         
@@ -752,7 +757,7 @@ function renderLatexInLog(log_entry) {
     var latexContent = log_entry.html();
 
     // 匹配所有 LaTeX 公式并渲染, "$" "\[" "\]" "\(" "\)"
-    var latexContent = latexContent.replace(/(\$\$[\s\S]*?\$\$|\$[\s\S]*?\$|\\\[([\s\S]*?)\\\]|\\\(([\s\S]*?)\\\))/g,
+    var latexContent = latexContent.replace(/(\$\$[\s\S]*?\$\$|\$[\s\S]*?\$|\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\))/g,
         function(match) {
             var equationHtml = $("<div>").html(match).text(); // 将 HTML 字符串解析为文本
             // 去除首尾的 "$" "\[" "\]" "\(" "\)" 符号
