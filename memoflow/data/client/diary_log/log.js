@@ -669,7 +669,6 @@ saveChangesBtn.onclick = function() {
             // 更新原始的日志内容
             log_entry.text(logText);
             log_entry.data('logText', logText);
-            debugger;
             processLogEntryText(log_entry)
             // 清空编辑框
             editLog.value = '';
@@ -748,9 +747,10 @@ function deleteLogEntry(record_id, logentrycontainer) {
 
 
 // latexContent = latexContent.replace(/(\s[\$]{1,2}[\s\S]*?[\$]{1,2}|\s\$[\s\S]*?\$)/g, 
-function renderLatexInLog(log_entry) {
+function renderLatexInLog(log_entry_html) {
     // 获取原始的 HTML 内容
-    var latexContent = log_entry.html();
+    // var latexContent = log_entry.html();
+    var latexContent = log_entry_html;
 
     try{
         // 块级公式, 占据一行, 居中显示
@@ -793,8 +793,9 @@ function renderLatexInLog(log_entry) {
     }
 
     // 将替换后的内容放回原始元素中
-    log_entry.data('LatexParsed', true);
-    log_entry.html(latexContent);
+    // log_entry.data('LatexParsed', true);
+    // log_entry.html(latexContent);
+    return latexContent
 }
 
 
@@ -813,10 +814,10 @@ function restoreLatexFromRendered(element) {
 
 
 // Function to replace URLs with hyperlinks within a <log_entry> element
-function replaceURLsWithLinks(log_entry) {
+function replaceURLsWithLinks(log_entry_html) {
     // element 是 jQuery 对象
     // Get the text content of the <log_entry> element
-    var content = log_entry.html();
+    var content = log_entry_html;
     // Regular expression to find URLs within the text
     var urlRegex = /(?<=^|\s)(https?:\/\/[^\s]+)/g;
     // Replace URLs with hyperlinks
@@ -824,7 +825,8 @@ function replaceURLsWithLinks(log_entry) {
       return '<a href="' + url + '">' + url + '</a>';
     });
     // Set the HTML content of the <log_entry> element with the replaced content
-    log_entry.html(content);
+    // log_entry.html(content);
+    return content
 }
 
 
@@ -876,8 +878,8 @@ function replaceURLsWithLinks(log_entry) {
 
 
 function copyIconSvgButtonListener(button) {
-    button = button.get(0)
-    let clipboard = new ClipboardJS(button,{
+    let buttonDom = button.get(0)
+    let clipboard = new ClipboardJS(buttonDom,{
         text: function(trigger){
             // trigger DOM 元素
             var codeContainer =  trigger.closest('.code-container');
@@ -900,7 +902,7 @@ function copyIconSvgButtonListener(button) {
 }
 
 
-function replaceCodeWithPre(log_entry) {
+function replaceCodeWithPre(log_entry_html) {
     // 定义语言映射表
     const languageMap = {
         'python': 'Python',
@@ -937,7 +939,7 @@ function replaceCodeWithPre(log_entry) {
     </div>`);
     
     // 获取<log_entry>元素的文本内容
-    var content = log_entry.html();
+    var content = log_entry_html;
     
     // 定义匹配三个反引号包围的代码段的正则表达式
     // var codeRegex = /```([\s\S]*?)```/g;
@@ -984,8 +986,11 @@ function replaceCodeWithPre(log_entry) {
     });
 
     // 设置<log_entry>元素的HTML内容为替换后的内容
-    log_entry.html(content);
+    // log_entry.html(content);
+    return content
+}
 
+function addCodeBlockCopyListener(log_entry){
     // 获取替换后的代码块元素
     var codeContainers = log_entry.find('.code-container');
 
@@ -997,9 +1002,10 @@ function replaceCodeWithPre(log_entry) {
 }
 
 
-function replaceTabWithSpace(log_entry) {
+function replaceTabWithSpace(log_entry_html) {
     // 获取<log_entry>元素的文本内容
-    var content = log_entry.html();
+    // var content = log_entry.html();
+    var content = log_entry_html
     
     // 定义匹配\t的正则表达式
     var tabRegex = /\t{1,}/g;
@@ -1010,7 +1016,8 @@ function replaceTabWithSpace(log_entry) {
     });    
 
     // 设置<log_entry>元素的HTML内容为替换后的内容
-    log_entry.html(content);
+    // log_entry.html(content);
+    return content
 }
 
 
@@ -1056,10 +1063,13 @@ function removeMinimumIndentation(text) {
 
   
 function processLogEntryText(log_entry){
-    replaceURLsWithLinks(log_entry);
-    replaceTabWithSpace(log_entry);
-    replaceCodeWithPre(log_entry);
-    renderLatexInLog(log_entry)
+    let log_entry_html = log_entry.html();
+    log_entry_html = replaceURLsWithLinks(log_entry_html);
+    log_entry_html = replaceTabWithSpace(log_entry_html);
+    log_entry_html = replaceCodeWithPre(log_entry_html);
+    log_entry_html = renderLatexInLog(log_entry_html)
+    log_entry.html(log_entry_html)
+    addCodeBlockCopyListener(log_entry)
 }
 
 
