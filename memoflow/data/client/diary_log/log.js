@@ -992,7 +992,7 @@ function replaceCodeWithPre(log_entry) {
     // 为每个代码块元素添加点击事件监听器
     codeContainers.each(function() {
         var button = $(this).find('.copyIconSvgButton');
-        copyIconSvgButtonListener(button);
+        if (button){ copyIconSvgButtonListener(button); }
     });
 }
 
