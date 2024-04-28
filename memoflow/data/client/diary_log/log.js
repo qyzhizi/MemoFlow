@@ -314,7 +314,7 @@ function addLogEntry(logText, record_id, reverse=true) {
     // 添加删除选项
     var deleteOption = $('<div class="dropdown-option delete-option">删除</div>');
     // 添加LatexView选项
-    var latexView = $('<div class="dropdown-option latexView-option">latexView</div>');
+    // var latexView = $('<div class="dropdown-option latexView-option">latexView</div>');
 
     // 将下拉菜单图标添加到 dropdownContainer 中
     dropdownContainer.append(dropdownIcon);
@@ -398,33 +398,29 @@ function addLogEntry(logText, record_id, reverse=true) {
     });
 
     // latexView 选项点击事件处理程序
-    latexView.click(function() {
-        // 判断是否已经解析过, 否则再次解析会解析错误
-        if (log_entry.data('LatexParsed')){
-            console.log("Latex Already Parsed")
-            return;
-        }
-        // 渲染当前笔记中出现的公式
-        renderLatexInLog(log_entry);
+    // latexView.click(function() {
+    //     // 渲染当前笔记中出现的公式
+    //     debugger;
+    //     renderLatexInLog(log_entry);
         
-        // renderLatexInLog 这里 重置了 html, 需要重新设置监听函数
-        // 获取替换后的代码块元素
-        var codeContainers = log_entry.find('.code-container');
-        // 为每个代码块元素添加点击事件监听器
-        codeContainers.each(function() {
-            var button = $(this).find('.copyIconSvgButton');
-            copyIconSvgButtonListener(button);
-        });
-        // 隐藏下拉菜单
-        dropdownMenu.hide();
-    });
+    //     // renderLatexInLog 这里 重置了 html, 需要重新设置监听函数
+    //     // 获取替换后的代码块元素
+    //     var codeContainers = log_entry.find('.code-container');
+    //     // 为每个代码块元素添加点击事件监听器
+    //     codeContainers.each(function() {
+    //         var button = $(this).find('.copyIconSvgButton');
+    //         copyIconSvgButtonListener(button);
+    //     });
+    //     // 隐藏下拉菜单
+    //     dropdownMenu.hide();
+    // });
 
 
     // 将复制、编辑和删除选项添加到下拉菜单中
     dropdownMenu.append(copyOption);
     dropdownMenu.append(editOption);
     dropdownMenu.append(deleteOption);
-    dropdownMenu.append(latexView);
+    // dropdownMenu.append(latexView);
 }
 
 
@@ -763,8 +759,9 @@ function renderLatexInLog(log_entry) {
             // 去除首尾的 "$" "\[" "\]" "\(" "\)" 符号
             var equation = equationHtml.trim().replace(/^\$+|\$+$|^\\\[|\\\]+$|^\\\(|\\\)+$/g, ''); 
             var span = document.createElement('span');
-            // 为 span 元素添加 data-latex 属性以存储原始的 LaTeX 代码
-            span.setAttribute('data-latex', match);
+            // 不需要为 span 元素添加 data-latex 属性以存储原始的 LaTeX 代码, 
+            // 否则 log_entry.html() 再次又包含了 latex 源码, 再次解析会乱码
+            // span.setAttribute('data-latex', match); 
             span.classList.add('latexMath'); // 添加类名
             katex.render(equation, span);
             return span.outerHTML;
@@ -1038,6 +1035,7 @@ function processLogEntryText(log_entry){
     replaceURLsWithLinks(log_entry);
     replaceTabWithSpace(log_entry);
     replaceCodeWithPre(log_entry);
+    renderLatexInLog(log_entry)
 }
 
 
