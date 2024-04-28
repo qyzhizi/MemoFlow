@@ -752,21 +752,45 @@ function renderLatexInLog(log_entry) {
     // 获取原始的 HTML 内容
     var latexContent = log_entry.html();
 
-    // 匹配所有 LaTeX 公式并渲染, "$" "\[" "\]" "\(" "\)"
-    var latexContent = latexContent.replace(/(\$\$[\s\S]*?\$\$|\$[\s\S]*?\$|\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\))/g,
-        function(match) {
-            var equationHtml = $("<div>").html(match).text(); // 将 HTML 字符串解析为文本
-            // 去除首尾的 "$" "\[" "\]" "\(" "\)" 符号
-            var equation = equationHtml.trim().replace(/^\$+|\$+$|^\\\[|\\\]+$|^\\\(|\\\)+$/g, ''); 
-            var span = document.createElement('span');
-            // 不需要为 span 元素添加 data-latex 属性以存储原始的 LaTeX 代码, 
-            // 否则 log_entry.html() 再次又包含了 latex 源码, 再次解析会乱码
-            // span.setAttribute('data-latex', match); 
-            span.classList.add('latexMath'); // 添加类名
-            katex.render(equation, span);
-            return span.outerHTML;
-        }
-    );
+    try{
+        // 块级公式, 占据一行, 居中显示
+        latexContent = latexContent.replace(/((?:\s|\r?\n)*?\$\$[\s\S]*?\$\$(?:\s|\r?\n)*?)/g,
+            function(match) {
+                var equationHtml = $("<div>").html(match).text(); // 将 HTML 字符串解析为文本
+                // 去除首尾的 "$$"
+                // var equation = equationHtml.trim().replace(/^\$\$|\$\$$/g, ''); 
+                var equation = equationHtml.trim().replace(/^\$\$(?:\s|\r?\n)*|(?:\s|\r?\n)*\$\$$/g, '');
+                var latexBlock = document.createElement('div');
+                latexBlock.classList.add('BlocklatexMath'); // 添加类名
+                katex.render(equation, latexBlock, { displayMode: true }); // 设置为块级公式
+                return latexBlock.outerHTML; // 返回渲染后的 LaTeX 块
+            }
+        );   
+    } catch(e){
+        console.error("Latex Parasing Error");
+        console.error(e);
+    }
+
+    try{
+        // 匹配所有 LaTeX 公式并渲染, "$" "\[" "\]" "\(" "\)"
+        latexContent = latexContent.replace(/(\$[\s\S]*?\$|\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\))/g,
+            function(match) {
+                var equationHtml = $("<div>").html(match).text(); // 将 HTML 字符串解析为文本
+                // 去除首尾的 "$" "\[" "\]" "\(" "\)" 符号
+                var equation = equationHtml.trim().replace(/^\$+|\$+$|^\\\[|\\\]+$|^\\\(|\\\)+$/g, ''); 
+                var span = document.createElement('span');
+                // 不需要为 span 元素添加 data-latex 属性以存储原始的 LaTeX 代码, 
+                // 否则 log_entry.html() 再次又包含了 latex 源码, 再次解析会乱码
+                // span.setAttribute('data-latex', match); 
+                span.classList.add('latexMath'); // 添加类名
+                katex.render(equation, span);
+                return span.outerHTML;
+            }
+        );
+    } catch(e){
+        console.error("Latex Parasing Error");
+        console.error(e);
+    }
 
     // 将替换后的内容放回原始元素中
     log_entry.data('LatexParsed', true);
