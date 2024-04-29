@@ -225,7 +225,6 @@ function showSmHeadNavHandler() {
 function showSmHeadSearchAndTagsHandler() {
     $('#SmHedadSearchButton').on('click', function(event) {
         event.preventDefault();
-        // debugger;
         let smSerchSidebarModule = document.getElementById(
             'SmSearchRoot').querySelector(".smSerchSidebarModule");
 
@@ -400,7 +399,6 @@ function addLogEntry(logText, record_id, reverse=true) {
     // latexView 选项点击事件处理程序
     // latexView.click(function() {
     //     // 渲染当前笔记中出现的公式
-    //     debugger;
     //     renderLatexInLog(log_entry);
         
     //     // renderLatexInLog 这里 重置了 html, 需要重新设置监听函数
@@ -746,20 +744,14 @@ function deleteLogEntry(record_id, logentrycontainer) {
 }
 
 
-// latexContent = latexContent.replace(/(\s[\$]{1,2}[\s\S]*?[\$]{1,2}|\s\$[\s\S]*?\$)/g, 
 function renderLatexInLog(log_entry_html) {
-    // 获取原始的 HTML 内容
-    // var latexContent = log_entry.html();
     var latexContent = log_entry_html;
 
     try{
         // 块级公式, 占据一行, 居中显示
-        latexContent = latexContent.replace(/((?:\s|\r?\n)*?\$\$[\s\S]*?\$\$(?:\s|\r?\n)*?)/g,
-            function(match) {
-                var equationHtml = $("<div>").html(match).text(); // 将 HTML 字符串解析为文本
-                // 去除首尾的 "$$"
-                // var equation = equationHtml.trim().replace(/^\$\$|\$\$$/g, ''); 
-                var equation = equationHtml.trim().replace(/^\$\$(?:\s|\r?\n)*|(?:\s|\r?\n)*\$\$$/g, '');
+        latexContent = latexContent.replace(/(?:\s|\r?\n)*?\$\$([\s\S]*?)\$\$(?:\s|\r?\n)*?/g,
+            function(match, latexMatch) {
+                var equation = $("<div>").html(latexMatch).text().trim(); // 将 HTML 字符串解析为文本
                 var latexBlock = document.createElement('div');
                 latexBlock.classList.add('BlocklatexMath'); // 添加类名
                 katex.render(equation, latexBlock, { displayMode: true }); // 设置为块级公式
@@ -772,12 +764,10 @@ function renderLatexInLog(log_entry_html) {
     }
 
     try{
-        // 匹配所有 LaTeX 公式并渲染, "$" "\[" "\]" "\(" "\)"
-        latexContent = latexContent.replace(/(\$[\s\S]*?\$|\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\))/g,
-            function(match) {
-                var equationHtml = $("<div>").html(match).text(); // 将 HTML 字符串解析为文本
-                // 去除首尾的 "$" "\[" "\]" "\(" "\)" 符号
-                var equation = equationHtml.trim().replace(/^\$+|\$+$|^\\\[|\\\]+$|^\\\(|\\\)+$/g, ''); 
+        latexContent = latexContent.replace(/(?:\$|\\\[|\\\()([\s\S]*?)(?:\$|\\\]|\\\))/g,
+            function(match, latexMatch) {
+                var equation = $("<div>").html(latexMatch).text(); // 将 HTML 字符串解析为文本
+                equation = equation.trim()
                 var span = document.createElement('span');
                 // 不需要为 span 元素添加 data-latex 属性以存储原始的 LaTeX 代码, 
                 // 否则 log_entry.html() 再次又包含了 latex 源码, 再次解析会乱码
@@ -792,9 +782,6 @@ function renderLatexInLog(log_entry_html) {
         console.error(e);
     }
 
-    // 将替换后的内容放回原始元素中
-    // log_entry.data('LatexParsed', true);
-    // log_entry.html(latexContent);
     return latexContent
 }
 
@@ -831,7 +818,6 @@ function replaceURLsWithLinks(log_entry_html) {
 
 
 // function replaceCodeWithPre(log_entry) {
-//     // debugger;
 //     var copyIcon = $(<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy w-4 h-auto"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>)
 
 //     // 获取<log_entry>元素的文本内容
@@ -859,10 +845,8 @@ function replaceURLsWithLinks(log_entry_html) {
 // }
 
 // function copyIconSvgButtonListener(button) {
-//     // debugger;
 //     // 为所有的.copyIconSvgButton按钮添加点击事件监听器
 //     button.click(function () {
-//         // debugger;
 
 //         // 获取点击按钮所在的code-container元素
 //         var codeContainer = $(this).closest('.code-container');
