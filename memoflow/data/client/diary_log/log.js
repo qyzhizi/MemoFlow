@@ -744,17 +744,18 @@ function deleteLogEntry(record_id, logentrycontainer) {
 }
 
 
-function renderLatexInLog(log_entry_html) {
-    var latexContent = log_entry_html;
-
+function renderLatexInLog(htmlString) {
     try{
         // 块级公式, 占据一行, 居中显示
-        latexContent = latexContent.replace(/(?:\s|\r?\n)*?\$\$([\s\S]*?)\$\$(?:\s|\r?\n)*?/g,
+        htmlString = htmlString.replace(
+            /(?:\s|\r?\n)*?\$\$([\s\S]*?)\$\$(?:\s|\r?\n)*?/g,
             function(match, latexMatch) {
-                var equation = $("<div>").html(latexMatch).text().trim(); // 将 HTML 字符串解析为文本
+                // 将 HTML 字符串解析为文本, 并去除前后空白字符
+                var equation = $("<div>").html(latexMatch).text().trim(); 
                 var latexBlock = document.createElement('div');
                 latexBlock.classList.add('BlocklatexMath'); // 添加类名
-                katex.render(equation, latexBlock, { displayMode: true }); // 设置为块级公式
+                // 设置为块级公式
+                katex.render(equation, latexBlock, { displayMode: true }); 
                 return latexBlock.outerHTML; // 返回渲染后的 LaTeX 块
             }
         );   
@@ -764,10 +765,11 @@ function renderLatexInLog(log_entry_html) {
     }
 
     try{
-        latexContent = latexContent.replace(/(?:\$|\\\[|\\\()([\s\S]*?)(?:\$|\\\]|\\\))/g,
+        htmlString = htmlString.replace(
+            /(?:\$|\\\[|\\\()([\s\S]*?)(?:\$|\\\]|\\\))/g,
             function(match, latexMatch) {
-                var equation = $("<div>").html(latexMatch).text(); // 将 HTML 字符串解析为文本
-                equation = equation.trim()
+                // 将 HTML 字符串解析为文本, 并去除前后空白字符
+                var equation = $("<div>").html(latexMatch).text().trim(); 
                 var span = document.createElement('span');
                 // 不需要为 span 元素添加 data-latex 属性以存储原始的 LaTeX 代码, 
                 // 否则 log_entry.html() 再次又包含了 latex 源码, 再次解析会乱码
@@ -782,7 +784,7 @@ function renderLatexInLog(log_entry_html) {
         console.error(e);
     }
 
-    return latexContent
+    return htmlString
 }
 
 
@@ -801,10 +803,10 @@ function restoreLatexFromRendered(element) {
 
 
 // Function to replace URLs with hyperlinks within a <log_entry> element
-function replaceURLsWithLinks(log_entry_html) {
+function replaceURLsWithLinks(htmlString) {
     // element 是 jQuery 对象
     // Get the text content of the <log_entry> element
-    var content = log_entry_html;
+    var content = htmlString;
     // Regular expression to find URLs within the text
     var urlRegex = /(?<=^|\s)(https?:\/\/[^\s]+)/g;
     // Replace URLs with hyperlinks
@@ -886,7 +888,7 @@ function copyIconSvgButtonListener(button) {
 }
 
 
-function replaceCodeWithPre(log_entry_html) {
+function replaceCodeWithPre(htmlString) {
     // 定义语言映射表
     const languageMap = {
         'python': 'Python',
@@ -923,7 +925,7 @@ function replaceCodeWithPre(log_entry_html) {
     </div>`);
     
     // 获取<log_entry>元素的文本内容
-    var content = log_entry_html;
+    var content = htmlString;
     
     // 定义匹配三个反引号包围的代码段的正则表达式
     // var codeRegex = /```([\s\S]*?)```/g;
@@ -986,10 +988,10 @@ function addCodeBlockCopyListener(log_entry){
 }
 
 
-function replaceTabWithSpace(log_entry_html) {
+function replaceTabWithSpace(htmlString) {
     // 获取<log_entry>元素的文本内容
     // var content = log_entry.html();
-    var content = log_entry_html
+    var content = htmlString
     
     // 定义匹配\t的正则表达式
     var tabRegex = /\t{1,}/g;
@@ -1047,12 +1049,12 @@ function removeMinimumIndentation(text) {
 
   
 function processLogEntryText(log_entry){
-    let log_entry_html = log_entry.html();
-    log_entry_html = replaceURLsWithLinks(log_entry_html);
-    log_entry_html = replaceTabWithSpace(log_entry_html);
-    log_entry_html = replaceCodeWithPre(log_entry_html);
-    log_entry_html = renderLatexInLog(log_entry_html)
-    log_entry.html(log_entry_html)
+    let htmlString = log_entry.html();
+    htmlString = replaceURLsWithLinks(htmlString);
+    htmlString = replaceTabWithSpace(htmlString);
+    htmlString = replaceCodeWithPre(htmlString);
+    htmlString = renderLatexInLog(htmlString)
+    log_entry.html(htmlString)
     addCodeBlockCopyListener(log_entry)
 }
 
