@@ -38,7 +38,8 @@ class JianGuoYunClient(object):
             # directory = os.path.join(JIANGUOYUN_PREFIX, directory.lstrip('/'))
             directory = JIANGUOYUN_PREFIX
         dir_processed = '/'
-        for dir_path in directory.split('/')[1:]:
+        for dir_path in directory.split('/'):
+            if dir_path == '/': continue
             dir_processed = os.path.join(dir_processed, dir_path)
             if not self.client.exists(dir_processed):
                 self.client.mkdir(dir_processed)

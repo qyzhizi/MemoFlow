@@ -19,6 +19,8 @@ if (function() { return !this; }()) {
 
 
 $(function() {
+    // window.addEventListener('load', adjustLayout);
+    // window.addEventListener('beforeunload', adjustLayout);
     window.onload = adjustLayout;
     window.onresize = adjustLayout;
 
@@ -701,6 +703,8 @@ function editLogEntry(log_entry, record_id) {
 
     // 显示模态框
     // modal.style.display = "block";
+    // adjust width of modal
+    adjustLayout()
     modal.style.display = "flex";
 
     // 将原始日志内容填充到编辑框中
