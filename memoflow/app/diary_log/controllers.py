@@ -1104,8 +1104,8 @@ class DiaryLog(wsgi.Application):
         # 获取当前时间
         current_datetime = datetime.now()
         # if access_token hans expired
-        if current_datetime > access_token_expires_at:
-            LOG.info("access_token has expired")
+        if current_datetime >= access_token_expires_at:
+            LOG.warn("access_token has expired")
             refresh_token_expires_at = github_access_info[
                 'refresh_token_expires_at']
             refresh_token_expires_at = datetime.strptime\
@@ -1115,7 +1115,7 @@ class DiaryLog(wsgi.Application):
             if current_datetime > refresh_token_expires_at:
                 LOG.error( "github refresh token has expired, \
                     please bing github again")
-                raise Exception("github refresh token has expired, \
+                raise VisibleException("github refresh token has expired, \
                     please bing github again")
 
             # 获取新的access_token
@@ -1124,7 +1124,8 @@ class DiaryLog(wsgi.Application):
                     get_github_access_token_by_refresh_token\
                     (refresh_token=refresh_token)
             except Exception as e:
-                raise VisibleException(str(e), status=500)
+                LOG.exception(str(e))
+                raise VisibleException("Network Error, Please try again later.", status=500)
 
             # update the new access_token to db
             processed_github_access_info = self.diary_log_api.\

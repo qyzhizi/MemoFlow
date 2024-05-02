@@ -115,8 +115,11 @@ def is_nested_list(lst, exclude_type):
 
 
 def match_file_path(file_path):
-    # `\-` 表示`-`, 其中 `\`是转义符合，另外`.` 在字符集中不需要被转义
-    pattern = r'^[a-zA-Z0-9_\-./]+$'
+    # 确保字符串不包含特定的不合法字符：:*"?<>|\ 和 反斜杠 \，单引号 '，分号 ;，以及序列 --
+    # 使用负向前瞻断言确保字符串中不包含 --
+    pattern = r'^(?!.*--)'  # 确保字符串中不包含 --
+    # 添加原有的排除规则
+    pattern += r'[^:*"?<>|\\\'\;]+$'
     if re.match(pattern, file_path):
         return True
     else:
@@ -139,8 +142,7 @@ def validate_linux_file_path(file_path):
     # 检查文件名是否合法
     if not match_file_path(file_path):
         raise VisiblePathException(
-            "文件名包含非法字符或路径分隔符, "
-            "路径必须为字母、数字、下划线、正斜线和点号的字符串"
+            "文件名包含不合法字符：*?<>;:|\和 引号,以及序列 -- "
             )
 
     # 检查文件名是否以 .md 或 .txt 结尾

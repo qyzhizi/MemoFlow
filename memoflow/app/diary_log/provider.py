@@ -8,6 +8,7 @@ from datetime import timedelta
 import requests
 import uuid
 from webob import Request
+import urllib.request
 import re
 
 from memoflow.core import dependency
@@ -105,19 +106,29 @@ class Manager(manager.Manager):
             'refresh_token': refresh_token
         }
         headers = {'Accept': 'application/json'}
+
         # 创建 POST 请求对象
-        request = Request.blank(token_url, method='POST',
-                                POST=payload, headers=headers)
+        # request = Request.blank(token_url, method='POST',
+        #                         POST=payload, headers=headers)
+        # # 发送请求
+        # response = request.get_response()
+
+        # 将 payload 转换为字节类型的数据
+        data = urllib.parse.urlencode(payload).encode('utf-8')
+        request = urllib.request.Request(
+            token_url, method='POST', data=data, headers=headers)
+
         # 发送请求
-        response = request.get_response()
-        if response.status_code == 200:
-            data = json.loads(response.text)
+        # 使用 urlopen 发送请求，并设置超时时间为2秒
+        response = urllib.request.urlopen(request, timeout=2)
+        if response.getcode() == 200:
+            data = json.loads(response.read())
             if "access_token" not in data:
                 return None
             return data
-        elif response.status_code == 401:
-            return None
-        return None
+        elif response.getcode() != 200 :
+            LOG.exception("Network Error, Can't get accesstoken by refresh token")
+            raise Exception("Network Error, Can't get accesstoken by refresh token")
 
     def process_github_tokens_info_to_db_format(self, github_tokens_info):
         access_token = github_tokens_info.get('access_token', None)
