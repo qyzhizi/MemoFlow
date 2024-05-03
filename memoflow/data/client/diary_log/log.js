@@ -747,22 +747,85 @@ function deleteLogEntry(record_id, logentrycontainer) {
     });
 }
 
+function match_replace_help(match, offset, replacement, positions){
+    const originalMatchLength = match.length; // 原始匹配字符串的长度
 
-function renderLatexInLog(htmlString) {
+    // 检查offset是否位于任何已替换代码块的范围内
+    const isWithinReplacedBlock = positions.some(position => {
+        return offset >= position.start && offset < position.end;
+    });
+
+    // 如果offset位于已替换代码块的范围内，则不进行替换
+    if (isWithinReplacedBlock) {
+        // return match; // 返回原始匹配字符串
+        return {
+            replacement: match,
+            positions: positions
+        }; 
+    }
+
+    const replacementLength = replacement.length; // 替换后字符串的长度
+    const lengthDifference = replacementLength - originalMatchLength; // 长度变化
+    // 更新positions数组中的位置信息
+    positions = positions.map(pos => {
+        if (offset < pos.start) {
+            // 如果当前替换发生在某个代码块之前，只需要移动该代码块的位置
+            return {
+                ...pos,
+                start: pos.start + lengthDifference,
+                end: pos.end + lengthDifference,
+            };
+        } else {
+            // 如果当前替换发生在某个代码块之后，不需要更新该代码块的位置
+            return pos;
+        }
+    });
+    return {
+        replacement: replacement,
+        positions: positions
+    };     
+}
+
+function match_replace_help2(match, offset, replacement, positions){
+    // 检查offset是否位于任何已替换代码块的范围内
+    const isWithinReplacedBlock = positions.some(position => {
+        return offset >= position.start && offset < position.end;
+    });
+
+    // 如果offset位于已替换代码块的范围内，则不进行替换
+    if (isWithinReplacedBlock) {
+        // return match; // 返回原始匹配字符串
+        return {
+            replacement: match,
+            positions: positions
+        }; 
+    }
+
+    return {
+        replacement: replacement,
+        positions: positions
+    };     
+}
+
+function renderLatexInLog(htmlString, positions) {
+    // var positions = positions;
     try{
         // 块级公式, 占据一行, 居中显示
         htmlString = htmlString.replace(
             /(?:\s|\r?\n)*?\$\$([\s\S]*?)\$\$(?:\s|\r?\n)*?/g,
-            function(match, latexMatch) {
+            function(match, latexMatch, offset ) {
                 // 将 HTML 字符串解析为文本, 并去除前后空白字符
                 var equation = $("<div>").html(latexMatch).text().trim(); 
                 var latexBlock = document.createElement('div');
                 latexBlock.classList.add('BlocklatexMath'); // 添加类名
                 // 设置为块级公式
                 katex.render(equation, latexBlock, { displayMode: true }); 
-                return latexBlock.outerHTML; // 返回渲染后的 LaTeX 块
+                let replacement = latexBlock.outerHTML; // 返回渲染后的 LaTeX 块
+                
+                ({replacement, positions} = match_replace_help(match, offset, replacement, positions));
+                return replacement
             }
-        );   
+        );  
     } catch(e){
         console.error("Latex Parasing Error");
         console.error(e);
@@ -771,7 +834,7 @@ function renderLatexInLog(htmlString) {
     try{
         htmlString = htmlString.replace(
             /(?:\$|\\\[|\\\()([\s\S]*?)(?:\$|\\\]|\\\))/g,
-            function(match, latexMatch) {
+            function(match, latexMatch, offset) {
                 // 将 HTML 字符串解析为文本, 并去除前后空白字符
                 var equation = $("<div>").html(latexMatch).text().trim(); 
                 var span = document.createElement('span');
@@ -779,8 +842,11 @@ function renderLatexInLog(htmlString) {
                 // 否则 log_entry.html() 再次又包含了 latex 源码, 再次解析会乱码
                 // span.setAttribute('data-latex', match); 
                 span.classList.add('latexMath'); // 添加类名
-                katex.render(equation, span);
-                return span.outerHTML;
+                try{ katex.render(equation, span);} catch(e){return match}
+                
+                let replacement = span.outerHTML;
+                ({replacement, positions} = match_replace_help(match, offset, replacement, positions));
+                return replacement
             }
         );
     } catch(e){
@@ -788,7 +854,11 @@ function renderLatexInLog(htmlString) {
         console.error(e);
     }
 
-    return htmlString
+    // return htmlString
+    return {
+        htmlString: htmlString,
+        positions: positions
+    };
 }
 
 
@@ -807,19 +877,27 @@ function restoreLatexFromRendered(element) {
 
 
 // Function to replace URLs with hyperlinks within a <log_entry> element
-function replaceURLsWithLinks(htmlString) {
+function replaceURLsWithLinks(htmlString, positions) {
     // element 是 jQuery 对象
     // Get the text content of the <log_entry> element
-    var content = htmlString;
+    // var content = htmlString;
     // Regular expression to find URLs within the text
-    var urlRegex = /(?<=^|\s)(https?:\/\/[^\s]+)/g;
+    var urlRegex = /(?<=^|\s)https?:\/\/[^\s]+/g;
     // Replace URLs with hyperlinks
-    content = content.replace(urlRegex, function(url) {
-      return '<a href="' + url + '">' + url + '</a>';
+    htmlString = htmlString.replace(urlRegex, function(match, offset) {
+        let replacement = '<a href="' + match + '">' + match + '</a>';
+        // return match_replace_help(match, offset, replacement, positions);
+        ({replacement, positions} = match_replace_help(match, offset, replacement, positions));
+        return replacement
+
     });
-    // Set the HTML content of the <log_entry> element with the replaced content
-    // log_entry.html(content);
-    return content
+    // Set the HTML htmlString of the <log_entry> element with the replaced htmlString
+    // log_entry.html(htmlString);
+    // return htmlString
+    return {
+        htmlString: htmlString,
+        positions: positions
+    };    
 }
 
 
@@ -920,6 +998,7 @@ function replaceCodeWithPre(htmlString) {
         'code': 'Code',
         'py': 'Python'
     };
+    var positions = []; // 用于存储每个代码块的位置
     // 复制图标的HTML字符串
     var copyIcon = $(`<div class="copyIcon"> 
     <span class="codeTag">Code</span>
@@ -929,7 +1008,7 @@ function replaceCodeWithPre(htmlString) {
     </div>`);
     
     // 获取<log_entry>元素的文本内容
-    var content = htmlString;
+    // var htmlString = htmlString;
     
     // 定义匹配三个反引号包围的代码段的正则表达式
     // var codeRegex = /```([\s\S]*?)```/g;
@@ -937,8 +1016,8 @@ function replaceCodeWithPre(htmlString) {
     // var codeRegex = /```(python|c|c\+\+|js|css|html|go|ruby|java|(?=))\s*\n([\s\S]*?)```/g
     // var codeRegex = /```((?:python|c|c\+\+|js|css|html|go|ruby|java)?)\s*\n([\s\S]*?)```/g
     // const codeRegex = /```(objective-c\+*|\w*)([^]*)```/gi;
-    const codeRegex = /```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```/gi;
-    content = content.replace(codeRegex, function(match, language, code) {
+    const codeRegex = /\s```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s*/gi;
+    htmlString = htmlString.replace(codeRegex, function(match, language, code, offset) {
         language = language.toLowerCase();
         let languageName = languageMap[language];
       //   let languageName = languageMap[language] || 'None';
@@ -949,35 +1028,94 @@ function replaceCodeWithPre(htmlString) {
         }
         // 移除代码段开头和结尾的换行符
         code = code.replace(/^\n+/, '').trimEnd();
-    
+        
+        let replacement;
         if (code.length === 0) {
             // 空代码段处理方式1：替换为空白
-            return '<div class="code-container"><pre></pre></div>';
+            replacement = '<div class="code-container"><pre></pre></div>';
         }
         if (languageName){
             copyIcon.find('span').text(languageName);
         }
 
-    
         // 使用<div>标签包裹复制图标和<pre>标签
-        return `<div class="code-container">${copyIcon.prop('outerHTML')}<pre>${code}</pre></div>`;
-    });  
+        replacement = `<div class="code-container">${copyIcon.prop('outerHTML')}<pre>${code}</pre></div>`;
 
-    const singleLineCode = /`([^`]+)`/g;
-    content = content.replace(singleLineCode, function(match, code) {
-        return `<span class="singleLineCode">${code}</span>`;
+        // 计算并存储当前匹配项的位置
+        let startPosition = offset;
+        let endPosition = offset + match.length;
+        positions.push({start: startPosition, end: endPosition, replacementLength: replacement.length});
 
+        // 返回替换字符串
+        return replacement;
     });
 
-    const tagRegex = /(^|\s)#\w+\b/g;
-    content = content.replace(tagRegex, function(match) {
-        return `<span class="tag">${match}</span>`;
+    // 更新位置信息，考虑到替换后的长度变化
+    let currentAdjustment = 0;
+    positions = positions.map(pos => {
+        let adjustedStart = pos.start + currentAdjustment;
+        let adjustedEnd = adjustedStart + pos.replacementLength;
+        currentAdjustment += (pos.replacementLength - (pos.end - pos.start));
+        return {start: adjustedStart, end: adjustedEnd};
+    });
+
+    const singleLineCode = /(?<!`)`([^`]+)`(?!`)/g;
+    var singleLinepositions = []
+    htmlString = htmlString.replace(singleLineCode, function(match, code, offset) {
+
+        let replacement = `<span class="singleLineCode">${code}</span>`;
+        // replacement = match_replace_help(match, offset, replacement, positions);
+        ({replacement, positions} = match_replace_help2(match, offset, replacement, positions));
+        // return replacement
+        // 添加当前单行代码的位置信息到positions数组
+        // 计算并存储当前匹配项的位置
+        let startPosition = offset;
+        let endPosition = offset + match.length;
+        if (match != replacement){
+            singleLinepositions.push(
+                {start: startPosition, 
+                end: endPosition, 
+                replacementLength: replacement.length});
+        }
+    
+        return replacement;
+
+    });
+    // 更新位置信息，考虑到替换后的长度变化
+    currentAdjustment = 0;
+    singleLinepositions = singleLinepositions.map(pos => {
+        let adjustedStart = pos.start + currentAdjustment;
+        let adjustedEnd = adjustedStart + pos.replacementLength;
+        currentAdjustment += (pos.replacementLength - (pos.end - pos.start));
+        return {start: adjustedStart, end: adjustedEnd};
+    });
+    positions.push(...singleLinepositions);
+
+    const tagRegex = /(?:^|\s)#\w+\b/g;
+    htmlString = htmlString.replace(tagRegex, function(match, offset) {
+
+        let replacement = `<span class="tag">${match}</span>`;
+        // replacement = match_replace_help(match, offset, replacement, positions);
+        ({replacement, positions} = match_replace_help(match, offset, replacement, positions));
+        // 添加当前单行代码的位置信息到positions数组
+        // if (match != replacement){
+        //     positions.push({
+        //         start: offset,
+        //         end: offset + replacement.length,
+        //     });
+        // }
+    
+        return replacement;
 
     });
 
     // 设置<log_entry>元素的HTML内容为替换后的内容
-    // log_entry.html(content);
-    return content
+    // log_entry.html(htmlString);
+    // return htmlString
+    return {
+        htmlString: htmlString,
+        positions: positions
+    };
 }
 
 function addCodeBlockCopyListener(log_entry){
@@ -994,20 +1132,21 @@ function addCodeBlockCopyListener(log_entry){
 
 function replaceTabWithSpace(htmlString) {
     // 获取<log_entry>元素的文本内容
-    // var content = log_entry.html();
-    var content = htmlString
+    // var htmlString = log_entry.html();
+    // var htmlString = htmlString
     
     // 定义匹配\t的正则表达式
     var tabRegex = /\t{1,}/g;
 
-    content = content.replace(tabRegex, function(match) {
-        // 使用空格替换
+    htmlString = htmlString.replace(tabRegex, function(match) {
+        // // 使用空格替换
         return '  '.repeat(match.length);
+
     });    
 
     // 设置<log_entry>元素的HTML内容为替换后的内容
-    // log_entry.html(content);
-    return content
+    // log_entry.html(htmlString);
+    return htmlString
 }
 
 
@@ -1053,11 +1192,12 @@ function removeMinimumIndentation(text) {
 
   
 function processLogEntryText(log_entry){
-    let htmlString = log_entry.html();
-    htmlString = replaceURLsWithLinks(htmlString);
-    htmlString = replaceTabWithSpace(htmlString);
-    htmlString = replaceCodeWithPre(htmlString);
-    htmlString = renderLatexInLog(htmlString)
+    var htmlString = log_entry.html();
+    let positions; // 声明 positions 变量
+    htmlString  = replaceTabWithSpace(htmlString);
+    ({htmlString, positions} = replaceCodeWithPre(htmlString));
+    ({htmlString, positions} = replaceURLsWithLinks(htmlString, positions));
+    ({htmlString, positions}  = renderLatexInLog(htmlString, positions));
     log_entry.html(htmlString)
     addCodeBlockCopyListener(log_entry)
 }
