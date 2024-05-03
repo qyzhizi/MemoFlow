@@ -1017,7 +1017,7 @@ function replaceCodeWithPre(htmlString) {
     // var codeRegex = /```(python|c|c\+\+|js|css|html|go|ruby|java|(?=))\s*\n([\s\S]*?)```/g
     // var codeRegex = /```((?:python|c|c\+\+|js|css|html|go|ruby|java)?)\s*\n([\s\S]*?)```/g
     // const codeRegex = /```(objective-c\+*|\w*)([^]*)```/gi;
-    const codeRegex = /\s```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s/gi;
+    const codeRegex = /\s```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s{0,1}/gi;
     htmlString = htmlString.replace(codeRegex, function(match, language, code, offset) {
         language = language.toLowerCase();
         let languageName = languageMap[language];
