@@ -882,7 +882,7 @@ function replaceURLsWithLinks(htmlString, positions) {
     // Get the text content of the <log_entry> element
     // var content = htmlString;
     // Regular expression to find URLs within the text
-    var urlRegex = /(?<=^|\s)https?:\/\/[^\s]+/g;
+    var urlRegex = /(?<=^|\s)https?:\/\/[^\s<]+/g;
     // Replace URLs with hyperlinks
     htmlString = htmlString.replace(urlRegex, function(match, offset) {
         let replacement = '<a href="' + match + '">' + match + '</a>';
@@ -996,7 +996,8 @@ function replaceCodeWithPre(htmlString) {
         'shell': 'Shell',
         'sh': 'Shell',
         'code': 'Code',
-        'py': 'Python'
+        'py': 'Python',
+        'regex':'regex'
     };
     var positions = []; // 用于存储每个代码块的位置
     // 复制图标的HTML字符串
@@ -1016,7 +1017,7 @@ function replaceCodeWithPre(htmlString) {
     // var codeRegex = /```(python|c|c\+\+|js|css|html|go|ruby|java|(?=))\s*\n([\s\S]*?)```/g
     // var codeRegex = /```((?:python|c|c\+\+|js|css|html|go|ruby|java)?)\s*\n([\s\S]*?)```/g
     // const codeRegex = /```(objective-c\+*|\w*)([^]*)```/gi;
-    const codeRegex = /\s```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s*/gi;
+    const codeRegex = /\s```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s/gi;
     htmlString = htmlString.replace(codeRegex, function(match, language, code, offset) {
         language = language.toLowerCase();
         let languageName = languageMap[language];
@@ -1091,7 +1092,11 @@ function replaceCodeWithPre(htmlString) {
     });
     positions.push(...singleLinepositions);
 
-    const tagRegex = /(?:^|\s)#\w+\b/g;
+    // const tagRegex = /(?:^|\s)#\w+\b/g;
+    // const tagRegex = /(?<!#)#(?![#]).*?(?=\x20|\n)/g;
+    // const tagRegex = /(?<!#)#(?![#])[\u4e00-\u9fff/]|\w+(?=\x20|\n)/g;
+    // const tagRegex = /(?<!#)#(?![#])\w+(?=\x20|\n)/g;
+    const tagRegex = /(?<!#)#(?![#])[/\w\u4e00-\u9fff]+(?=\x20|\n)/g;
     htmlString = htmlString.replace(tagRegex, function(match, offset) {
 
         let replacement = `<span class="tag">${match}</span>`;
