@@ -1060,7 +1060,7 @@ function replaceCodeWithPre(htmlString) {
         return {start: adjustedStart, end: adjustedEnd};
     });
 
-    const singleLineCode = /(?<!`)`([^`]+)`(?!`)/g;
+    const singleLineCode = /(?<!`)(`[^`]+`)(?!`)/g;
     var singleLinepositions = []
     htmlString = htmlString.replace(singleLineCode, function(match, code, offset) {
 
