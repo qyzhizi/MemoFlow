@@ -1208,7 +1208,9 @@ function replaceCodeWithPre(htmlString) {
     const tagRegex = /(?<=\x20|^)(?<!#)#(?![#])[/\w\u4e00-\u9fff]+[\x20|\n|$]{1}/g;
     htmlString = htmlString.replace(tagRegex, function(match, offset) {
 
-        let replacement = `<span class="tag">${match}</span>`;
+        let trimmedStr = match.trimEnd();
+        let endWhitespace = match.slice(trimmedStr.length);
+        let replacement = `<span class="tag">${trimmedStr}</span>${endWhitespace}`;
         // replacement = match_replace_help(match, offset, replacement, positions);
         ({replacement, newPositions} = match_replace_help3(
             match, offset, replacement, positions, newPositions));
