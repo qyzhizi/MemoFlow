@@ -1131,7 +1131,8 @@ function replaceCodeWithPre(htmlString) {
     // var codeRegex = /```((?:python|c|c\+\+|js|css|html|go|ruby|java)?)\s*\n([\s\S]*?)```/g
     // const codeRegex = /```(objective-c\+*|\w*)([^]*)```/gi;
     // const codeRegex = /\s```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s{0,1}/gi;
-    const codeRegex = /(?<!\n)\s*```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s{0,1}(?!\n)/gi;
+    // const codeRegex = /(?<!\n)[\t\x20]*```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s{0,1}(?!\n)/gi;
+    const codeRegex = /[\t\x20]*```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s{0,1}(?!\n)/gi;
     htmlString = htmlString.replace(codeRegex, function(match, language, code, offset) {
         language = language.toLowerCase();
         let languageName = languageMap[language];
@@ -1142,7 +1143,7 @@ function replaceCodeWithPre(htmlString) {
           code = language + code;
         }
         // 移除代码段开头和结尾的换行符
-        code = code.replace(/^\n+/, '').trimEnd();
+        code = code.replace(/^\s*/, '').trimEnd();
         
         let replacement;
         if (code.length === 0) {
@@ -1201,10 +1202,10 @@ function replaceCodeWithPre(htmlString) {
     positions = addCodePositions(singleLinepositions, positions)
 
 
-    debugger;
     var newPositions = [...positions]
     // const tagRegex = /(?<!#)#(?![#])[/\w\u4e00-\u9fff]+(?=\x20|\n)/g;
-    const tagRegex = /(?<=\x20|^)(?<!#)#(?![#])[/\w\u4e00-\u9fff]+(?=\x20|\n|$)/g;
+    // const tagRegex = /(?<=\x20|^)(?<!#)#(?![#])[/\w\u4e00-\u9fff]+(?=\x20|\n|$)/g;
+    const tagRegex = /(?<=\x20|^)(?<!#)#(?![#])[/\w\u4e00-\u9fff]+[\x20|\n|$]{1}/g;
     htmlString = htmlString.replace(tagRegex, function(match, offset) {
 
         let replacement = `<span class="tag">${match}</span>`;
@@ -1302,7 +1303,6 @@ function processLogEntryText(log_entry){
     var htmlString = log_entry.html();
     var positions; // 声明 positions 变量
     htmlString  = replaceTabWithSpace(htmlString);
-    debugger;
     ({htmlString, positions} = replaceCodeWithPre(htmlString));
     ({htmlString, positions} = replaceURLsWithLinks(htmlString, positions));
     ({htmlString, positions}  = renderLatexInLog(htmlString, positions));
