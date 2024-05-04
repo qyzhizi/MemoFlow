@@ -1110,7 +1110,8 @@ function replaceCodeWithPre(htmlString) {
         'sh': 'Shell',
         'code': 'Code',
         'py': 'Python',
-        'regex':'regex'
+        'regex':'regex',
+        'json':'Json'
     };
     var positions = []; // 用于存储每个代码块的位置
     // 复制图标的HTML字符串
@@ -1133,6 +1134,7 @@ function replaceCodeWithPre(htmlString) {
     // const codeRegex = /\s```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s{0,1}/gi;
     // const codeRegex = /(?<!\n)[\t\x20]*```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s{0,1}(?!\n)/gi;
     const codeRegex = /[\t\x20]*```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s{0,1}(?!\n)/gi;
+    debugger;
     htmlString = htmlString.replace(codeRegex, function(match, language, code, offset) {
         language = language.toLowerCase();
         let languageName = languageMap[language];
@@ -1152,6 +1154,8 @@ function replaceCodeWithPre(htmlString) {
         }
         if (languageName){
             copyIcon.find('span').text(languageName);
+        } else {
+            copyIcon.find('span').text('Code');
         }
 
         // 使用<div>标签包裹复制图标和<pre>标签
