@@ -41,6 +41,8 @@ class Manager(object):
             return 'text/css'
         elif extension == '.js':
             return 'application/javascript'
+        elif extension == '.png':
+            return 'image/png'        
         else:
             return 'text/plain'  # 默认为纯文本类型
     

@@ -1134,7 +1134,6 @@ function replaceCodeWithPre(htmlString) {
     // const codeRegex = /\s```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s{0,1}/gi;
     // const codeRegex = /(?<!\n)[\t\x20]*```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s{0,1}(?!\n)/gi;
     const codeRegex = /[\t\x20]*```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s{0,1}(?!\n)/gi;
-    debugger;
     htmlString = htmlString.replace(codeRegex, function(match, language, code, offset) {
         language = language.toLowerCase();
         let languageName = languageMap[language];
