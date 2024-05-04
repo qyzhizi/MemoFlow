@@ -1201,9 +1201,10 @@ function replaceCodeWithPre(htmlString) {
     positions = addCodePositions(singleLinepositions, positions)
 
 
+    debugger;
     var newPositions = [...positions]
     // const tagRegex = /(?<!#)#(?![#])[/\w\u4e00-\u9fff]+(?=\x20|\n)/g;
-    const tagRegex = /(?<=(\x20|^))(?<!#)#(?![#])[/\w\u4e00-\u9fff]+(?=\x20|\n|$)/g;
+    const tagRegex = /(?<=\x20|^)(?<!#)#(?![#])[/\w\u4e00-\u9fff]+(?=\x20|\n|$)/g;
     htmlString = htmlString.replace(tagRegex, function(match, offset) {
 
         let replacement = `<span class="tag">${match}</span>`;
@@ -1301,6 +1302,7 @@ function processLogEntryText(log_entry){
     var htmlString = log_entry.html();
     var positions; // 声明 positions 变量
     htmlString  = replaceTabWithSpace(htmlString);
+    debugger;
     ({htmlString, positions} = replaceCodeWithPre(htmlString));
     ({htmlString, positions} = replaceURLsWithLinks(htmlString, positions));
     ({htmlString, positions}  = renderLatexInLog(htmlString, positions));
