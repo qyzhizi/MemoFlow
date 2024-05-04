@@ -342,7 +342,7 @@ function addLogEntry(logText, record_id, reverse=true) {
     });
 
     // 在文档的其他位置点击时隐藏下拉菜单
-    $(document).click(function() {
+    logEntryContainer.click(function() {
         dropdownMenu.hide();
     });
 
@@ -807,8 +807,116 @@ function match_replace_help2(match, offset, replacement, positions){
     };     
 }
 
+function match_replace_help3(
+    match, offset, replacement, positions, newPositions){
+    // 检查offset是否位于任何已替换代码块的范围内
+    const isWithinReplacedBlock = positions.some(position => {
+        return offset >= position.start && offset < position.end;
+    });
+
+    // 如果offset位于已替换代码块的范围内，则不进行替换
+    if (isWithinReplacedBlock) {
+        // return match; // 返回原始匹配字符串
+        return {
+            replacement: match,
+            newPositions: newPositions
+        }; 
+    }
+
+    const replacementLength = replacement.length; // 替换后字符串的长度
+    const lengthDifference = replacementLength - match.length; // 长度变化
+    // 更新positions数组中的位置信息
+
+    // newPositions = newPositions.map(pos => {
+    //     if (offset < pos.start) {
+    //         // 如果当前替换发生在某个代码块之前，只需要移动该代码块的位置
+    //         return {
+    //             ...pos,
+    //             start: pos.start + lengthDifference,
+    //             end: pos.end + lengthDifference,
+    //         };
+    //     } else {
+    //         // 如果当前替换发生在某个代码块之后，不需要更新该代码块的位置
+    //         return pos;
+    //     }
+    // });
+
+    for (let i = newPositions.length - 1; i >= 0; i--) {
+        const pos = newPositions[i];
+        if (offset < pos.start) {
+            // 如果当前替换发生在某个代码块之前，只需要移动该代码块的位置
+            newPositions[i] = {
+                ...pos,
+                start: pos.start + lengthDifference,
+                end: pos.end + lengthDifference,
+            };
+        } else{
+            // 如果当前替换发生在某个代码块之后，不需要更新该代码块的位置
+            break;
+        }
+    };
+    
+    return {
+        replacement: replacement,
+        newPositions: newPositions
+    };     
+}
+
+function addCodePositions(changedPositions, targetPositions){
+    // 更新位置信息，考虑到替换后的长度变化
+    let currentAdjustment = 0;
+    changedPositions = changedPositions.map(pos => {
+        let adjustedStart = pos.start + currentAdjustment;
+        let adjustedEnd = adjustedStart + pos.replacementLength;
+        currentAdjustment += (pos.replacementLength - (pos.end - pos.start));
+
+        // targetPositions.push(...changedPositions);    
+        // const replacementLength = replacement.length; // 替换后字符串的长度
+        const lengthDifference = pos.replacementLength - (pos.end - pos.start); // 长度变化
+        // 更新positions数组中的位置信息
+        let offset  = pos.start;
+        
+        // targetPositions = targetPositions.map(targetPos => {
+        //     if (offset < targetPos.start) {
+        //         // 如果当前替换发生在某个代码块之前，只需要移动该代码块的位置
+        //         return {
+        //             ...targetPos,
+        //             start: targetPos.start + lengthDifference,
+        //             end: targetPos.end + lengthDifference,
+        //         };
+        //     } else {
+        //         // 如果当前替换发生在某个代码块之后，不需要更新该代码块的位置
+        //         return targetPos;
+        //     }
+        // });
+
+        for (let i = targetPositions.length - 1; i >= 0; i--) {
+            const pos = targetPositions[i];
+            if (offset < pos.start) {
+                // 如果当前替换发生在某个代码块之前，只需要移动该代码块的位置
+                targetPositions[i] = {
+                    ...pos,
+                    start: pos.start + lengthDifference,
+                    end: pos.end + lengthDifference,
+                };
+            } else{
+                // 如果当前替换发生在某个代码块之后，不需要更新该代码块的位置
+                break;
+            }
+        };
+
+        return {start: adjustedStart, end: adjustedEnd};
+
+    });
+
+    targetPositions.push(...changedPositions); 
+    targetPositions.sort((a, b) => a.start - b.start);
+    return targetPositions
+}
+
 function renderLatexInLog(htmlString, positions) {
     // var positions = positions;
+    var newPositions = [...positions]
     try{
         // 块级公式, 占据一行, 居中显示
         htmlString = htmlString.replace(
@@ -822,15 +930,17 @@ function renderLatexInLog(htmlString, positions) {
                 katex.render(equation, latexBlock, { displayMode: true }); 
                 let replacement = latexBlock.outerHTML; // 返回渲染后的 LaTeX 块
                 
-                ({replacement, positions} = match_replace_help(match, offset, replacement, positions));
+                ({replacement, newPositions} = match_replace_help3(
+                    match, offset, replacement, positions, newPositions));
                 return replacement
             }
-        );  
+        ); 
     } catch(e){
         console.error("Latex Parasing Error");
         console.error(e);
     }
 
+    positions = newPositions;
     try{
         htmlString = htmlString.replace(
             /(?:\$|\\\[|\\\()([\s\S]*?)(?:\$|\\\]|\\\))/g,
@@ -845,7 +955,8 @@ function renderLatexInLog(htmlString, positions) {
                 try{ katex.render(equation, span);} catch(e){return match}
                 
                 let replacement = span.outerHTML;
-                ({replacement, positions} = match_replace_help(match, offset, replacement, positions));
+                ({replacement, newPositions} = match_replace_help3(
+                    match, offset, replacement, positions, newPositions));
                 return replacement
             }
         );
@@ -884,10 +995,12 @@ function replaceURLsWithLinks(htmlString, positions) {
     // Regular expression to find URLs within the text
     var urlRegex = /(?<=^|\s)https?:\/\/[^\s<]+/g;
     // Replace URLs with hyperlinks
+    var newPositions = [...positions]
     htmlString = htmlString.replace(urlRegex, function(match, offset) {
         let replacement = '<a href="' + match + '">' + match + '</a>';
         // return match_replace_help(match, offset, replacement, positions);
-        ({replacement, positions} = match_replace_help(match, offset, replacement, positions));
+        ({replacement, newPositions} = match_replace_help3(
+            match, offset, replacement, positions, newPositions));
         return replacement
 
     });
@@ -896,7 +1009,7 @@ function replaceURLsWithLinks(htmlString, positions) {
     // return htmlString
     return {
         htmlString: htmlString,
-        positions: positions
+        positions: newPositions
     };    
 }
 
@@ -1083,33 +1196,20 @@ function replaceCodeWithPre(htmlString) {
 
     });
     // 更新位置信息，考虑到替换后的长度变化
-    currentAdjustment = 0;
-    singleLinepositions = singleLinepositions.map(pos => {
-        let adjustedStart = pos.start + currentAdjustment;
-        let adjustedEnd = adjustedStart + pos.replacementLength;
-        currentAdjustment += (pos.replacementLength - (pos.end - pos.start));
-        return {start: adjustedStart, end: adjustedEnd};
-    });
-    positions.push(...singleLinepositions);
 
-    // const tagRegex = /(?:^|\s)#\w+\b/g;
-    // const tagRegex = /(?<!#)#(?![#]).*?(?=\x20|\n)/g;
-    // const tagRegex = /(?<!#)#(?![#])[\u4e00-\u9fff/]|\w+(?=\x20|\n)/g;
-    // const tagRegex = /(?<!#)#(?![#])\w+(?=\x20|\n)/g;
-    const tagRegex = /(?<!#)#(?![#])[/\w\u4e00-\u9fff]+(?=\x20|\n)/g;
+    positions = addCodePositions(singleLinepositions, positions)
+
+
+    var newPositions = [...positions]
+    // const tagRegex = /(?<!#)#(?![#])[/\w\u4e00-\u9fff]+(?=\x20|\n)/g;
+    const tagRegex = /(?<!#)#(?![#])[/\w\u4e00-\u9fff]+/g;
     htmlString = htmlString.replace(tagRegex, function(match, offset) {
 
         let replacement = `<span class="tag">${match}</span>`;
         // replacement = match_replace_help(match, offset, replacement, positions);
-        ({replacement, positions} = match_replace_help(match, offset, replacement, positions));
-        // 添加当前单行代码的位置信息到positions数组
-        // if (match != replacement){
-        //     positions.push({
-        //         start: offset,
-        //         end: offset + replacement.length,
-        //     });
-        // }
-    
+        ({replacement, newPositions} = match_replace_help3(
+            match, offset, replacement, positions, newPositions));
+
         return replacement;
 
     });
@@ -1119,7 +1219,7 @@ function replaceCodeWithPre(htmlString) {
     // return htmlString
     return {
         htmlString: htmlString,
-        positions: positions
+        positions: newPositions
     };
 }
 
@@ -1198,7 +1298,7 @@ function removeMinimumIndentation(text) {
   
 function processLogEntryText(log_entry){
     var htmlString = log_entry.html();
-    let positions; // 声明 positions 变量
+    var positions; // 声明 positions 变量
     htmlString  = replaceTabWithSpace(htmlString);
     ({htmlString, positions} = replaceCodeWithPre(htmlString));
     ({htmlString, positions} = replaceURLsWithLinks(htmlString, positions));
