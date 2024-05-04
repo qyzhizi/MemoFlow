@@ -875,7 +875,7 @@ function addCodePositions(changedPositions, targetPositions){
         const lengthDifference = pos.replacementLength - (pos.end - pos.start); // 长度变化
         // 更新positions数组中的位置信息
         let offset  = pos.start;
-        
+
         // targetPositions = targetPositions.map(targetPos => {
         //     if (offset < targetPos.start) {
         //         // 如果当前替换发生在某个代码块之前，只需要移动该代码块的位置
@@ -1130,7 +1130,8 @@ function replaceCodeWithPre(htmlString) {
     // var codeRegex = /```(python|c|c\+\+|js|css|html|go|ruby|java|(?=))\s*\n([\s\S]*?)```/g
     // var codeRegex = /```((?:python|c|c\+\+|js|css|html|go|ruby|java)?)\s*\n([\s\S]*?)```/g
     // const codeRegex = /```(objective-c\+*|\w*)([^]*)```/gi;
-    const codeRegex = /\s```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s{0,1}/gi;
+    // const codeRegex = /\s```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s{0,1}/gi;
+    const codeRegex = /(?<!\n)\s*```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s{0,1}/gi;
     htmlString = htmlString.replace(codeRegex, function(match, language, code, offset) {
         language = language.toLowerCase();
         let languageName = languageMap[language];
@@ -1202,7 +1203,7 @@ function replaceCodeWithPre(htmlString) {
 
     var newPositions = [...positions]
     // const tagRegex = /(?<!#)#(?![#])[/\w\u4e00-\u9fff]+(?=\x20|\n)/g;
-    const tagRegex = /(?<!#)#(?![#])[/\w\u4e00-\u9fff]+/g;
+    const tagRegex = /(?<=(\x20|^))(?<!#)#(?![#])[/\w\u4e00-\u9fff]+(?=\x20|\n|$)/g;
     htmlString = htmlString.replace(tagRegex, function(match, offset) {
 
         let replacement = `<span class="tag">${match}</span>`;
