@@ -1142,8 +1142,8 @@ function replaceCodeWithPre(htmlString) {
         if (!languageName) {
           code = language + code;
         }
-        // 移除代码段开头和结尾的换行符
-        code = code.replace(/^\s*/, '').trimEnd();
+        // 移除代码段开头和结尾的换行符, 不可以/^\s*/, 要保留前缀格式
+        code = code.replace(/^\n*/, '').trimEnd();
         
         let replacement;
         if (code.length === 0) {
