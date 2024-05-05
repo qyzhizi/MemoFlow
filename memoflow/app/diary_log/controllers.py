@@ -4,8 +4,9 @@
 import base64
 import logging
 import json
-from datetime import datetime
-from datetime import timedelta
+import datetime
+# from datetime import datetime
+# from datetime import timedelta
 from webob.exc import HTTPUnauthorized
 from webob.exc import HTTPFound
 from webob import Response
@@ -134,7 +135,12 @@ class DiaryLog(wsgi.Application):
             # 创建响应对象
             response = Response(json.dumps({"token": token}))
             # 设置名为 "user_id" 的 Cookie，值为用户ID
-            response.set_cookie('Authorization', 'Bearer ' + token)
+            # 获取当前时间
+            current_time = datetime.datetime.now()
+
+            # 计算过期时间为当前时间后的24小时
+            expires = current_time + datetime.timedelta(hours=24)
+            response.set_cookie('Authorization', 'Bearer ' + token, expires=expires)
 
             return response
         else:
@@ -1091,7 +1097,7 @@ class DiaryLog(wsgi.Application):
         refresh_token = github_access_info.get('refresh_token', None)
         access_token_expires_at = github_access_info.get(
             'access_token_expires_at', None)
-        access_token_expires_at = datetime.strptime\
+        access_token_expires_at = datetime.datetime.strptime\
             (access_token_expires_at, '%Y-%m-%d %H:%M:%S.%f') \
                 if access_token_expires_at else None
         
@@ -1102,13 +1108,13 @@ class DiaryLog(wsgi.Application):
                     "please bing github again")
 
         # 获取当前时间
-        current_datetime = datetime.now()
+        current_datetime = datetime.datetime.now()
         # if access_token hans expired
         if current_datetime >= access_token_expires_at:
             LOG.warn("access_token has expired")
             refresh_token_expires_at = github_access_info[
                 'refresh_token_expires_at']
-            refresh_token_expires_at = datetime.strptime\
+            refresh_token_expires_at = datetime.datetime.strptime\
                     (refresh_token_expires_at,
                     '%Y-%m-%d %H:%M:%S.%f')
             # if refresh token alse has expired
