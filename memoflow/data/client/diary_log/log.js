@@ -75,11 +75,11 @@ $(function() {
     $('#SmHeadRefreshButton').on('click', function(event) {
         event.preventDefault();
         // location.reload();
+        emptyLogEntry()
         localStorage.setItem('page_size', null);
         localStorage.setItem('page_number', null);
         // get logs
         getLogs()
-        showNotification('Refresh Success!', 700);
 
     })
 
@@ -433,6 +433,10 @@ function addLogEntry(logText, record_id, reverse=true) {
     // dropdownMenu.append(latexView);
 }
 
+function emptyLogEntry(){
+    var logList = $('#logList');
+    logList.empty();
+}
 
 /**
 * 将字符串根据给定的模式分割，并返回匹配项和分隔符的列表
