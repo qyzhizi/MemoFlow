@@ -6,21 +6,10 @@
       <p>同步文件配置</p>
     </div>
   </div>
-<div style="display: flex; gap:20px; align-items: flex-end;">
 
-  <div style="flex: 1;">
-    <img src="https://qyzhizi.cn/img/202405071940580.png" alt="client" width="auto" height="auto" />
-    <div align="center">
-      <p>Github 仓库配置</p>
-    </div>    
-  </div>
-  <div style="flex: 1; items-start:center">
-    <img src="https://qyzhizi.cn/img/202405071942295.png" alt="client" width="auto" height="auto" />
-    <div align="center">
-      <p>坚果云配置</p>
-    </div>
-  </div>  
-</div>
+Github 仓库配置|坚果云配置
+:-------------------------:|:-------------------------:
+![](https://qyzhizi.cn/img/202405071940580.png)  |  ![](https://qyzhizi.cn/img/202405071942295.png)
 
 # 网站 Host 配置
 

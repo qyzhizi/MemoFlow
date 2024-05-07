@@ -2,37 +2,15 @@
 以本地启动为例，启动服务后，访问：`http://localhost:6060/v1/diary-log`
 ，可得到页面:
 
-<div style="display: flex; gap:20px; align-items: flex-end;">
-  <div style="flex: 4; items-start:center">
-    <img src="https://qyzhizi.cn/img/202405071900184.png" alt="client" width="auto" height="auto" />
-    <div align="center">
-      <p>桌面网页客户端</p>
-    </div>
-  </div>
-  <div style="flex: 1;">
-    <img src="https://qyzhizi.cn/img/202405071900655.png" alt="client" width="auto" height="auto" />
-    <div align="center">
-      <p>移动端网页客户端</p>
-    </div>    
-  </div>
-</div>
+Desktop web client             |  Mobile web client
+:-------------------------:|:-------------------------:
+![](https://qyzhizi.cn/img/202405071900184.png)  |  ![](https://qyzhizi.cn/img/202405071900655.png)
 
 相同的卡片笔记在 Logseq(或Obsidian) 显示的内容：
 
-<div style="display: flex; gap:20px; align-items: flex-end;">
-  <div style="flex: 1; items-start:center">
-    <img src="https://qyzhizi.cn/img/202405071911371.png" alt="client" width="auto" height="auto" />
-    <div align="center">
-      <p>Logseq 显示的卡片笔记内容</p>
-    </div>
-  </div>
-  <div style="flex: 1;">
-    <img src="https://qyzhizi.cn/img/202405071915390.png" alt="client" width="auto" height="auto" />
-    <div align="center">
-      <p>Obsidian 显示的卡片笔记内容</p>
-    </div>    
-  </div>
-</div>
+Logseq 显示的卡片笔记内容|Obsidian 显示的卡片笔记内容
+:-------------------------:|:-------------------------:
+![](https://qyzhizi.cn/img/202405071911371.png)  |  ![](https://qyzhizi.cn/img/202405071915390.png)
 
 本项目的网页客户端的输入框保留空格、换行符和其他空白字符，支持tab与shift+tab 缩进。当你提交输入的内容后，后台会自动添加时间戳标题，后台使用字符串匹配来识别卡片笔记的标签、子块与todo等功能。
 
