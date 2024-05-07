@@ -72,6 +72,16 @@ $(function() {
     // show sm-width search sidebar
     showSmHeadSearchAndTagsHandler()
 
+    $('#SmHeadRefreshButton').on('click', function(event) {
+        event.preventDefault();
+        // location.reload();
+        localStorage.setItem('page_size', null);
+        localStorage.setItem('page_number', null);
+        // get logs
+        getLogs()
+        showNotification('Refresh Success!', 700);
+
+    })
 
     $('#click-more-log').on('click', function(event) {
         event.preventDefault();

@@ -455,3 +455,8 @@ button:hover {
     min-height: 2.25rem;
 }
 
+:is(.dark .dark\:svg-gray-300) {
+    --tw-text-opacity: 1;
+    fill: rgb(209 213 219 / var(--tw-text-opacity))
+}
+
