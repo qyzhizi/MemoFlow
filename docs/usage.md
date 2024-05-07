@@ -1,29 +1,46 @@
 ## 使用方法
 以本地启动为例，启动服务后，访问：`http://localhost:6060/v1/diary-log`
-，可得到页面， 输入框中输入卡片笔记，然后点击`commit`：
+，可得到页面:
 
-<div align="center">
-<img src=https://qyzhizi.cn/img/202307202132935.png alt="client" width="500" height="auto" />
+<div style="display: flex; gap:20px; align-items: flex-end;">
+  <div style="flex: 4; items-start:center">
+    <img src="https://qyzhizi.cn/img/202405071900184.png" alt="client" width="auto" height="auto" />
+    <div align="center">
+      <p>桌面网页客户端</p>
+    </div>
+  </div>
+  <div style="flex: 1;">
+    <img src="https://qyzhizi.cn/img/202405071900655.png" alt="client" width="auto" height="auto" />
+    <div align="center">
+      <p>移动端网页客户端</p>
+    </div>    
+  </div>
 </div>
 
-<div align="center">
-  <p>网页客户端</p>
+相同的卡片笔记在 Logseq(或Obsidian) 显示的内容：
+
+<div style="display: flex; gap:20px; align-items: flex-end;">
+  <div style="flex: 1; items-start:center">
+    <img src="https://qyzhizi.cn/img/202405071911371.png" alt="client" width="auto" height="auto" />
+    <div align="center">
+      <p>Logseq 显示的卡片笔记内容</p>
+    </div>
+  </div>
+  <div style="flex: 1;">
+    <img src="https://qyzhizi.cn/img/202405071915390.png" alt="client" width="auto" height="auto" />
+    <div align="center">
+      <p>Obsidian 显示的卡片笔记内容</p>
+    </div>    
+  </div>
 </div>
 
-logseq 显示的卡片笔记内容：
+本项目的网页客户端的输入框保留空格、换行符和其他空白字符，支持tab与shift+tab 缩进。当你提交输入的内容后，后台会自动添加时间戳标题，后台使用字符串匹配来识别卡片笔记的标签、子块与todo等功能。
 
-
-<div align="center">
-  <img src="https://qyzhizi.cn/img/202307201141747.png" width="500" height="auto" alt="logseq 显示的卡片笔记内容" >
-</div>
-
-本项目的网页客户端有一个大的输入框。输入的内容保留空格、换行符和其他空白字符，支持tab与shift+tab 缩进。当你提交输入的内容后，后台会自动添加时间戳标题，目前使用一些简单的规则实现卡片笔记的标签、子块与todo功能。未来考虑添加其他容易使用的规则。
-
-另外数据会在数据库sqlite中保留一份，然后通过异步方式向远程同步文件发送一份（插入到文件最上面），由于采用异步发送方式，所以感受不到延迟。如果后台异步发送任务失败，那么远程同步文件得不到更新。未来考虑后台发送任务失败时，给出页面提示。
+另外数据会在数据库sqlite中保留一份，然后通过异步方式向远程同步文件发送一份（插入到文件最上面），由于采用异步发送方式，所以感受不到延迟。@todo 考虑后台发送任务失败时，给出页面提示。
 
 ## 卡片笔记示例
 记录卡片笔记，可以围绕一个问题(#que 标记)来进行：
-当你在笔记页面输入：
+当你在输入框输入：
 ```
 #key1 #key2
 #que 如何使用一个简单的自定义规则实现卡片笔记
@@ -32,17 +49,8 @@ logseq 显示的卡片笔记内容：
 --todo 代办事项1
 --todo 代办事项2
 ```
-提交笔记后，在线页面的内容：
-```
-- ## 2023/5/16 08:36:48:
-	- #key1 #key2
-#que 如何使用一个简单的自定义规则实现卡片笔记
-	- #ans
-就像这样, 这是一个例子
-	- TODO 代办事项1
-	- TODO 代办事项2
-```
-远程同步文件中内容：
+
+在线页面与远程同步文件中内容：
 ```
 - ## 2023/5/16 08:36:48:
 	- #key1 #key2
@@ -61,9 +69,7 @@ logseq 显示的卡片笔记内容：
 #key1 表示关键字标签 
 #que 表示问题标签
 #ans 表示答案标签
-关键字标签与问题部分在一个子块，块（block）是logseq中的核心概念，表示一个段落
-答案部分单独作为一个子块
+关键字与问题在一个子块，块（block）是logseq中的核心概念，表示一个段落
+答案单独作为一个子块
 --todo 表示代办事项
-另外代办事项（- TODO xxxx）也是一个单独子块
-本地页面的内容 与 远程同步文件中内容之所以不一样，是考虑到方便复制与粘贴本地页面的内容，因为远程同步文件中内容中子块会统一带"\t"的缩进，复制后，有时候还要去除"\t",不太方便。
 ```

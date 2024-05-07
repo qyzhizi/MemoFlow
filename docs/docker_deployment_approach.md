@@ -17,18 +17,52 @@
     main_server:
         depends_on:
         - redis
-        image: qyzhizi/memoflow:v0.1.1
+        - chroma
+        image: qyzhizi/memoflow:v0.1.6
         env_file:
-        - .env
+        - ../.env
         ports:
         - "6060:6060"
-        restart: always
         volumes:
-        - ".env:/app/.env"
+        - "../.env:/app/.env"
+        - "../log_file:/app/log_file"
+        - "../db_data:/app/db_data"
+        networks:
+        - net    
+        restart: on-failure
+        command:  sh -c "python setup.py egg_info && sh memoflow/cmd/run.sh"
+
     redis:
         image: "redis/redis-stack-server:latest"
+        networks:
+        - net 
+        restart: on-failure
+
+    chroma:
+        image: ghcr.io/chroma-core/chroma:latest
+        volumes:
+        - index_data:/chroma/chroma
+        command: "--workers 1 --host 0.0.0.0 --port 8000 --proxy-headers --log-config chromadb/log_config.yml --timeout-keep-alive 30"
+
+        environment:
+        - IS_PERSISTENT=TRUE
+        - ANONYMIZED_TELEMETRY=False
+        - ALLOW_RESET=True
+        - REBUILD_HNSWLIB=False
+        networks:
+        - net
+        restart: on-failure
+
+    volumes:
+    index_data:
+        driver: local
+
+    networks:
+    net:
+        driver: bridge
+
     ```   
-    其中 `image: qyzhizi/memoflow:v0.1.1` 是已经上传 DockHub 的镜像。
+    其中 `image: qyzhizi/memoflow:v0.1.6` 是已经上传 DockHub 的镜像。
 
 - 3、在与 docker-compose.yml 同级目录下，创建配置文件：`.env`。
     如果不配置只有空白页面，配置参考：
@@ -37,7 +71,7 @@
     ```
     docker-compose up -d
     ```
-    第一次运行会拉取 qyzhizi/memoflow:v0.1.1 镜像，大小为360M； 也会拉取 redis 镜像。然后启动服务。  
+    第一次运行会拉取 qyzhizi/memoflow:v0.1.6 镜像，也会拉取 redis, chroma 镜像。然后启动服务。  
 - 5、访问客户端页面
 
     浏览器输入：http://x.x.x.x:6060/v1/diary-log
