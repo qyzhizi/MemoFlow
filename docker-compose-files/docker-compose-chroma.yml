@@ -17,7 +17,7 @@ services:
     networks:
       - net    
     restart: on-failure
-    command:  sh -c "python setup.py egg_info && sh memoflow/cmd/run.sh"  
+    command:  sh -c "python setup.py egg_info && sh memoflow/cmd/run.sh"
 
   redis:
     image: "redis/redis-stack-server:latest"

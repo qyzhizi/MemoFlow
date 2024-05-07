@@ -1109,6 +1109,7 @@ function replaceCodeWithPre(htmlString) {
         'mongodb': 'MongoDB',
         'c#': 'C#',
         'c++': 'C++',
+        'cpp': 'cpp',
         'objective-c': 'Objective-C',
         'objective-c++': 'Objective-C++',
         'js': 'JavaScript',
