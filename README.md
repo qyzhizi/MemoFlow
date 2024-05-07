@@ -10,18 +10,18 @@
 
 有一个网页客户端，支持提交、浏览与编辑卡片笔记, 不支持 Markdown 语法, 但是支持 `#Tag`标签, Latex公式, 代码块与超链接。
 
-<div style="display: flex; gap:20px; align-items: flex-end;">
-  <div style="flex: 4; items-start:center">
-    <img src="https://qyzhizi.cn/img/202405071900184.png" alt="client" width="auto" height="auto" />
+<div style="display:flex">
+  <div style="flex:4;padding-right:10px;">
+     <img src="https://qyzhizi.cn/img/202405071900184.png" alt="client" width="auto" height="auto" />
     <div align="center">
       <p>桌面网页客户端</p>
-    </div>
+    </div>     
   </div>
-  <div style="flex: 1;">
+  <div style="flex:1;padding-left:10px;">
     <img src="https://qyzhizi.cn/img/202405071900655.png" alt="client" width="auto" height="auto" />
     <div align="center">
       <p>移动端网页客户端</p>
-    </div>    
+    </div>      
   </div>
 </div>
 
