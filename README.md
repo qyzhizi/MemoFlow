@@ -12,16 +12,10 @@
 
 <div style="display:flex">
   <div style="flex:4;padding-right:10px;">
-     <img src="https://qyzhizi.cn/img/202405071900184.png" alt="client" width="auto" height="auto" />
-    <div align="center">
-      <p>桌面网页客户端</p>
-    </div>     
+     <img src="https://qyzhizi.cn/img/202405071900184.png" alt="client" width="auto" height="auto" />   
   </div>
   <div style="flex:1;padding-left:10px;">
-    <img src="https://qyzhizi.cn/img/202405071900655.png" alt="client" width="auto" height="auto" />
-    <div align="center">
-      <p>移动端网页客户端</p>
-    </div>      
+    <img src="https://qyzhizi.cn/img/202405071900655.png" alt="client" width="auto" height="auto" />    
   </div>
 </div>
 
