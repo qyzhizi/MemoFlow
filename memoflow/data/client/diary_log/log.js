@@ -1007,7 +1007,9 @@ function replaceURLsWithLinks(htmlString, positions) {
     // Get the text content of the <log_entry> element
     // var content = htmlString;
     // Regular expression to find URLs within the text
-    var urlRegex = /(?<=^|\s)https?:\/\/[^\s<]+/g;
+    // var urlRegex = /(?<=^|\s)https?:\/\/[^\s<]+/g;
+    // var urlRegex = /https?:\/\/(?:www\.)?[^\s(<]+/g;
+    var urlRegex = /https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&/=]*)/g;
     // Replace URLs with hyperlinks
     var newPositions = [...positions]
     htmlString = htmlString.replace(urlRegex, function(match, offset) {
@@ -1223,9 +1225,9 @@ function replaceCodeWithPre(htmlString) {
     var newPositions = [...positions]
     // const tagRegex = /(?<!#)#(?![#])[/\w\u4e00-\u9fff]+(?=\x20|\n)/g;
     // const tagRegex = /(?<=\x20|^)(?<!#)#(?![#])[/\w\u4e00-\u9fff]+(?=\x20|\n|$)/g;
-    const tagRegex = /(?<=\x20|^)(?<!#)#(?![#])[/\w\u4e00-\u9fff]+[\x20|\n|$]{1}/g;
+    // const tagRegex = /(?<=\x20|^)(?<![# ＃])[#＃]{1}(?![#＃])[/\w\u4e00-\u9fff]+[\x20|\n|$]{1}/g;
+    const tagRegex = /(?<=\x20|^)(?<![#＃])[#＃]{1}(?![#＃])[/\w\u4e00-\u9fff]+(?=[\x20\n]|$)/g;
     htmlString = htmlString.replace(tagRegex, function(match, offset) {
-
         let trimmedStr = match.trimEnd();
         let endWhitespace = match.slice(trimmedStr.length);
         let replacement = `<span class="tag">${trimmedStr}</span>${endWhitespace}`;

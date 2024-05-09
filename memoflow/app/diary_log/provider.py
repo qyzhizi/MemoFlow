@@ -377,7 +377,10 @@ class Manager(manager.Manager):
         for i in range(0, len(matches), 2):
             pair_positions.append((matches[i].start(), matches[i+1].start()+3))
         return pair_positions
-
+    
+    def replace_error_tag_str(self, text):
+        return text.replace('＃', '#')
+    
     def replace_outside_code_blocks(self, text):
         code_blocks = self.find_code_blocks(text)
         # 找到所有 # 的位置
@@ -394,7 +397,7 @@ class Manager(manager.Manager):
             # 检查 # 是否在任何一个代码块内
             if not any(start <= pos_start < end for start, end in code_blocks):
                 # 如果不在代码块内，替换为 @
-                new_text[pos_start:pos_end] = '@'*(pos_end - pos_start - 1) + ' '
+                new_text[pos_start:pos_end] = '`'+ '@'*(pos_end - pos_start - 1) + '` '
         # 返回新文本
         return ''.join(new_text)
 
@@ -460,6 +463,7 @@ class Manager(manager.Manager):
                     todo_key[1]:todo_value[0],
                     todo_key[2]:todo_value[1],
                     todo_key[3]:todo_value[1]}
+        content = self.replace_error_tag_str(content)
         content = self.replace_outside_code_blocks(content)
         content_list = content.split('\n')
         for i, content in enumerate(content_list):
