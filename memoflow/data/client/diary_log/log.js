@@ -1009,7 +1009,7 @@ function replaceURLsWithLinks(htmlString, positions) {
     // Regular expression to find URLs within the text
     // var urlRegex = /(?<=^|\s)https?:\/\/[^\s<]+/g;
     // var urlRegex = /https?:\/\/(?:www\.)?[^\s(<]+/g;
-    var urlRegex = /https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&/=]*)/g;
+    var urlRegex = /https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&/=]*)/g;
     // Replace URLs with hyperlinks
     var newPositions = [...positions]
     htmlString = htmlString.replace(urlRegex, function(match, offset) {
@@ -1150,7 +1150,8 @@ function replaceCodeWithPre(htmlString) {
     // const codeRegex = /```(objective-c\+*|\w*)([^]*)```/gi;
     // const codeRegex = /\s```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s{0,1}/gi;
     // const codeRegex = /(?<!\n)[\t\x20]*```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s{0,1}(?!\n)/gi;
-    const codeRegex = /[\t\x20]*```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s{0,1}(?!\n)/gi;
+    // const codeRegex = /[\t\x20]{2,}(?!\\)```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```\s{0,1}(?!\n)/gi;
+    const codeRegex = /[\t\x20]{2,}(?!\\)```(objective-c\+*|c#|c\+\+|\w*)([\s\S]*?)```(?=[\x20\n]|$)(?!\n)/gi;
     htmlString = htmlString.replace(codeRegex, function(match, language, code, offset) {
         language = language.toLowerCase();
         let languageName = languageMap[language];
