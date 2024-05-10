@@ -1521,7 +1521,7 @@ function processLogEntryText2(log_entry){
         {regex:/((?<=\x20|^)(?<![#＃])[#＃]{1}(?![#＃])[/\w\u4e00-\u9fff]+(?=[\x20\n]|$))/g, type: 'tag'},
         {regex:/(https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&/=]*))/g, type: 'url'},
         // {regex:/(?:\s|\r?\n)*?\$\$([\s\S]*?)\$\$(?:\s|\r?\n)*?/g, type: 'MulLineslatex'},
-        {regex:/(?:\s|\r?\n)\$\$([\s\S]*?)\$\$(?:$|[\x20]*\r?\n)/g, type: 'MulLineslatex'},
+        {regex:/(?:[\x20]*\r?\n?|\r?\n[\x20]*)\$\$([\s\S]*?)\$\$(?:$|[\x20]*\r?\n?)/g, type: 'MulLineslatex'},
         {regex:/(?:\$|\\\[|\\\()([\s\S]*?)(?:\$|\\\]|\\\))/g, type: 'InLineslatex'},
     ]
     Matches = mulTextMatchPattern(textString, codeBlockLinesPattern, inlinePattern, otherPatterns)
