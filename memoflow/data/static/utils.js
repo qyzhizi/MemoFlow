@@ -423,12 +423,12 @@ function textMatchPattern(input, Pattern, PatternType) {
 }
 
 
-function subTextMatchPattern(Matches, urlPattern, urlPatternType){
+function subTextMatchPattern(Matches, Pattern, PatternType){
     let tempMatches = [...Matches];
     for(let i = 0, addItems = 0; i < tempMatches.length; i++){
         let item  = tempMatches[i];
         if (item.type == 'text'){
-            let PatternMatches = textMatchPattern(item.content, urlPattern, urlPatternType);
+            let PatternMatches = textMatchPattern(item.content, Pattern, PatternType);
             Matches.splice(i + addItems, 1, ...PatternMatches)
             addItems = addItems + PatternMatches.length - 1
         }
