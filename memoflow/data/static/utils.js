@@ -388,6 +388,64 @@ function checkElementExistence(element_id) {
 };
 
 
+function textMatchPattern(input, Pattern, PatternType) {
+    let match;
+    let Matches = [];
+    let lastIndex = 0; // 用于跟踪上一个匹配项的结束位置
+
+    // 搜集所有行间代码块及其位置
+    while ((match = Pattern.exec(input)) !== null) {
+        // 检查并添加前一个代码块后和当前代码块前的非代码块文本
+        if (match.index > lastIndex) {
+            Matches.push({
+                type: 'text',
+                content: input.substring(lastIndex, match.index),
+            });
+        }
+
+        Matches.push({
+            type: PatternType,
+            content: match[1],
+        });
+
+        // 更新lastIndex为当前代码块的结束位置
+        lastIndex = match.index + match[0].length;
+    }
+
+    // 检查最后一个代码块后是否还有文本
+    if (lastIndex < input.length) {
+        Matches.push({
+            type: 'text',
+            content: input.substring(lastIndex),
+        });
+    }
+    return Matches;
+}
+
+
+function subTextMatchPattern(Matches, urlPattern, urlPatternType){
+    let tempMatches = [...Matches];
+    for(let i = 0, addItems = 0; i < tempMatches.length; i++){
+        let item  = tempMatches[i];
+        if (item.type == 'text'){
+            let PatternMatches = textMatchPattern(item.content, urlPattern, urlPatternType);
+            Matches.splice(i + addItems, 1, ...PatternMatches)
+            addItems = addItems + PatternMatches.length - 1
+        }
+    }
+}
+
+
+function mulTextMatchPattern(input, codeBlockLinesPattern, inlinePattern, otherPatterns){
+    let Matches = textMatchPattern(input, codeBlockLinesPattern.regex, codeBlockLinesPattern.type);
+    subTextMatchPattern(Matches, inlinePattern.regex, inlinePattern.type)
+    otherPatterns.forEach(element => {
+        subTextMatchPattern(Matches, element.regex, element.type)
+    }); 
+    return Matches
+}
+
+
 export {
     set_user_name_and_avatar,
     cropImage, Image2base64, showup_class, showoff_class,
@@ -397,4 +455,5 @@ export {
     addSourceDataToTargetDiv,
     fetchData,
     getUserNameAndAvatar,
+    mulTextMatchPattern,
 };

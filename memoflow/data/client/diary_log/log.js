@@ -8,7 +8,8 @@ import {  getSmHeadNavHtml
 import {  getSmSearchDivHtml
 } from '/v1/diary-log/static/sm_head_search.js';
 import {
-    showNotification
+    showNotification,
+    mulTextMatchPattern
 } from '/v1/diary-log/static/utils.js';
 
 if (function() { return !this; }()) {
@@ -296,7 +297,7 @@ function addLogEntry(logText, record_id, reverse=true) {
     // 将 log_entry 元素的内容添加到 log_entry 中
     log_entry.text(logText);
     log_entry.data('logText', logText);
-    processLogEntryText(log_entry);
+    processLogEntryText2(log_entry);
     // 创建一个包含下拉菜单的容器
     var logEntryContainer = $('<div class="log-entry-container"></div>');
     // 下拉菜单图标容器
@@ -683,7 +684,7 @@ saveChangesBtn.onclick = function() {
             // 更新原始的日志内容
             log_entry.text(logText);
             log_entry.data('logText', logText);
-            processLogEntryText(log_entry)
+            processLogEntryText2(log_entry)
             // 清空编辑框
             editLog.value = '';
             editLog.curPreObject = null;
@@ -1099,6 +1100,181 @@ function copyIconSvgButtonListener(button) {
 }
 
 
+function createCodeContainer(code, copyIcon) {
+    // 创建一个<div>元素并设置class属性
+    let divElement = document.createElement('div');
+    divElement.className = 'code-container';
+
+    // 假设copyIcon已经是一个安全的jQuery对象，我们可以直接将其追加到divElement中
+    // 如果copyIcon是一个DOM元素，使用divElement.appendChild(copyIcon.cloneNode(true));
+    $(divElement).append(copyIcon.clone(true));
+
+    // 创建<pre>元素并安全地设置其文本内容
+    let preElement = document.createElement('pre');
+    preElement.textContent = code;
+
+    // 将<pre>元素添加到<div>元素中
+    divElement.appendChild(preElement);
+
+    // 如果你需要返回一个jQuery对象
+    // return $(divElement);
+
+    // 如果你不需要jQuery特性，可以直接返回原生DOM元素
+    return divElement;
+}
+
+
+function createCodeBlockBetweenLinesElement(content){
+    // 定义语言映射表
+    const languageMap = {
+        'python': 'Python',
+        'c': 'C',
+        'make': 'Makefile',
+        'cmd': 'CMD',
+        'sql': 'SQL',
+        'db': 'Database',
+        'mongodb': 'MongoDB',
+        'c#': 'C#',
+        'c++': 'C++',
+        'cpp': 'cpp',
+        'objective-c': 'Objective-C',
+        'objective-c++': 'Objective-C++',
+        'js': 'JavaScript',
+        'javascript': 'JavaScript',
+        'css': 'CSS',
+        'html': 'HTML',
+        'php': 'PHP',
+        'go': 'Go',
+        'ruby': 'Ruby',
+        'rust': 'Rust',
+        'java': 'Java',
+        'shell': 'Shell',
+        'sh': 'Shell',
+        'code': 'Code',
+        'py': 'Python',
+        'regex':'regex',
+        'json':'Json'
+    };
+    var copyIcon = $(`<div class="copyIcon"> 
+    <span class="codeTag">Code</span>
+    <button class="copyIconSvgButton">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy w-4 h-auto"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+    </button>
+    </div>`);
+
+    // 使用正则表达式匹配第一个单词
+    const regex = /([\S]+)([\s\S]*)/;
+    const matches = content.match(regex);
+    let language = '';
+    let code = '';
+    if (matches){
+        language = matches[1]
+        code = matches[2]
+    }
+    let lowerCaseLanguage = language.toLowerCase();
+    let languageName = languageMap[lowerCaseLanguage];
+
+    if (languageName){
+        copyIcon.find('span').text(languageName);
+    } else {
+        code = language + code;
+        copyIcon.find('span').text('Code');
+    }    
+    // 移除代码段开头和结尾的换行符, 不可以/^\s*/, 要保留前缀格式
+    code = code.replace(/^\n*/, '').trimEnd();
+    let Element;
+    // 使用<div>标签包裹复制图标和<pre>标签
+    // Element = $(`<div class="code-container">${copyIcon.prop('outerHTML')}<pre>${code}</pre></div>`);
+    Element = createCodeContainer(code, copyIcon)
+    return Element
+}
+
+
+function createInLinecodeBlockElement(content){
+    // let Element = $(`<span class="singleLineCode">${content}</span>`);
+    // 创建一个空的span元素
+    let element = document.createElement('span');
+    // 添加类名
+    element.className = 'singleLineCode';
+    // 使用textContent属性安全地添加内容
+    element.textContent = content;
+    
+    // 如果你使用jQuery并希望返回一个jQuery对象
+    // return $(element);
+
+    // 如果直接使用原生DOM操作，返回原生DOM元素
+    return element;
+}
+
+function createUrlElement(content){
+    // 创建一个空的<a>元素
+    let element = document.createElement('a');
+    // 设置href属性
+    element.href = content;
+    // 设置显示的文本
+    element.textContent = content;
+    
+    // 如果你使用jQuery并希望返回一个jQuery对象
+    // return $(element);
+
+    // 如果直接使用原生DOM操作，返回原生DOM元素
+    return element;    
+}
+
+function createTagElement(content){
+    // let trimmedStr = content.trimEnd();
+    // let endWhitespace = content.slice(trimmedStr.length);
+    // // let replacement = `<span class="tag">${trimmedStr}</span>${endWhitespace}`;
+    // let Element = $(`<span class="tag">${trimmedStr}</span>${endWhitespace}`);
+    // return Element 
+
+    // 去除尾部空格并保存
+    let trimmedStr = content.trimEnd();
+    let endWhitespace = content.slice(trimmedStr.length);
+
+    // 创建一个空的span元素
+    let spanElement = document.createElement('span');
+    // 添加类名
+    spanElement.className = 'tag';
+    // 使用textContent属性安全地设置文本内容
+    spanElement.textContent = trimmedStr;
+
+    // 如果你使用jQuery并希望返回一个jQuery对象
+    let $spanElement = $(spanElement);
+
+    // 处理尾随空格。由于尾随空格是纯文本，我们可以安全地添加。
+    if (endWhitespace.length > 0) {
+        // 创建一个文本节点来表示尾随空格，并将其添加到span元素之后
+        $spanElement.after(document.createTextNode(endWhitespace));
+    }
+
+    // 返回jQuery对象
+    return $spanElement;   
+}
+
+function createMulLineslatexElement(content){
+    // 将 HTML 字符串解析为文本, 并去除前后空白字符
+    let equation = content.trim(); 
+    let latexBlock = document.createElement('div');
+    latexBlock.classList.add('BlocklatexMath'); // 添加类名
+    // 设置为块级公式
+    katex.render(equation, latexBlock, { displayMode: true }); 
+    return latexBlock
+}
+
+function createInLineslatexElement(content){
+    // 将 HTML 字符串解析为文本, 并去除前后空白字符
+    let equation = content.trim(); 
+    let span = document.createElement('span');
+    // 不需要为 span 元素添加 data-latex 属性以存储原始的 LaTeX 代码, 
+    // 否则 log_entry.html() 再次又包含了 latex 源码, 再次解析会乱码
+    // span.setAttribute('data-latex', match); 
+    span.classList.add('latexMath'); // 添加类名
+    try{ katex.render(equation, span);} catch(e){return match}
+    return span  
+}
+
+
 function replaceCodeWithPre(htmlString) {
     // 定义语言映射表
     const languageMap = {
@@ -1197,7 +1373,8 @@ function replaceCodeWithPre(htmlString) {
         return {start: adjustedStart, end: adjustedEnd};
     });
 
-    const singleLineCode = /(?<!`)(`[^`]+`)(?!`)/g;
+    // const singleLineCode = /(?<!``)(`[^`]+`)(?!`)/g;
+    const singleLineCode = /(?<!``)(`[^`<]+`)/g;
     var singleLinepositions = []
     htmlString = htmlString.replace(singleLineCode, function(match, code, offset) {
 
@@ -1331,6 +1508,53 @@ function processLogEntryText(log_entry){
     ({htmlString, positions} = replaceURLsWithLinks(htmlString, positions));
     ({htmlString, positions}  = renderLatexInLog(htmlString, positions));
     log_entry.html(htmlString)
+    addCodeBlockCopyListener(log_entry)
+}
+
+function processLogEntryText2(log_entry){
+    var textString = log_entry.text();
+    textString  = replaceTabWithSpace(textString);
+    var Matches = [];
+    const codeBlockLinesPattern = {regex:/[\t\x20]{2,}(?!\\)```([\s\S]*?)```(?:$|[\x20]*\n)(?!\n)/gi, type: 'codeBlockBetweenLines'}
+    const inlinePattern = {regex:/(?<!``)(`[^`]+`)/g, type: 'inLinecodeBlock'}
+    const otherPatterns = [
+        {regex:/((?<=\x20|^)(?<![#＃])[#＃]{1}(?![#＃])[/\w\u4e00-\u9fff]+(?=[\x20\n]|$))/g, type: 'tag'},
+        {regex:/(https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&/=]*))/g, type: 'url'},
+        {regex:/(?:\s|\r?\n)*?\$\$([\s\S]*?)\$\$(?:\s|\r?\n)*?/g, type: 'MulLineslatex'},
+        {regex:/(?:\$|\\\[|\\\()([\s\S]*?)(?:\$|\\\]|\\\))/g, type: 'InLineslatex'},
+    ]
+    Matches = mulTextMatchPattern(textString, codeBlockLinesPattern, inlinePattern, otherPatterns)
+
+    // log_entry.html(htmlString)
+    log_entry.empty()
+    Matches.forEach(match => {
+        let element;
+        switch (match.type) {
+          case 'text':
+            element = document.createElement('span');
+            element.textContent = match.content;
+            break;
+          case 'codeBlockBetweenLines':
+            element = createCodeBlockBetweenLinesElement(match.content)
+            break;
+          case 'inLinecodeBlock':
+            element = createInLinecodeBlockElement(match.content)
+            break;
+        case 'tag':
+            element = createTagElement(match.content)
+            break;
+          case 'url':
+            element = createUrlElement(match.content)
+            break;
+          case 'MulLineslatex':
+            element = createMulLineslatexElement(match.content)
+            break;
+        case 'InLineslatex':
+            element = createInLineslatexElement(match.content)
+            break;            
+        }
+        log_entry.append(element)
+    });        
     addCodeBlockCopyListener(log_entry)
 }
 
