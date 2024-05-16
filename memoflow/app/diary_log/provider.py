@@ -403,7 +403,7 @@ class Manager(manager.Manager):
             # 检查 # 是否在任何一个代码块内
             if not any(start <= pos_start < end for start, end in code_blocks):
                 # 如果不在代码块内，替换为 @
-                new_text[pos_start:pos_end] = '`'+ '@'*(pos_end - pos_start - 1) + '` '
+                new_text[pos_start:pos_end] = '@'*(pos_end - pos_start - 1) + " "
         # 返回新文本
         return ''.join(new_text)
 
