@@ -1131,7 +1131,7 @@ class DiaryLog(wsgi.Application):
                     (refresh_token=refresh_token)
             except Exception as e:
                 LOG.exception(str(e))
-                raise VisibleException("Network Error, Please try again later.", status=500)
+                raise VisibleException("Network Error, Can't get github access token by refresh token", status=500)
 
             # update the new access_token to db
             processed_github_access_info = self.diary_log_api.\
