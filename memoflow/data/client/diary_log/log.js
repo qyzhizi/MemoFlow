@@ -1163,7 +1163,8 @@ function createCodeBlockBetweenLinesElement(content){
     </div>`);
 
     // 使用正则表达式匹配第一个单词
-    const regex = /([\S]+)([\s\S]*)/;
+    // const regex = /([\S]+)([\s\S]*)/;
+    const regex = /^([\S]*)(?:\r?\n)([\s\S]*)/;
     const matches = content.match(regex);
     let language = '';
     let code = '';
