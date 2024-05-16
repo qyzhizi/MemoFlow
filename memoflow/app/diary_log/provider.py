@@ -120,14 +120,20 @@ class Manager(manager.Manager):
 
         # 发送请求
         # 使用 urlopen 发送请求，并设置超时时间为2秒
-        response = urllib.request.urlopen(request, timeout=2)
+        try:
+            response = urllib.request.urlopen(request, timeout=2)
+        except Exception as e:
+            LOG.exception(str(e))
         if response.getcode() == 200:
             data = json.loads(response.read())
             if "access_token" not in data:
-                return None
+                LOG.error(f"access_token not in response, response: {data}")
+                raise Exception("Network Error, Can't get accesstoken by refresh token")
+                # return None
             return data
         elif response.getcode() != 200 :
-            LOG.exception("Network Error, Can't get accesstoken by refresh token")
+            data = json.loads(response.read())
+            LOG.error(f"Network Error, Can't get accesstoken by refresh token: {data}")
             raise Exception("Network Error, Can't get accesstoken by refresh token")
 
     def process_github_tokens_info_to_db_format(self, github_tokens_info):

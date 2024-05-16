@@ -32,6 +32,7 @@ import webob.dec
 import webob.exc
 from memoflow.exception.visiable_exc import VisibleException
 from memoflow.exception.visiable_exc import VisibleResponse
+from memoflow.exception.visiable_exc import ServerErrorResponse
 
 LOG = log.getLogger(__name__)
 
@@ -292,6 +293,11 @@ class Application(BaseApplication):
             result = method(req, **params)
         except VisibleException as e:
             return VisibleResponse(str(e), status=e.status)
+        except Exception as e:
+            # return ServerErrorResponse(str(e), status=500)
+            return ServerErrorResponse(
+                "Server error. Please try again later or \
+                contact the website developer", status=500)
 
         if result is None:
             return render_response(

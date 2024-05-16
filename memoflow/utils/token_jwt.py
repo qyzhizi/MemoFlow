@@ -63,7 +63,7 @@ def token_required(func):
             return func(*args, **kwargs)
         else:
             LOG.error("error: Invalid credentials")
-            raise HTTPUnauthorized(json.dumps({"error": "Invalid credentials"}))
+            return HTTPUnauthorized(json.dumps({"error": "Invalid credentials"}))
 
     return decorated_func
 
