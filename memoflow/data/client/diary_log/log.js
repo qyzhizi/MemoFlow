@@ -298,10 +298,7 @@ function addLogEntry(logText, record_id, reverse=true) {
     var log_entry = $('<div class="log_entry"></div>'); // 添加一个类以便样式控制
     // 将 log_entry 元素的内容添加到 log_entry 中
     log_entry.data('logText', logText);
-    // 当logText内容过长时, class = "log_entry is-fold"
-    // if (logText.length >= logText_length_threshold){
-    //     log_entry.addClass("is-fold");
-    // }
+
 
     log_entry.text(logText);
     processLogEntryText2(log_entry);
@@ -377,26 +374,7 @@ function addLogEntry(logText, record_id, reverse=true) {
             unfold.show();
         });    
         collapse.hide();    
-    }
-    // // 添加展开和折叠功能
-    // unfold.click(function() {
-    //     log_entry.removeClass("is-fold");
-    //     unfold.hide();
-    //     collapse.show();
-    // });
-
-    // collapse.click(function() {
-    //     log_entry.addClass("is-fold");
-    //     collapse.hide();
-    //     unfold.show();
-    // });
-
-    // // 如果初始状态是折叠的，只显示展开按钮
-    // if (logText.length >= logText_length_threshold) {
-    //     collapse.hide();
-    // } else {
-    //     unfold.hide();
-    // }    
+    }   
 
     // 点击下拉菜单图标时触发事件
     dropdownIcon.click(function(event) {
