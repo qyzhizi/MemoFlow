@@ -223,6 +223,7 @@ h3 {
     white-space: pre-wrap;
     word-wrap: break-word;
     /* padding: 2px;  */
+    padding-bottom: 0.5rem;
     width: 100%;
     font-size: 1rem;
     border: 0px solid hsl(0, 0%, 0%);

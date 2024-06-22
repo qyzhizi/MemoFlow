@@ -293,14 +293,15 @@ function autoResize(textarea_id) {
 
 
 function addLogEntry(logText, record_id, reverse=true) {
-    const logText_length_threshold = 200;
+    // const logText_length_threshold = 200;
+    const height_threshold = 30*13;
     var log_entry = $('<div class="log_entry"></div>'); // 添加一个类以便样式控制
     // 将 log_entry 元素的内容添加到 log_entry 中
     log_entry.data('logText', logText);
     // 当logText内容过长时, class = "log_entry is-fold"
-    if (logText.length >= logText_length_threshold){
-        log_entry.addClass("is-fold");
-    }
+    // if (logText.length >= logText_length_threshold){
+    //     log_entry.addClass("is-fold");
+    // }
 
     log_entry.text(logText);
     processLogEntryText2(log_entry);
@@ -347,8 +348,19 @@ function addLogEntry(logText, record_id, reverse=true) {
     logEntryContainer.append(dropdownContainer);
     // 将 log_entry 添加到 logEntryContainer 中
     logEntryContainer.append(log_entry);
+
+
+    // 将 logEntryContainer 添加到 logList 中
+    var logList= $('#logList');
+    if(reverse == true){
+        logList.prepend(logEntryContainer);
+    } else{
+        logList.append(logEntryContainer);
+    }
     // 将 unfold 添加到 logEntryContainer 中
-    if (logText.length >= logText_length_threshold){
+    var log_entry_height = log_entry.height()
+    if (log_entry_height >= height_threshold){
+        log_entry.addClass("is-fold");
         logEntryContainer.append(unfold);
         // 将 collapse 添加到 logEntryContainer 中
         logEntryContainer.append(collapse);
@@ -366,15 +378,6 @@ function addLogEntry(logText, record_id, reverse=true) {
         });    
         collapse.hide();    
     }
-
-    // 将 logEntryContainer 添加到 logList 中
-    var logList= $('#logList');
-    if(reverse == true){
-        logList.prepend(logEntryContainer);
-    } else{
-        logList.append(logEntryContainer);
-    }
-
     // // 添加展开和折叠功能
     // unfold.click(function() {
     //     log_entry.removeClass("is-fold");
