@@ -293,10 +293,16 @@ function autoResize(textarea_id) {
 
 
 function addLogEntry(logText, record_id, reverse=true) {
+    const logText_length_threshold = 200;
     var log_entry = $('<div class="log_entry"></div>'); // 添加一个类以便样式控制
     // 将 log_entry 元素的内容添加到 log_entry 中
-    log_entry.text(logText);
     log_entry.data('logText', logText);
+    // 当logText内容过长时, class = "log_entry is-fold"
+    if (logText.length >= logText_length_threshold){
+        log_entry.addClass("is-fold");
+    }
+
+    log_entry.text(logText);
     processLogEntryText2(log_entry);
     // 创建一个包含下拉菜单的容器
     var logEntryContainer = $('<div class="log-entry-container"></div>');
@@ -314,6 +320,11 @@ function addLogEntry(logText, record_id, reverse=true) {
     );
     // 下拉菜单
     var dropdownMenu = $('<div class="dropdown-menu"></div>');
+    // 展开
+    var unfold= $('<div class="unfold"><span class="showBtn"> unfold </span></div>');
+    // 收起
+    var collapse = $('<div class="collapse"><span class="showBtn"> collapse </span></div>');
+
 
     // 将 record_id 添加到 dropdownMenu 作为属性
     dropdownMenu.data('record_id', record_id);
@@ -336,6 +347,26 @@ function addLogEntry(logText, record_id, reverse=true) {
     logEntryContainer.append(dropdownContainer);
     // 将 log_entry 添加到 logEntryContainer 中
     logEntryContainer.append(log_entry);
+    // 将 unfold 添加到 logEntryContainer 中
+    if (logText.length >= logText_length_threshold){
+        logEntryContainer.append(unfold);
+        // 将 collapse 添加到 logEntryContainer 中
+        logEntryContainer.append(collapse);
+        // 添加展开和折叠功能
+        unfold.click(function() {
+            log_entry.removeClass("is-fold");
+            unfold.hide();
+            collapse.show();
+        });
+
+        collapse.click(function() {
+            log_entry.addClass("is-fold");
+            collapse.hide();
+            unfold.show();
+        });    
+        collapse.hide();    
+    }
+
     // 将 logEntryContainer 添加到 logList 中
     var logList= $('#logList');
     if(reverse == true){
@@ -343,6 +374,26 @@ function addLogEntry(logText, record_id, reverse=true) {
     } else{
         logList.append(logEntryContainer);
     }
+
+    // // 添加展开和折叠功能
+    // unfold.click(function() {
+    //     log_entry.removeClass("is-fold");
+    //     unfold.hide();
+    //     collapse.show();
+    // });
+
+    // collapse.click(function() {
+    //     log_entry.addClass("is-fold");
+    //     collapse.hide();
+    //     unfold.show();
+    // });
+
+    // // 如果初始状态是折叠的，只显示展开按钮
+    // if (logText.length >= logText_length_threshold) {
+    //     collapse.hide();
+    // } else {
+    //     unfold.hide();
+    // }    
 
     // 点击下拉菜单图标时触发事件
     dropdownIcon.click(function(event) {
@@ -1517,7 +1568,8 @@ function processLogEntryText2(log_entry){
     textString  = replaceTabWithSpace(textString);
     var Matches = [];
     const codeBlockLinesPattern = {regex:/[\t\x20]{2,}(?!\\)```([\s\S]*?)```(?:$|[\x20]*\r?\n)(?!\n)/gi, type: 'codeBlockBetweenLines'}
-    const inlinePattern = {regex:/(?<!``|\()(`[^`]+`)(?!\))/g, type: 'inLinecodeBlock'}
+    const inlinePattern = {regex:/((?<!``)`[^`]+`)/g, type: 'inLinecodeBlock'}
+
     const otherPatterns = [
         {regex:/((?<=\x20|^)(?<![#＃])[#＃]{1}(?![#＃])[/\w\u4e00-\u9fff]+(?=[\x20\n]|$))/g, type: 'tag'},
         // {regex:/(https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&/=]*))/g, type: 'url'},

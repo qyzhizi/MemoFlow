@@ -200,14 +200,29 @@ h3 {
     color: coral;
 }
 
-.log_entry {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    /* padding: 2px;  */
+.log-entry-container {
+    position: relative;
     margin-top: 10px;
     /* 设置上边距为 10 像素 */
     margin-bottom: 10px;
     /* 设置下边距为 10 像素 */
+    border-radius: 6px;
+    background-color: rgb(39, 39, 42);
+    
+}
+
+.log-entry-container .dropdown-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+    /* 添加指针样式，表明可以点击 */
+}
+
+.log_entry {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    /* padding: 2px;  */
     width: 100%;
     font-size: 1rem;
     border: 0px solid hsl(0, 0%, 0%);
@@ -217,12 +232,29 @@ h3 {
     text-rendering: geometricPrecision;
     line-height: 1.35;
     tab-size: 2;
-    display: block;
     /* 设置为块级元素 */
-    background-color: rgb(39, 39, 42);
-    border-radius: 6px;
-    /* 设置所有四个角的圆角大小为 10 像素 */
+    display: block;
     /* background-color: #27272A; */
+    transition: max-height 0.3s ease-in-out; /* 添加过渡效果 */
+}
+.log_entry.is-fold{
+    max-height: 30ch;
+    overflow: hidden;
+}
+.unfold {
+    width: 100%;
+    font-size: 1rem;
+    cursor: pointer;
+    margin: 6px 0;
+}
+.collapse{
+    width: 100%;
+    font-size: 1rem;
+    cursor: pointer;
+    margin: 6px 0;
+}
+.showBtn{
+    color: rgb(45, 121, 186);
 }
 
 pre{
@@ -296,19 +328,6 @@ background-color: rgb(63, 63, 70);
     width: auto; /* 根据内容自动调整宽度 */
     /* white-space: nowrap; */
     /* display: inline-block; 将span元素转换为块级元素，以便设置宽度 */
-}
-
-
-.log-entry-container {
-    position: relative;
-}
-
-.log-entry-container .dropdown-container {
-    position: absolute;
-    top: 0;
-    right: 0;
-    cursor: pointer;
-    /* 添加指针样式，表明可以点击 */
 }
 
 .dropdown-menu {
