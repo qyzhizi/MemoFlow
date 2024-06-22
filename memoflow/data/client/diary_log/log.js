@@ -356,25 +356,7 @@ function addLogEntry(logText, record_id, reverse=true) {
     }
     // 将 unfold 添加到 logEntryContainer 中
     var log_entry_height = log_entry.height()
-    if (log_entry_height >= height_threshold){
-        log_entry.addClass("is-fold");
-        logEntryContainer.append(unfold);
-        // 将 collapse 添加到 logEntryContainer 中
-        logEntryContainer.append(collapse);
-        // 添加展开和折叠功能
-        unfold.click(function() {
-            log_entry.removeClass("is-fold");
-            unfold.hide();
-            collapse.show();
-        });
 
-        collapse.click(function() {
-            log_entry.addClass("is-fold");
-            collapse.hide();
-            unfold.show();
-        });    
-        collapse.hide();    
-    }   
 
     // 点击下拉菜单图标时触发事件
     dropdownIcon.click(function(event) {
@@ -464,6 +446,44 @@ function addLogEntry(logText, record_id, reverse=true) {
     dropdownMenu.append(editOption);
     dropdownMenu.append(deleteOption);
     // dropdownMenu.append(latexView);
+
+    if (log_entry_height >= height_threshold){
+        // 添加 unfold 选项
+        var unfoldOption = $('<div class="dropdown-option unfold-option">unfold</div>');
+        // 添加collapse选项
+        var collapseOption = $('<div class="dropdown-option collapse-option">collapse</div>');
+        // 添加 unfold 选项点击事件处理程序
+        unfoldOption.click(function() {
+            log_entry.removeClass("is-fold");
+            unfold.hide();
+            collapse.show();
+        });    
+        // 添加删除选项点击事件处理程序
+        collapseOption.click(function() {
+            log_entry.addClass("is-fold");
+            collapse.hide();
+            unfold.show();
+        }); 
+        log_entry.addClass("is-fold");
+        logEntryContainer.append(unfold);
+        // 将 collapse 添加到 logEntryContainer 中
+        logEntryContainer.append(collapse);
+        // 添加展开和折叠功能
+        unfold.click(function() {
+            log_entry.removeClass("is-fold");
+            unfold.hide();
+            collapse.show();
+        });
+
+        collapse.click(function() {
+            log_entry.addClass("is-fold");
+            collapse.hide();
+            unfold.show();
+        });    
+        collapse.hide();    
+        dropdownMenu.append(unfoldOption)
+        dropdownMenu.append(collapseOption)
+    }       
 }
 
 function emptyLogEntry(){
