@@ -293,12 +293,9 @@ function autoResize(textarea_id) {
 
 
 function addLogEntry(logText, record_id, reverse=true) {
-    // const logText_length_threshold = 200;
-    const height_threshold = 30*13;
     var log_entry = $('<div class="log_entry"></div>'); // 添加一个类以便样式控制
     // 将 log_entry 元素的内容添加到 log_entry 中
     log_entry.data('logText', logText);
-
 
     log_entry.text(logText);
     processLogEntryText2(log_entry);
@@ -318,11 +315,6 @@ function addLogEntry(logText, record_id, reverse=true) {
     );
     // 下拉菜单
     var dropdownMenu = $('<div class="dropdown-menu"></div>');
-    // 展开
-    var unfold= $('<div class="unfold"><span class="showBtn"> unfold </span></div>');
-    // 收起
-    var collapse = $('<div class="collapse"><span class="showBtn"> collapse </span></div>');
-
 
     // 将 record_id 添加到 dropdownMenu 作为属性
     dropdownMenu.data('record_id', record_id);
@@ -346,7 +338,6 @@ function addLogEntry(logText, record_id, reverse=true) {
     // 将 log_entry 添加到 logEntryContainer 中
     logEntryContainer.append(log_entry);
 
-
     // 将 logEntryContainer 添加到 logList 中
     var logList= $('#logList');
     if(reverse == true){
@@ -354,9 +345,6 @@ function addLogEntry(logText, record_id, reverse=true) {
     } else{
         logList.append(logEntryContainer);
     }
-    // 将 unfold 添加到 logEntryContainer 中
-    var log_entry_height = log_entry.height()
-
 
     // 点击下拉菜单图标时触发事件
     dropdownIcon.click(function(event) {
@@ -447,43 +435,52 @@ function addLogEntry(logText, record_id, reverse=true) {
     dropdownMenu.append(deleteOption);
     // dropdownMenu.append(latexView);
 
+    const height_threshold = 30*13; // px
+    var log_entry_height = log_entry.height()
     if (log_entry_height >= height_threshold){
-        // 添加 unfold 选项
-        var unfoldOption = $('<div class="dropdown-option unfold-option">unfold</div>');
-        // 添加collapse选项
-        var collapseOption = $('<div class="dropdown-option collapse-option">collapse</div>');
-        // 添加 unfold 选项点击事件处理程序
-        unfoldOption.click(function() {
-            log_entry.removeClass("is-fold");
-            unfold.hide();
-            collapse.show();
-        });    
-        // 添加删除选项点击事件处理程序
-        collapseOption.click(function() {
-            log_entry.addClass("is-fold");
-            collapse.hide();
-            unfold.show();
-        }); 
+        // 在log_entry 底部添加 unfold fold 按钮
         log_entry.addClass("is-fold");
+        // 展开
+        var unfold= $('<div class="unfold"><span class="showBtn"> unfold </span></div>');
+        // 收起
+        var fold = $('<div class="fold"><span class="showBtn"> fold </span></div>');
+        // 将 unfold 添加到 logEntryContainer 中
         logEntryContainer.append(unfold);
-        // 将 collapse 添加到 logEntryContainer 中
-        logEntryContainer.append(collapse);
+        // 将 fold 添加到 logEntryContainer 中
+        logEntryContainer.append(fold);
         // 添加展开和折叠功能
         unfold.click(function() {
             log_entry.removeClass("is-fold");
             unfold.hide();
-            collapse.show();
+            fold.show();
         });
 
-        collapse.click(function() {
+        fold.click(function() {
             log_entry.addClass("is-fold");
-            collapse.hide();
+            fold.hide();
             unfold.show();
+        });
+        fold.hide();
+
+        // log_entry 下拉菜单, 添加 unfold fold 选项
+        var unfoldOption = $('<div class="dropdown-option unfold-option">unfold</div>');
+        // 添加fold选项
+        var foldOption = $('<div class="dropdown-option fold-option">fold</div>');
+        // 添加 unfold 选项点击事件处理程序
+        unfoldOption.click(function() {
+            log_entry.removeClass("is-fold");
+            unfold.hide();
+            fold.show();
         });    
-        collapse.hide();    
+        // 添加删除选项点击事件处理程序
+        foldOption.click(function() {
+            log_entry.addClass("is-fold");
+            fold.hide();
+            unfold.show();
+        }); 
         dropdownMenu.append(unfoldOption)
-        dropdownMenu.append(collapseOption)
-    }       
+        dropdownMenu.append(foldOption)
+    }
 }
 
 function emptyLogEntry(){
