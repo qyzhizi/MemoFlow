@@ -1202,7 +1202,15 @@ function createCodeBlockBetweenLinesElement(content){
         'code': 'Code',
         'py': 'Python',
         'regex':'regex',
-        'json':'Json'
+        'json':'Json',
+        'bash': 'Bash',
+        'dockerfile': 'Dockerfile',
+        'powershell': 'PowerShell',
+        'ps': 'PowerShell',
+        'zsh': 'Zsh',
+        'cmd': 'CMD',
+        'git': 'Git',
+        'mojo': 'Mojo',
     };
     var copyIcon = $(`<div class="copyIcon"> 
     <span class="codeTag">Code</span>
