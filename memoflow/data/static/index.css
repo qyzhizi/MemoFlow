@@ -239,7 +239,7 @@ h3 {
     transition: max-height 0.3s ease-in-out; /* 添加过渡效果 */
 }
 .log_entry.is-fold{
-    max-height: 30ch;
+    max-height: 260px;
     overflow: hidden;
 }
 .unfold {

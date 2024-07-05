@@ -435,8 +435,27 @@ function addLogEntry(logText, record_id, reverse=true) {
     dropdownMenu.append(deleteOption);
     // dropdownMenu.append(latexView);
 
-    const height_threshold = 30*13; // px
+    process_fold_unfold(log_entry);
+}
+
+function process_fold_unfold(log_entry){
+    var log_entry = $(log_entry)
+    var logEntryContainer = log_entry.parent();
+    var dropdownMenu = $(logEntryContainer).find('.dropdown-container > .dropdown-menu');
+
+    const height_threshold = 260; // 20*13 px = 20 rem
     var log_entry_height = log_entry.height()
+
+    var hasFoldClass = $(log_entry).is('.is-fold');
+    if (log_entry_height < height_threshold && hasFoldClass){
+        log_entry.removeClass("is-fold");
+        logEntryContainer.find('.unfold').remove()
+        logEntryContainer.find('.fold').remove()
+        dropdownMenu.find('.unfold-option').remove();
+        dropdownMenu.find('.fold-option').remove();
+        log_entry_height = log_entry.height()
+    }
+
     if (log_entry_height >= height_threshold){
         // 在log_entry 底部添加 unfold fold 按钮
         log_entry.addClass("is-fold");
@@ -734,6 +753,7 @@ saveChangesBtn.onclick = function() {
             log_entry.text(logText);
             log_entry.data('logText', logText);
             processLogEntryText2(log_entry)
+            process_fold_unfold(log_entry);
             // 清空编辑框
             editLog.value = '';
             editLog.curPreObject = null;
