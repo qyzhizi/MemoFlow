@@ -446,8 +446,8 @@ function process_fold_unfold(log_entry){
     const height_threshold = 260; // 20*13 px = 20 rem
     var log_entry_height = log_entry.height()
 
-    var hasFoldClass = $(log_entry).is('.is-fold');
-    if (log_entry_height < height_threshold && hasFoldClass){
+    var hasFoldUnfold = dropdownMenu.find('.fold-option').length > 0;
+    if (hasFoldUnfold){
         log_entry.removeClass("is-fold");
         logEntryContainer.find('.unfold').remove()
         logEntryContainer.find('.fold').remove()
