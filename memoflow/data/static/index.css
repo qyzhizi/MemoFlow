@@ -208,6 +208,8 @@ h3 {
     /* 设置下边距为 10 像素 */
     border-radius: 6px;
     background-color: rgb(39, 39, 42);
+    padding-left:0.5rem;
+    padding-right: 0.5rem;
     
 }
 

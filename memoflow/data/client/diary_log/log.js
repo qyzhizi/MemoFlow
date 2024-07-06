@@ -243,6 +243,10 @@ function showSmHeadSearchAndTagsHandler() {
 
         if (smSerchSidebarModule) {
             console.log("smSerchSidebarModule 存在");
+            // smSearchInput set empty
+            let smSearchInput = document.getElementById(
+                'SmSearchRoot').querySelector(".smSearchInput")
+            smSearchInput.value = '';
             smSerchSidebarModule.classList.remove('!hidden')
         } else {
             console.log("smSerchSidebarModule 不存在");
@@ -287,7 +291,7 @@ function autoResize(textarea_id) {
     // 设置高度为 auto，以获取正确的 scrollHeight
     textarea.style.height = 'auto';
     // 设置高度为 scrollHeight，可能需要加上边框的高度（如果有的话）
-    textarea.style.height = `${textarea.scrollHeight}px`;
+    textarea.style.height = `${textarea.scrollHeight + 1}px`;
 }
 
 
@@ -1336,7 +1340,7 @@ function createMulLineslatexElement(content){
     let latexBlock = document.createElement('div');
     latexBlock.classList.add('BlocklatexMath'); // 添加类名
     // 设置为块级公式
-    katex.render(equation, latexBlock, { displayMode: true }); 
+    try { katex.render(equation, latexBlock, { displayMode: true }); } catch (e) { return '$$'+content+'$$'} 
     return latexBlock
 }
 
@@ -1348,7 +1352,7 @@ function createInLineslatexElement(content){
     // 否则 log_entry.html() 再次又包含了 latex 源码, 再次解析会乱码
     // span.setAttribute('data-latex', match); 
     span.classList.add('latexMath'); // 添加类名
-    try{ katex.render(equation, span);} catch(e){return match}
+    try{ katex.render(equation, span);} catch(e){return '$'+content+'$'}
     return span  
 }
 
@@ -1715,6 +1719,7 @@ function addLog() {
             
             // 清空 输入框
             $('#log').val('');
+            autoResize('log')
             // console.log(response);
         },
         error: xhr_process_error
