@@ -138,9 +138,9 @@ class DiaryLog(wsgi.Application):
             # 获取当前时间
             current_time = datetime.datetime.now()
 
-            # 计算过期时间为当前时间后的24小时
-            expires = current_time + datetime.timedelta(hours=24)
-            response.set_cookie('Authorization', 'Bearer ' + token, expires=expires)
+            # 计算过期时间为当前时间后的24*7小时
+            expires = current_time + datetime.timedelta(hours=24*7)
+            response.set_cookie('MemoFlowAuth', 'Bearer ' + token, expires=expires, httponly=True)
 
             return response
         else:
@@ -154,13 +154,13 @@ class DiaryLog(wsgi.Application):
         # 获取请求中的 Cookie
         cookies = req.cookies
 
-        # 检查是否存在名为 "Authorization" 的 Cookie
-        if 'Authorization' in cookies:
+        # 检查是否存在名为 "MemoFlowAuth" 的 Cookie
+        if 'MemoFlowAuth' in cookies:
             # 创建响应对象
             response = Response()
 
-            # 清除名为 "Authorization" 的 Cookie
-            response.delete_cookie('Authorization')
+            # 清除名为 "MemoFlowAuth" 的 Cookie
+            response.delete_cookie('MemoFlowAuth')
 
             # 可选：将用户从任何其他会话数据中注销，如数据库中的活动会话表
 

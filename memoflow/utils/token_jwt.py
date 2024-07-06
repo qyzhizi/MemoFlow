@@ -45,10 +45,10 @@ def token_required(func):
         else:
             req = kwargs.get('req')
 
-        token = req.headers.get('Authorization')
+        token = req.headers.get('MemoFlowAuth')
         if not token:
             # Try getting token from cookies if not found in headers
-            token = req.cookies.get('Authorization')
+            token = req.cookies.get('MemoFlowAuth')
 
         if not token:
             LOG.error("error: Token is missing")

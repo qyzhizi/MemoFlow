@@ -746,7 +746,7 @@ saveChangesBtn.onclick = function() {
         url: '/v1/diary-log/updatelog',
         type: 'POST',
         // headers: {
-        //     'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+        //     'MemoFlowAuth': 'Bearer ' + localStorage.getItem('jwtToken')
         // },
         contentType: 'application/json',
         data: JSON.stringify({content: editedText, record_id: curRecordId}),
@@ -811,7 +811,7 @@ function deleteLogEntry(record_id, logentrycontainer) {
         url: '/v1/diary-log/deletelog/' + record_id,
         type: 'DELETE',
         // headers: {
-        //     'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+        //     'MemoFlowAuth': 'Bearer ' + localStorage.getItem('jwtToken')
         // },
         success: function(response) {
             // 请求成功时的处理
@@ -1740,7 +1740,7 @@ function getLogs(page_size = null, page_number = null) {
         url: get_log_url,
         type: 'GET',
         // headers: {
-        //     'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+        //     'MemoFlowAuth': 'Bearer ' + localStorage.getItem('jwtToken')
         // },
         success: function(response) {
             response = JSON.parse(response);

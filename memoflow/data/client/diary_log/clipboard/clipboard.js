@@ -15,7 +15,7 @@ $(function() {
             url: '/v1/diary-log/clipboard_addlog',
             type: 'POST',
             // headers: {
-            //     'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+            //     'MemoFlowAuth': 'Bearer ' + localStorage.getItem('jwtToken')
             // },
             contentType: 'application/json',
             data: JSON.stringify({content: log}),
@@ -41,7 +41,7 @@ $(function() {
         url: '/v1/diary-log/get_clipboard_logs',
         type: 'GET',
         // headers: {
-        //     'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+        //     'MemoFlowAuth': 'Bearer ' + localStorage.getItem('jwtToken')
         // },
         success: function(response) {
             // console.log(response);
