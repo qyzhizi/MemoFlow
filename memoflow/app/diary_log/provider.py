@@ -47,8 +47,8 @@ class Manager(manager.Manager):
         # from memoflow.app.diary_log.driver.backend import DiaryLogDriver
         # self.driver = DiaryLogDriver()
 
-    def generate_token(self, user_id):
-        return TokenManager.generate_token(user_id)
+    def generate_token(self, user_id, expires):
+        return TokenManager.generate_token(user_id, expires)
 
     def verify_token(self, token):
         return TokenManager.verify_token(token)

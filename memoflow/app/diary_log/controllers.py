@@ -130,16 +130,16 @@ class DiaryLog(wsgi.Application):
         password_db = user_info.get("password", None)
         if username and password and (username == user_name_db and
             hashed_password == password_db):
-            token = self.diary_log_api.generate_token(user_info['id'])
+            # 获取当前时间
+            current_time = datetime.datetime.now()
+            # 计算过期时间为当前时间后的24*7小时
+            expires = current_time + datetime.timedelta(hours=24*7)
+            token = self.diary_log_api.generate_token(user_info['id'], expires)
 
             # 创建响应对象
             response = Response(json.dumps({"token": token}))
             # 设置名为 "user_id" 的 Cookie，值为用户ID
-            # 获取当前时间
-            current_time = datetime.datetime.now()
 
-            # 计算过期时间为当前时间后的24*7小时
-            expires = current_time + datetime.timedelta(hours=24*7)
             response.set_cookie('MemoFlowAuth', 'Bearer ' + token, expires=expires, httponly=True)
 
             return response

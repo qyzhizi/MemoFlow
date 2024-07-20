@@ -14,8 +14,9 @@ class TokenManager:
     secret_key = secrets.token_urlsafe(32)  # 类属性
 
     @classmethod
-    def generate_token(cls, user_id):
-        expiration_time = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+    def generate_token(cls, user_id, expiration_time=None):
+        if not expiration_time:
+            expiration_time = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
         token = jwt.encode({"user_id": user_id, "exp": expiration_time}, cls.secret_key, algorithm="HS256")
         return token
     
@@ -32,8 +33,10 @@ class TokenManager:
             decoded_data = jwt.decode(token, cls.secret_key, algorithms=["HS256"])
             return decoded_data
         except jwt.ExpiredSignatureError:
+            LOG.error("error: jwt ExpiredSignatureError")
             return None
         except jwt.InvalidTokenError:
+            LOG.error("error: jwt InvalidTokenError")
             return None
 
 
