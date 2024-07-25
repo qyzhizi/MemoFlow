@@ -10,8 +10,12 @@ services:
       - .env
     ports:
      - "6060:6060"
+    # volumes:
+    #   - ".:/app"
     volumes:
-      - ".:/app"
+      - "../.env:/app/.env"
+      - "../log_file:/app/log_file"
+      - "../db_data:/app/db_data"
     networks:
       - net  
 
