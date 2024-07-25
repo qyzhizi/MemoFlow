@@ -134,7 +134,7 @@ class Manager(manager.Manager):
         elif response.getcode() != 200 :
             data = json.loads(response.read())
             LOG.error(f"Network Error, Can't get accesstoken by refresh token: {data}")
-            raise Exception("Network Error, Can't get accesstoken by refresh token")
+            raise Exception("Network Error, Can't get accesstoken by refresh token, try again later!")
 
     def process_github_tokens_info_to_db_format(self, github_tokens_info):
         access_token = github_tokens_info.get('access_token', None)
