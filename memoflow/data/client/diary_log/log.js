@@ -560,7 +560,7 @@ function processInputAndReturnString(process_input, pattern_logseq_child) {
         let child_block_list;
         child_block_list = splitStringWithPattern(child_string, pattern_logseq_child)
         for (let i = 1; i < child_block_list.length; i += 2) {
-            let firstWord = child_block_list[i].split(' ')[0];
+            let firstWord = child_block_list[i].split(' ');
             if (firstWord.length === 0 && firstWord.length < num_t_logseq){
                 child_block_list[i+1] = "@ans " + child_block_list[i+1]
                 var combinedString = child_block_list.join(""); // 使用空串作为分隔符
