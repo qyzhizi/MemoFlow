@@ -1216,7 +1216,9 @@ function createCodeBlockBetweenLinesElement(content){
         'objective-c': 'Objective-C',
         'objective-c++': 'Objective-C++',
         'js': 'JavaScript',
+        'tx': 'TypeScript',
         'javascript': 'JavaScript',
+        'typescript': 'TypeScript',
         'css': 'CSS',
         'html': 'HTML',
         'php': 'PHP',
@@ -1261,10 +1263,11 @@ function createCodeBlockBetweenLinesElement(content){
 
     if (languageName){
         copyIcon.find('span').text(languageName);
-    } else {
-        code = language + code;
-        copyIcon.find('span').text('Code');
-    }    
+    } else if(language) {
+        // use match to replace language with languageName
+        copyIcon.find('span').text(language);
+    }
+
     // 移除代码段开头和结尾的换行符, 不可以/^\s*/, 要保留前缀格式
     code = code.replace(/^\n*/, '').trimEnd();
     let Element;
