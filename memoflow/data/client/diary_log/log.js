@@ -1250,7 +1250,7 @@ function createCodeBlockBetweenLinesElement(content){
 
     // 使用正则表达式匹配第一个单词
     // const regex = /([\S]+)([\s\S]*)/;
-    const regex = /^([\S]*)(?:\r?\n)([\s\S]*)/;
+    const regex = /^(?:```)([\S]*)(?:\r?\n)([\s\S]*)(?:```)/;
     const matches = content.match(regex);
     let language = '';
     let code = '';
@@ -1605,13 +1605,13 @@ function processLogEntryText2(log_entry){
     var textString = log_entry.text();
     textString  = replaceTabWithSpace(textString);
     var Matches = [];
-    const codeBlockLinesPattern = {regex:/[\t\x20]{2,}(?!\\)```([\s\S]*?)```(?:$|[\x20]*\r?\n)(?!\n)/gi, type: 'codeBlockBetweenLines'}
+    const codeBlockLinesPattern = {regex:/[\t\x20]{2,}(?!\\)(```[\s\S]*?```)(?:$|[\x20]*\r?\n)(?!\n)/gi, type: 'codeBlockBetweenLines'}
     // const inlinePattern = {regex:/((?<!``)`[^`]+`)/g, type: 'inLinecodeBlock'}
-    const inlinePattern = {regex:/(^|[^`])(`[^`<]+`)/g, type: 'inLinecodeBlock'}
+    const inlinePattern = {regex:/(?:^|[^`])(`[^`<]+`)/g, type: 'inLinecodeBlock'}
 
     const otherPatterns = [
         // {regex:/((?<=\x20|^)(?<![#＃])[#＃]{1}(?![#＃])[/\w\u4e00-\u9fff]+(?=[\x20\n]|$))/g, type: 'tag'},
-        {regex:/((^|\x20)([#＃])([/\w\u4e00-\u9fff]+)(?=[\x20\n]|$))/g, type: 'tag'},
+        {regex:/(?:^|\x20)([#＃](?:[/\w\u4e00-\u9fff]+)(?=[\x20\n]|$))/g, type: 'tag'},
         // {regex:/(https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&/=]*))/g, type: 'url'},
         {regex:/(https?:\/\/(?:[a-zA-Z0-9.-]+|\d{1,3}(?:\.\d{1,3}){3})(?::\d+)?(?:\/[-a-zA-Z0-9@:%_\+.~#?&/=]*)?)/g, type: 'url'},
         // {regex:/(?:\s|\r?\n)*?\$\$([\s\S]*?)\$\$(?:\s|\r?\n)*?/g, type: 'MulLineslatex'},

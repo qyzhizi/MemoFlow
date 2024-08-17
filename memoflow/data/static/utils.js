@@ -388,6 +388,7 @@ function checkElementExistence(element_id) {
 };
 
 
+// Pattern 必须保证有一个分组
 function textMatchPattern(input, Pattern, PatternType) {
     let match;
     let Matches = [];
@@ -396,10 +397,12 @@ function textMatchPattern(input, Pattern, PatternType) {
     // 搜集所有行间代码块及其位置
     while ((match = Pattern.exec(input)) !== null) {
         // 检查并添加前一个代码块后和当前代码块前的非代码块文本
+        let fullMatchIndex = match.index; // 总匹配的起始位置
+        let firstGroupIndex = fullMatchIndex + match[0].indexOf(match[1]); // 第一个分组的起始位置
         if (match.index > lastIndex) {
             Matches.push({
                 type: 'text',
-                content: input.substring(lastIndex, match.index),
+                content: input.substring(lastIndex, firstGroupIndex),
             });
         }
 
@@ -409,7 +412,7 @@ function textMatchPattern(input, Pattern, PatternType) {
         });
 
         // 更新lastIndex为当前代码块的结束位置
-        lastIndex = match.index + match[0].length;
+        lastIndex = firstGroupIndex + match[1].length;
     }
 
     // 检查最后一个代码块后是否还有文本
