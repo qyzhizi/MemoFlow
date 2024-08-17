@@ -1462,7 +1462,8 @@ function replaceCodeWithPre(htmlString) {
     });
 
     // const singleLineCode = /(?<!``)(`[^`]+`)(?!`)/g;
-    const singleLineCode = /(?<!``)(`[^`<]+`)/g;
+    // const singleLineCode = /(?<!``)(`[^`<]+`)/g; //不使用负向前瞻（因为某些环境可能不支持）
+    const singleLineCode = /(^|[^`])(`[^`<]+`)/g;
     var singleLinepositions = []
     htmlString = htmlString.replace(singleLineCode, function(match, code, offset) {
 
