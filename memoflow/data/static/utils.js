@@ -399,7 +399,7 @@ function textMatchPattern(input, Pattern, PatternType) {
         // 检查并添加前一个代码块后和当前代码块前的非代码块文本
         let fullMatchIndex = match.index; // 总匹配的起始位置
         let firstGroupIndex = fullMatchIndex + match[0].indexOf(match[1]); // 第一个分组的起始位置
-        if (match.index > lastIndex) {
+        if (firstGroupIndex > lastIndex) {
             Matches.push({
                 type: 'text',
                 content: input.substring(lastIndex, firstGroupIndex),

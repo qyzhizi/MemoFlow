@@ -1343,6 +1343,8 @@ function createTagElement(content){
 function createMulLineslatexElement(content){
     // 将 HTML 字符串解析为文本, 并去除前后空白字符
     let equation = content.trim(); 
+    // 去除 前后的 \$\$
+    equation = equation.replace(/^\$\$|\$\$$/g, '');
     let latexBlock = document.createElement('div');
     latexBlock.classList.add('BlocklatexMath'); // 添加类名
     // 设置为块级公式
@@ -1353,6 +1355,8 @@ function createMulLineslatexElement(content){
 function createInLineslatexElement(content){
     // 将 HTML 字符串解析为文本, 并去除前后空白字符
     let equation = content.trim(); 
+    // 去除 前后的 标识
+    equation = equation.replace(/^(\$|\\\[|\\\()|(\$|\\\]|\\\))$/g, '');
     let span = document.createElement('span');
     // 不需要为 span 元素添加 data-latex 属性以存储原始的 LaTeX 代码, 
     // 否则 log_entry.html() 再次又包含了 latex 源码, 再次解析会乱码
@@ -1611,12 +1615,12 @@ function processLogEntryText2(log_entry){
 
     const otherPatterns = [
         // {regex:/((?<=\x20|^)(?<![#＃])[#＃]{1}(?![#＃])[/\w\u4e00-\u9fff]+(?=[\x20\n]|$))/g, type: 'tag'},
-        {regex:/(?:^|\x20)([#＃](?:[/\w\u4e00-\u9fff]+)(?=[\x20\n]|$))/g, type: 'tag'},
+        {regex:/(?:^|\x20)([#＃](?:[/\w\u4e00-\u9fff]+))(?=[\x20\n]|$)/g, type: 'tag'},
         // {regex:/(https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&/=]*))/g, type: 'url'},
         {regex:/(https?:\/\/(?:[a-zA-Z0-9.-]+|\d{1,3}(?:\.\d{1,3}){3})(?::\d+)?(?:\/[-a-zA-Z0-9@:%_\+.~#?&/=]*)?)/g, type: 'url'},
         // {regex:/(?:\s|\r?\n)*?\$\$([\s\S]*?)\$\$(?:\s|\r?\n)*?/g, type: 'MulLineslatex'},
-        {regex:/(?:[\x20]*\r?\n?|\r?\n[\x20]*)\$\$([\s\S]*?)\$\$(?:$|[\x20]*\r?\n?)/g, type: 'MulLineslatex'},
-        {regex:/(?:\$|\\\[|\\\()([\s\S]*?)(?:\$|\\\]|\\\))/g, type: 'InLineslatex'},
+        {regex:/(?:[\x20]*\r?\n?|\r?\n[\x20]*)(\$\$[\s\S]*?\$\$)(?:$|[\x20]*\r?\n?)/g, type: 'MulLineslatex'},
+        {regex:/((\$|\\\[|\\\()[\s\S]*?(\$|\\\]|\\\)))/g, type: 'InLineslatex'},
     ]
     Matches = mulTextMatchPattern(textString, codeBlockLinesPattern, inlinePattern, otherPatterns)
 
