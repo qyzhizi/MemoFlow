@@ -1338,6 +1338,8 @@ function createUrlElement(content){
 }
 
 function createTagElement(content){
+    // 去除尾部空格并保存
+    let trimmedStr = content.trimEnd();
     // 创建一个空的span元素
     let spanElement = document.createElement('span');
     // 添加类名
