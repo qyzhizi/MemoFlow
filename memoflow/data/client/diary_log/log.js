@@ -357,7 +357,7 @@ function addLogEntry(logText, record_id, reverse=true) {
     //     // 显示或隐藏下拉菜单
     //     dropdownMenu.toggle();
     // });
-    
+
     // 鼠标移入下拉菜单图标时触发事件
     dropdownIcon.mouseenter(function(event) {
         // 阻止事件冒泡
@@ -386,10 +386,10 @@ function addLogEntry(logText, record_id, reverse=true) {
         dropdownMenu.hide();
     });
 
-    // 在文档的其他位置点击时隐藏下拉菜单
-    logEntryContainer.click(function() {
-        dropdownMenu.hide();
-    });
+    // // 在文档的其他位置点击时隐藏下拉菜单
+    // logEntryContainer.click(function() {
+    //     dropdownMenu.hide();
+    // });
 
     // 添加复制选项点击事件处理程序
     // copyOption.click(function() {
