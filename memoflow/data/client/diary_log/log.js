@@ -350,12 +350,40 @@ function addLogEntry(logText, record_id, reverse=true) {
         logList.append(logEntryContainer);
     }
 
-    // 点击下拉菜单图标时触发事件
-    dropdownIcon.click(function(event) {
+    // // 点击下拉菜单图标时触发事件
+    // dropdownIcon.click(function(event) {
+    //     // 阻止事件冒泡
+    //     event.stopPropagation();
+    //     // 显示或隐藏下拉菜单
+    //     dropdownMenu.toggle();
+    // });
+    
+    // 鼠标移入下拉菜单图标时触发事件
+    dropdownIcon.mouseenter(function(event) {
         // 阻止事件冒泡
         event.stopPropagation();
-        // 显示或隐藏下拉菜单
-        dropdownMenu.toggle();
+        // 显示下拉菜单
+        dropdownMenu.show();
+    });
+
+    // 鼠标离开下拉菜单图标时触发事件
+    dropdownIcon.mouseleave(function(event) {
+        // 阻止事件冒泡
+        event.stopPropagation();
+        // 隐藏下拉菜单
+        dropdownMenu.hide();
+    });
+
+    // 鼠标移入下拉菜单时，确保菜单保持可见
+    dropdownMenu.mouseenter(function(event) {
+        event.stopPropagation();
+        dropdownMenu.show();
+    });
+
+    // 鼠标离开下拉菜单时，隐藏菜单
+    dropdownMenu.mouseleave(function(event) {
+        event.stopPropagation();
+        dropdownMenu.hide();
     });
 
     // 在文档的其他位置点击时隐藏下拉菜单
@@ -1310,16 +1338,6 @@ function createUrlElement(content){
 }
 
 function createTagElement(content){
-    // let trimmedStr = content.trimEnd();
-    // let endWhitespace = content.slice(trimmedStr.length);
-    // // let replacement = `<span class="tag">${trimmedStr}</span>${endWhitespace}`;
-    // let Element = $(`<span class="tag">${trimmedStr}</span>${endWhitespace}`);
-    // return Element 
-
-    // 去除尾部空格并保存
-    let trimmedStr = content.trimEnd();
-    let endWhitespace = content.slice(trimmedStr.length);
-
     // 创建一个空的span元素
     let spanElement = document.createElement('span');
     // 添加类名
@@ -1329,12 +1347,6 @@ function createTagElement(content){
 
     // 如果你使用jQuery并希望返回一个jQuery对象
     let $spanElement = $(spanElement);
-
-    // 处理尾随空格。由于尾随空格是纯文本，我们可以安全地添加。
-    if (endWhitespace.length > 0) {
-        // 创建一个文本节点来表示尾随空格，并将其添加到span元素之后
-        $spanElement.after(document.createTextNode(endWhitespace));
-    }
 
     // 返回jQuery对象
     return $spanElement;   
