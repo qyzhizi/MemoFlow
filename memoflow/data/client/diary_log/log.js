@@ -350,13 +350,6 @@ function addLogEntry(logText, record_id, reverse=true) {
         logList.append(logEntryContainer);
     }
 
-    // // 点击下拉菜单图标时触发事件
-    // dropdownIcon.click(function(event) {
-    //     // 阻止事件冒泡
-    //     event.stopPropagation();
-    //     // 显示或隐藏下拉菜单
-    //     dropdownMenu.toggle();
-    // });
 
     // 鼠标移入下拉菜单图标时触发事件
     dropdownIcon.mouseenter(function(event) {
@@ -364,6 +357,17 @@ function addLogEntry(logText, record_id, reverse=true) {
         event.stopPropagation();
         // 显示下拉菜单
         dropdownMenu.show();
+    });
+
+
+    dropdownIcon.on('touchstart', function(event) {
+        event.stopPropagation();
+        dropdownMenu.toggle();
+    });
+
+    dropdownIcon.on('click', function(event) {
+        event.stopPropagation();
+        dropdownMenu.toggle();
     });
 
     // 鼠标离开下拉菜单图标时触发事件
