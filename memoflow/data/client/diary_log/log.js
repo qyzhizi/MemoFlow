@@ -359,16 +359,22 @@ function addLogEntry(logText, record_id, reverse=true) {
         dropdownMenu.show();
     });
 
-
+    let isTouched = false; 
     dropdownIcon.on('touchstart', function(event) {
         event.stopPropagation();
+        console.log("touchstart")
         dropdownMenu.toggle();
+        isTouched = true;
     });
 
     dropdownIcon.on('click', function(event) {
-        event.stopPropagation();
-        dropdownMenu.toggle();
-    });
+        if (!isTouched) {
+            event.stopPropagation();
+            console.log("click")
+            dropdownMenu.toggle();
+        }
+        isTouched = false; // 重置标志位
+    });    
 
     // 鼠标离开下拉菜单图标时触发事件
     dropdownIcon.mouseleave(function(event) {
@@ -390,10 +396,10 @@ function addLogEntry(logText, record_id, reverse=true) {
         dropdownMenu.hide();
     });
 
-    // // 在文档的其他位置点击时隐藏下拉菜单
-    // logEntryContainer.click(function() {
-    //     dropdownMenu.hide();
-    // });
+    // 在文档的其他位置点击时隐藏下拉菜单
+    logEntryContainer.click(function() {
+        dropdownMenu.hide();
+    });
 
     // 添加复制选项点击事件处理程序
     // copyOption.click(function() {
