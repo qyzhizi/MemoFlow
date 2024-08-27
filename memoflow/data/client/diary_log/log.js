@@ -362,7 +362,6 @@ function addLogEntry(logText, record_id, reverse=true) {
     let isTouched = false; 
     dropdownIcon.on('touchstart', function(event) {
         event.stopPropagation();
-        console.log("touchstart")
         dropdownMenu.toggle();
         isTouched = true;
     });
@@ -370,7 +369,6 @@ function addLogEntry(logText, record_id, reverse=true) {
     dropdownIcon.on('click', function(event) {
         if (!isTouched) {
             event.stopPropagation();
-            console.log("click")
             dropdownMenu.toggle();
         }
         isTouched = false; // 重置标志位
@@ -396,10 +394,10 @@ function addLogEntry(logText, record_id, reverse=true) {
         dropdownMenu.hide();
     });
 
-    // 在文档的其他位置点击时隐藏下拉菜单
-    logEntryContainer.click(function() {
-        dropdownMenu.hide();
-    });
+    // // 在文档的其他位置点击时隐藏下拉菜单
+    // logEntryContainer.click(function() {
+    //     dropdownMenu.hide();
+    // });
 
     // 添加复制选项点击事件处理程序
     // copyOption.click(function() {
@@ -420,7 +418,6 @@ function addLogEntry(logText, record_id, reverse=true) {
       });
     // 处理复制成功事件（可选）
     clipboard.on('success', function(e) {
-        console.log('复制成功');
         showNotification('Copy Success!', 700);
         e.clearSelection();
     });
@@ -433,7 +430,6 @@ function addLogEntry(logText, record_id, reverse=true) {
     // 添加编辑选项点击事件处理程序
     editOption.click(function() {
         record_id = dropdownMenu.data('record_id')
-        console.log("record_id : ", record_id)
         // 编辑日志条目
         editLogEntry(log_entry, record_id);
         // 隐藏下拉菜单
@@ -443,7 +439,6 @@ function addLogEntry(logText, record_id, reverse=true) {
     // 添加删除选项点击事件处理程序
     deleteOption.click(function() {
         record_id = dropdownMenu.data('record_id')
-        console.log("record_id : ", record_id)
         // 弹窗提示，是否删除
         if (confirm('确定要删除该条日志吗？')) {
             // 删除日志条目
