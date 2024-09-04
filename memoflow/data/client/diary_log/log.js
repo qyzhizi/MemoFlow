@@ -1283,7 +1283,7 @@ function createCodeBlockBetweenLinesElement(content){
 
     // 使用正则表达式匹配第一个单词
     // const regex = /([\S]+)([\s\S]*)/;
-    const regex = /^(?:```)([\S]*)(?:\r?\n)([\s\S]*)(?:```)/;
+    const regex = /^(?:```)([\S]*)(?:\x20*\t?\r?\n)([\s\S]*)(?:```)/;
     const matches = content.match(regex);
     let language = '';
     let code = '';
@@ -1634,9 +1634,9 @@ function processLogEntryText2(log_entry){
 
     const otherPatterns = [
         // {regex:/((?<=\x20|^)(?<![#＃])[#＃]{1}(?![#＃])[/\w\u4e00-\u9fff]+(?=[\x20\n]|$))/g, type: 'tag'},
-        {regex:/(?:^|\x20)([#＃](?:[/\w\u4e00-\u9fff]+))(?=[\x20\n]|$)/g, type: 'tag'},
+        {regex:/(?:^|\x20)([#＃](?:[/\w\u4e00-\u9fff\-@:%_\+*!$'.,~#?&/=]+))(?=[\x20\n]|$)/g, type: 'tag'},
         // {regex:/(https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&/=]*))/g, type: 'url'},
-        {regex:/(https?:\/\/(?:[a-zA-Z0-9.-]+|\d{1,3}(?:\.\d{1,3}){3})(?::\d+)?(?:\/[-a-zA-Z0-9@:%_\+.~#?&/=]*)?)/g, type: 'url'},
+        {regex:/(https?:\/\/(?:[a-zA-Z0-9.-]+|\d{1,3}(?:\.\d{1,3}){3})(?::\d+)?(?:\/[-a-zA-Z0-9@:%_\+*!$'.,~#?&/=]*)?)/g, type: 'url'},
         // {regex:/(?:\s|\r?\n)*?\$\$([\s\S]*?)\$\$(?:\s|\r?\n)*?/g, type: 'MulLineslatex'},
         {regex:/(?:[\x20]*\r?\n?|\r?\n[\x20]*)(\$\$[\s\S]*?\$\$)(?:$|[\x20]*\r?\n?)/g, type: 'MulLineslatex'},
         {regex:/((\$|\\\[|\\\()[\s\S]*?(\$|\\\]|\\\)))/g, type: 'InLineslatex'},
