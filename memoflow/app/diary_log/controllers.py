@@ -664,6 +664,8 @@ class DiaryLog(wsgi.Application):
     def search_contents_from_vecter_db(self, req):
         user_id = req.environ['user_id']
         data = req.body
+        # Get the first 37 results
+        TOP_K = 37
         # Convert post data to json format
         search_data = json.loads(data)['search_data']
         LOG.info("search_data json_data:, %s" % search_data)
@@ -672,7 +674,7 @@ class DiaryLog(wsgi.Application):
         if search_data:
             filter = {"user_id": user_id}
             search_result = self.vector_db_api.get_similarity_search_docs(
-                query=search_data, top_k=10, filter=filter)
+                query=search_data, top_k=TOP_K, filter=filter)
         return json.dumps({"search_result": search_result})
 
     @token_required
