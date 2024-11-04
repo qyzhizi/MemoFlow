@@ -1,3 +1,4 @@
+import base64
 import logging
 
 from github import Github
@@ -87,19 +88,22 @@ class GitHupApi(object):
                 continue
             # pull file from github
             try:
-                file_content = self.repo.get_contents(file_path, ref=branch_name)
+                files = self.repo.get_contents(file_path, ref=branch_name)
             except UnknownObjectException as e:
                 LOG.warning(f"Exception: {e}")
                 LOG.info(f"File {file_path} not found, skip it.")
                 continue
-            
-            if isinstance(file_content, list):
-                # 对于列表中的每个文件，将其路径作为键，内容作为值添加到contents字典中
-                for file in file_content:
+            if not isinstance(files, list):
+                files = [files]
+            # 对于列表中的每个文件，将其路径作为键，内容作为值添加到contents字典中
+            for file in files:
+                if file.encoding != 'none':
                     contents[file.path] = file.decoded_content.decode()
-            else:
-                # 将单个文件的路径作为键，内容作为值添加到contents字典中
-                contents[file_path] = file_content.decoded_content.decode()
+                if file.encoding == 'none':
+                    # when file size >　１Ｍ
+                    blob = self.repo.get_git_blob(file.sha)
+                    b64 = base64.b64decode(blob.content)
+                    contents[file.path] = b64.decode("utf8")
 
         return contents
     
