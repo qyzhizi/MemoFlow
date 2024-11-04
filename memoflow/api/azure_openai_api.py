@@ -86,11 +86,10 @@ class AzureOpenAIEmbedding(object):
         return openai.Embedding.create(
             input=[text], engine=self.engine)["data"][0]["embedding"]
 
-    @retry(wait=wait_random_exponential(min=1, max=20),
-           stop=stop_after_attempt(6))
     def get_embeddings(self, list_of_text: List[str]) -> List[List[float]]:
-        assert len(list_of_text
-                   ) <= 2048, "The batch size should not be larger than 2048."
+        # openai embedding model maximum supported batch size is 2048 
+        # assert len(list_of_text
+        #            ) <= 2048, "The batch size should not be larger than 2048."
 
         # replace newlines, which can negatively affect performance.
         list_of_text = [text.replace("\n", " ") for text in list_of_text]
@@ -98,8 +97,12 @@ class AzureOpenAIEmbedding(object):
 
         _iter = range(0, len(list_of_text), self._chunk_size)
         for i in _iter:
-            response = openai.Embedding.create(input=list_of_text[i:i+self._chunk_size], engine=self.engine)
-            data.extend(sorted(response.data, key=lambda x: x["index"]))
-            # data.extend(response.data)
-
+            chunk_embeddings = self.get_chunk_embeddings(chunk_text=list_of_text[i:i+self._chunk_size])
+            data.extend(chunk_embeddings)
         return [d["embedding"] for d in data]
+
+    @retry(wait=wait_random_exponential(min=1, max=20),
+           stop=stop_after_attempt(6))
+    def get_chunk_embeddings(self, chunk_text: List[str]) -> List[List[float]]:
+        response = openai.Embedding.create(input=chunk_text, engine=self.engine)
+        return sorted(response.data, key=lambda x: x["index"])
