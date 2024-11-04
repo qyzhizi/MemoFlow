@@ -17,7 +17,9 @@ second_jianguoyun_to_path = env_vars.get("SECOND_JIANGUOYUN_TO_PATH",  None)
 
 AZURE_OPENAI_ENDPOINT = env_vars.get("AZURE_OPENAI_ENDPOINT",  None)
 AZURE_OPENAI_KEY = env_vars.get("AZURE_OPENAI_KEY",  None)
-
+AZURE_API_VERSION = env_vars.get("AZURE_API_VERSION", None)
+AZURE_API_DEPLOYMENT = env_vars.get("AZURE_API_DEPLOYMENT", None)
+AZURE_API_MODEL = env_vars.get("AZURE_API_MODEL", None)
 
 PINECONE_API_KEY = env_vars.get("PINECONE_API_KEY", None)
 
@@ -58,6 +60,15 @@ CONF_OPTS = [
     cfg.StrOpt('AZURE_OPENAI_KEY',
                 default=AZURE_OPENAI_KEY,
                 help='azure openai key'),
+    cfg.StrOpt('AZURE_API_VERSION',
+                default=AZURE_API_VERSION,
+                help='azure api version'),
+    cfg.StrOpt('AZURE_API_MODEL',
+                default=AZURE_API_MODEL,
+                help='azure api model'),
+    cfg.StrOpt('AZURE_API_DEPLOYMENT',
+                default=AZURE_API_DEPLOYMENT,
+                help='azure api deployment'),
 
     cfg.StrOpt('PINECONE_API_KEY',
                 default=PINECONE_API_KEY,

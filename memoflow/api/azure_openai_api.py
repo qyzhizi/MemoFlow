@@ -17,7 +17,12 @@ from typing import (
 
 class LangAzureOpenAIEmbedding(object):
     def __init__(self,
-                 azure_openai_endpoint=CONF.api_conf['AZURE_OPENAI_ENDPOINT'], azure_openai_key=CONF.api_conf['AZURE_OPENAI_KEY']):
+                 azure_openai_endpoint=CONF.api_conf['AZURE_OPENAI_ENDPOINT'], 
+                 azure_openai_key=CONF.api_conf['AZURE_OPENAI_KEY'],
+                 azure_api_version=CONF.api_conf['AZURE_API_VERSION'],
+                 azure_api_deployment=CONF.api_conf['AZURE_API_DEPLOYMENT'],
+                 azure_api_model=CONF.api_conf['AZURE_API_MODEL']
+                 ):
         if azure_openai_endpoint is None:
             raise Exception("azure_openai_endpoint is None")
         if azure_openai_key is None:
@@ -27,8 +32,9 @@ class LangAzureOpenAIEmbedding(object):
             openai_api_key = azure_openai_key,
             openai_api_type = "azure",
             chunk_size=16,
-            deployment="text-embedding-ada-002",
-            model="text-embedding-ada-002")
+            deployment=azure_api_deployment,
+            model=azure_api_model,
+            openai_api_version=azure_api_version)
 
     def get_embedding(self, text):
         return self.embedding.embed_query(text)
@@ -43,7 +49,10 @@ class LangAzureOpenAIEmbedding(object):
 class AzureOpenAIEmbedding(object):
     def __init__(self,
                  azure_openai_endpoint=CONF.api_conf['AZURE_OPENAI_ENDPOINT'],
-                 azure_openai_key=CONF.api_conf['AZURE_OPENAI_KEY']):
+                 azure_openai_key=CONF.api_conf['AZURE_OPENAI_KEY'],
+                 azure_api_version=CONF.api_conf['AZURE_API_VERSION'],
+                 azure_api_model=CONF.api_conf['AZURE_API_MODEL']
+                 ):
 
         if azure_openai_endpoint is None:
             raise Exception("azure_openai_endpoint is None")
@@ -53,11 +62,11 @@ class AzureOpenAIEmbedding(object):
         openai.api_type = "azure"
         openai.api_key = azure_openai_key
         openai.api_base = azure_openai_endpoint
-        openai.api_version = "2022-12-01"
+        openai.api_version = azure_api_version
         # engine  Defaults to "text-embedding-ada-002".
         # engine should be set to the deployment name you chose when you deployed
         # the text-embedding-ada-002 (Version 2) model
-        self.engine = "text-embedding-ada-002"
+        self.engine = azure_api_model
         self._chunk_size = 16
 
     @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
