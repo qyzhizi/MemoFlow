@@ -14,6 +14,8 @@ from typing import (
     Type,
 )
 
+from memoflow.utils.async_manager.task_manager import TaskManager
+
 
 class LangAzureOpenAIEmbedding(object):
     def __init__(self,
@@ -87,9 +89,10 @@ class AzureOpenAIEmbedding(object):
             input=[text], engine=self.engine)["data"][0]["embedding"]
 
     def get_embeddings(self, list_of_text: List[str]) -> List[List[float]]:
-        # openai embedding model maximum supported batch size is 2048 
-        # assert len(list_of_text
-        #            ) <= 2048, "The batch size should not be larger than 2048."
+        # use async to save time
+        if len(list_of_text) > self._chunk_size:
+            return self.get_embeddings_use_async_loop(
+                list_of_text=list_of_text)
 
         # replace newlines, which can negatively affect performance.
         list_of_text = [text.replace("\n", " ") for text in list_of_text]
@@ -106,3 +109,30 @@ class AzureOpenAIEmbedding(object):
     def get_chunk_embeddings(self, chunk_text: List[str]) -> List[List[float]]:
         response = openai.Embedding.create(input=chunk_text, engine=self.engine)
         return sorted(response.data, key=lambda x: x["index"])
+    
+    @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
+    async def aget_chunk_embeddings(self, chunk_text: List[str]) -> List[List[float]]:
+        response = await openai.Embedding.acreate(input=chunk_text, engine=self.engine)
+        return sorted(response['data'], key=lambda x: x["index"])
+
+    def get_embeddings_use_async_loop(self, list_of_text: List[str]) -> List[List[float]]:
+        # replace newlines, which can negatively affect performance.
+        list_of_text = [text.replace("\n", " ") for text in list_of_text]
+        data: List[List[float]] = []
+
+        _iter = range(0, len(list_of_text), self._chunk_size)
+        # Create a list of tasks for concurrent execution
+        tasks = [
+            self.aget_chunk_embeddings(chunk_text=list_of_text[i:i + self._chunk_size])
+            for i in _iter
+        ]
+        # Gather results from all tasks concurrently
+        manager = TaskManager()
+        results = manager.run_multiple_tasks(tasks)
+        # close event loop
+        manager.close()
+        # Flatten the list of results
+        for chunk_embeddings in results:
+            data.extend(chunk_embeddings)
+
+        return [d["embedding"] for d in data]

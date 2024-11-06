@@ -12,6 +12,7 @@ build/
 ChangeLog
 .idea/
 venv/
+.venv/
 .env
 *.db
 db_data/

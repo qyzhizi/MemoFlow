@@ -23,3 +23,4 @@
 **/values.dev.yaml
 **/*.db
 **/db_data
+**/.venv
