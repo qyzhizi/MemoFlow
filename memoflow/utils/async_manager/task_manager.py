@@ -1,13 +1,15 @@
-# async_manager/task_manager.py
-
+import logging
 import asyncio
 from typing import Any, Awaitable
+
+LOG = logging.getLogger(__name__)
 
 class TaskManager:
     """管理异步任务的事件循环"""
 
     def __init__(self):
         # 初始化事件循环
+        LOG.info("create new event loop")
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
 
@@ -26,6 +28,7 @@ class TaskManager:
         try:
             # 使用 asyncio.gather 并发运行多个异步任务
             results = self.loop.run_until_complete(asyncio.gather(*coros))
+            LOG.info("all async task is over")
             return results
         except Exception as e:
             print(f"Error occurred: {e}")

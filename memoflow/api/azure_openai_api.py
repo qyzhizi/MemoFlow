@@ -1,3 +1,4 @@
+import logging
 import os
 import openai
 from memoflow.conf import CONF
@@ -16,6 +17,7 @@ from typing import (
 
 from memoflow.utils.async_manager.task_manager import TaskManager
 
+LOG = logging.getLogger(__name__)
 
 class LangAzureOpenAIEmbedding(object):
     def __init__(self,
@@ -89,8 +91,10 @@ class AzureOpenAIEmbedding(object):
             input=[text], engine=self.engine)["data"][0]["embedding"]
 
     def get_embeddings(self, list_of_text: List[str]) -> List[List[float]]:
+        LOG.info(f"The length of the text to be processed is: {len(list_of_text)}")
         # use async to save time
         if len(list_of_text) > self._chunk_size:
+            LOG.info(f"use async loop to process embedding")
             return self.get_embeddings_use_async_loop(
                 list_of_text=list_of_text)
 
@@ -126,11 +130,15 @@ class AzureOpenAIEmbedding(object):
             self.aget_chunk_embeddings(chunk_text=list_of_text[i:i + self._chunk_size])
             for i in _iter
         ]
+        LOG.info(f"number of tasks: {len(tasks)}")
         # Gather results from all tasks concurrently
+        LOG.info("start process all embedding tasks")
         manager = TaskManager()
         results = manager.run_multiple_tasks(tasks)
+        LOG.info("end of all embedding tasks")
         # close event loop
         manager.close()
+        LOG.info("close event loop")
         # Flatten the list of results
         for chunk_embeddings in results:
             data.extend(chunk_embeddings)
