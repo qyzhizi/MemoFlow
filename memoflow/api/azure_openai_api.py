@@ -3,7 +3,7 @@ import os
 import openai
 from memoflow.conf import CONF
 from langchain.embeddings.openai import OpenAIEmbeddings
-from tenacity import retry, stop_after_attempt, wait_random_exponential
+from tenacity import retry, wait_fixed, stop_after_attempt, wait_random_exponential
 from typing import (
     Any,
     Callable,
@@ -73,7 +73,7 @@ class AzureOpenAIEmbedding(object):
         self.engine = azure_api_model
         self._chunk_size = 16
 
-    @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
+    @retry(wait=wait_fixed(1), stop=stop_after_attempt(3))
     def get_embedding(self, text: str) -> List[float]:
         """_summary_
 
@@ -109,13 +109,13 @@ class AzureOpenAIEmbedding(object):
             data.extend(chunk_embeddings)
         return [d["embedding"] for d in data]
 
-    @retry(wait=wait_random_exponential(min=1, max=20),
-           stop=stop_after_attempt(6))
+    @retry(wait=wait_fixed(1),
+           stop=stop_after_attempt(3))
     def get_chunk_embeddings(self, chunk_text: List[str]) -> List[List[float]]:
         response = openai.Embedding.create(input=chunk_text, engine=self.engine)
         return sorted(response.data, key=lambda x: x["index"])
     
-    @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
+    @retry(wait=wait_fixed(1), stop=stop_after_attempt(3))
     async def aget_chunk_embeddings(self, chunk_text: List[str]) -> List[List[float]]:
         LOG.info("start embedding async task")
         response = await openai.Embedding.acreate(input=chunk_text, engine=self.engine)
