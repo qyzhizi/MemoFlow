@@ -96,7 +96,8 @@ class AzureOpenAIEmbedding(object):
         if len(list_of_text) > self._chunk_size:
             LOG.info(f"use async loop to process embedding")
             return self.get_embeddings_use_async_loop(
-                list_of_text=list_of_text)
+                list_of_text=list_of_text,
+                batch_size=100)
 
         # replace newlines, which can negatively affect performance.
         list_of_text = [text.replace("\n", " ") for text in list_of_text]
@@ -116,10 +117,11 @@ class AzureOpenAIEmbedding(object):
     
     @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
     async def aget_chunk_embeddings(self, chunk_text: List[str]) -> List[List[float]]:
+        LOG.info("start embedding async task")
         response = await openai.Embedding.acreate(input=chunk_text, engine=self.engine)
         return sorted(response['data'], key=lambda x: x["index"])
 
-    def get_embeddings_use_async_loop(self, list_of_text: List[str]) -> List[List[float]]:
+    def get_embeddings_use_async_loop(self, list_of_text: List[str], batch_size: int) -> List[List[float]]:
         # replace newlines, which can negatively affect performance.
         list_of_text = [text.replace("\n", " ") for text in list_of_text]
         data: List[List[float]] = []
@@ -133,7 +135,7 @@ class AzureOpenAIEmbedding(object):
         LOG.info(f"number of tasks: {len(tasks)}")
         # Gather results from all tasks concurrently
         LOG.info("start process all embedding tasks")
-        manager = TaskManager()
+        manager = TaskManager(batch_size=batch_size)
         results = manager.run_multiple_tasks(tasks)
         LOG.info("end of all embedding tasks")
         # close event loop
