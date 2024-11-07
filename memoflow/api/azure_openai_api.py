@@ -142,7 +142,7 @@ class AzureOpenAIEmbedding(object):
         LOG.info("start process all embedding tasks")
         manager = TaskManager(batch_size=batch_size)
         results = manager.run_multiple_tasks(tasks)
-        LOG.info("end of all embedding tasks")
+        LOG.info(f"end of all embedding tasks, results length: {len(results)}")
         # close event loop
         manager.close()
         LOG.info("close event loop")
