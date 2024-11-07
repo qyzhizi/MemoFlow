@@ -150,6 +150,7 @@ class ChromeDBCollectionHttpDriver(object):
                     documents=texts_with_metadatas,
                     ids=ids_with_metadata,
                 )
+                LOG.info("success upsert embeddings")
             if empty_ids:
                 texts_without_metadatas = [texts[j] for j in empty_ids]
                 embeddings_without_metadatas = (
@@ -161,12 +162,14 @@ class ChromeDBCollectionHttpDriver(object):
                     documents=texts_without_metadatas,
                     ids=ids_without_metadatas,
                 )
+                LOG.info("success upsert embeddings")
         else:
             self._collection.upsert(
                 embeddings=embeddings,
                 documents=texts,
                 ids=ids,
             )
+            LOG.info("success upsert embeddings")
         return ids
 
     def update_texts(

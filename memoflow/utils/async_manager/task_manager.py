@@ -52,8 +52,8 @@ class TaskManager:
             LOG.info("All async tasks are over")
             return results
         except Exception as e:
-            LOG.error(f"Error occurred: {e}")
-            return []
+            LOG.error(f"run_until_complete, Error occurred: {e}")
+            return results
 
     def close(self):
         """关闭事件循环"""
