@@ -118,7 +118,12 @@ class AzureOpenAIEmbedding(object):
     # @retry(wait=wait_fixed(1), stop=stop_after_attempt(3))
     async def aget_chunk_embeddings(self, chunk_text: List[str]) -> List[List[float]]:
         LOG.info("start embedding async task")
-        response = await openai.Embedding.acreate(input=chunk_text, engine=self.engine)
+        try:
+            response = await openai.Embedding.acreate(input=chunk_text, engine=self.engine)
+        except Exception as e:
+            LOG.error(f"Error occurred: {e}")
+            return []
+
         return sorted(response['data'], key=lambda x: x["index"])
 
     def get_embeddings_use_async_loop(self, list_of_text: List[str], batch_size: int) -> List[List[float]]:
