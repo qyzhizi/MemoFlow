@@ -121,9 +121,8 @@ class ChromeDBCollectionHttpDriver(object):
         embeddings = None
         texts = list(texts)
         if self._embedding_function is not None:
-            LOG.info("start call get_embeddings")
+            LOG.info(f"call get_embeddings,length: {len(texts)}")
             embeddings = self._embedding_function.get_embeddings(texts)
-            LOG.info(f"end call get_embeddings,length: {len(embeddings)}")
         if metadatas:
             # fill metadatas with empty dicts if somebody
             # did not specify metadata for all texts

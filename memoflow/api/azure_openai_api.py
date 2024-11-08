@@ -3,7 +3,7 @@ import os
 import openai
 from memoflow.conf import CONF
 from langchain.embeddings.openai import OpenAIEmbeddings
-from tenacity import retry, wait_fixed, stop_after_attempt, wait_random_exponential
+from tenacity import retry, stop_after_attempt, wait_random_exponential
 from typing import (
     Any,
     Callable,
@@ -43,12 +43,6 @@ class LangAzureOpenAIEmbedding(object):
     def get_embedding(self, text):
         return self.embedding.embed_query(text)
 
-    # def get_embeddings(self, texts):
-    #     return self.embedding.get_embeddings(texts)
-
-    # def get_similarity(self, text1, text2):
-    #     return self.embedding.get_similarity(text1, text2)
-
 
 class AzureOpenAIEmbedding(object):
     def __init__(self,
@@ -69,11 +63,10 @@ class AzureOpenAIEmbedding(object):
         openai.api_version = azure_api_version
         # engine  Defaults to "text-embedding-ada-002".
         # engine should be set to the deployment name you chose when you deployed
-        # the text-embedding-ada-002 (Version 2) model
         self.engine = azure_api_model
         self._chunk_size = 16
 
-    # @retry(wait=wait_fixed(1), stop=stop_after_attempt(3))
+    @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
     def get_embedding(self, text: str) -> List[float]:
         """_summary_
 
@@ -109,15 +102,14 @@ class AzureOpenAIEmbedding(object):
             data.extend(chunk_embeddings)
         return [d["embedding"] for d in data]
 
-    # @retry(wait=wait_fixed(1),
-    #        stop=stop_after_attempt(3))
+    @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
     def get_chunk_embeddings(self, chunk_text: List[str]) -> List[List[float]]:
         response = openai.Embedding.create(input=chunk_text, engine=self.engine)
         return sorted(response.data, key=lambda x: x["index"])
     
-    # @retry(wait=wait_fixed(1), stop=stop_after_attempt(3))
+    @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
     async def aget_chunk_embeddings(self, chunk_text: List[str]) -> List[List[float]]:
-        LOG.info("start embedding async task")
+        LOG.info("start embedding async request")
         try:
             response = await openai.Embedding.acreate(input=chunk_text, engine=self.engine)
         except Exception as e:
@@ -137,15 +129,13 @@ class AzureOpenAIEmbedding(object):
             self.aget_chunk_embeddings(chunk_text=list_of_text[i:i + self._chunk_size])
             for i in _iter
         ]
-        LOG.info(f"number of tasks: {len(tasks)}")
+        LOG.info(f"start process all embedding tasks, number of tasks: {len(tasks)}")
         # Gather results from all tasks concurrently
-        LOG.info("start process all embedding tasks")
         manager = TaskManager(batch_size=batch_size)
         results = manager.run_multiple_tasks(tasks)
         LOG.info(f"end of all embedding tasks, results length: {len(results)}")
         # close event loop
         manager.close()
-        LOG.info("close event loop")
         # Flatten the list of results
         for chunk_embeddings in results:
             data.extend(chunk_embeddings)

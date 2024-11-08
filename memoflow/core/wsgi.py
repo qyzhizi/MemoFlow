@@ -294,7 +294,7 @@ class Application(BaseApplication):
         except VisibleException as e:
             return VisibleResponse(str(e), status=e.status)
         except Exception as e:
-            # return ServerErrorResponse(str(e), status=500)
+            LOG.exception(f"error: {str(e)}")
             return ServerErrorResponse(
                 "Server error. Please try again later or \
                 contact the website developer", status=500)

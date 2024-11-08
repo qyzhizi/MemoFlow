@@ -1,9 +1,6 @@
 import logging
 import asyncio
 from typing import Any, Awaitable, List
-# import uvloop
-
-# asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 LOG = logging.getLogger(__name__)
 
@@ -26,17 +23,6 @@ class TaskManager:
         except Exception as e:
             print(f"Error occurred: {e}")
             return None
-
-    # def run_multiple_tasks(self, coros: list[Awaitable[Any]]) -> list[Any]:
-    #     """并发运行多个异步任务，返回结果列表"""
-    #     try:
-    #         # 使用 asyncio.gather 并发运行多个异步任务
-    #         results = self.loop.run_until_complete(asyncio.gather(*coros))
-    #         LOG.info("all async task is over")
-    #         return results
-    #     except Exception as e:
-    #         print(f"Error occurred: {e}")
-    #         return []
 
     def run_multiple_tasks(self, coros: List[Awaitable[Any]]) -> List[Any]:
         """并发运行多个异步任务，返回结果列表"""
