@@ -146,5 +146,4 @@ class AzureOpenAIEmbedding(object):
         for chunk_embeddings in results:
             data.extend(chunk_embeddings)
         LOG.info(f"end of all embedding tasks, actual embedding length: {len(data)}")
-        LOG.info([d["embedding"] for d in data])
         return [d["embedding"] for d in data]
