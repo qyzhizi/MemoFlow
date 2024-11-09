@@ -20,3 +20,4 @@ db_data/
 *.back
 celerybeat*
 log_file
+.clash/

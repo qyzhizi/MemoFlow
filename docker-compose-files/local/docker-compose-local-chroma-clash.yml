@@ -1,0 +1,68 @@
+#version: "3.9"
+
+services:
+  main_server:
+    depends_on:
+      - redis
+      - chroma
+    image: qyzhizi/memoflow:v0.1.5
+    env_file:
+      - ../../.env
+    ports:
+     - "6060:6060"
+    volumes:
+      - "../../:/app"
+    networks:
+      - net    
+    restart: on-failure
+    command:  sh -c "python setup.py egg_info && sh memoflow/cmd/run.sh"
+    environment:
+      - HTTP_PROXY=http://clash:7890
+      - HTTPS_PROXY=http://clash:7890
+      - SOCKS_PROXY=socks5://clash:7891
+      - NO_PROXY=localhost,127.0.0.1,chroma,redis
+
+  redis:
+    image: "redis/redis-stack-server:latest"
+    networks:
+      - net 
+
+  chroma:
+    image: ghcr.io/chroma-core/chroma:latest
+    volumes:
+      - index_data:/chroma/chroma
+    command: "--workers 1 --host 0.0.0.0 --port 8000 --proxy-headers --log-config chromadb/log_config.yml --timeout-keep-alive 30"
+
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=False
+      - ALLOW_RESET=True
+      - REBUILD_HNSWLIB=False
+    networks:
+      - net
+
+  clash:
+    image: docker.1panel.dev/dreamacro/clash
+    ports:
+      - "5090:9090"   # Web interface port
+      - "5890:7890"   # HTTP proxy port
+      - "5891:7891"   # SOCKS proxy port
+    volumes:
+      - ../../.clash/config.yaml:/root/.config/clash/config.yaml  # Mount the configuration file
+    networks:
+      - net
+
+  clash-ui:
+    image: docker.1panel.dev/haishanh/yacd  # Use the YACD image for Clash UI
+    ports:
+      - "5080:80"   # Port mapping for YACD UI
+    networks:
+      - net
+
+volumes:
+  index_data:
+    driver: local
+
+networks:
+  net:
+    driver: bridge
