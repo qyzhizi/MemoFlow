@@ -10,13 +10,18 @@ services:
       - ../../.env
     ports:
      - "6060:6060"
+     - "6789:6789"     
     volumes:
       - "../../:/app"
     networks:
       - net    
-    restart: on-failure
-    command:  sh -c "python setup.py egg_info && sh memoflow/cmd/run.sh"
+    # restart: on-failure
+    command: >
+      sh -c "python memoflow/cmd/celery_work > celery_work.log 2>&1 &
+             python -m debugpy --listen 0.0.0.0:6789 --wait-for-client  memoflow/cmd/main"
     environment:
+      - openai_proxy=http://clash:7890
+      - OPENAI_PROXY=http://clash:7890
       - HTTP_PROXY=http://clash:7890
       - http_proxy=http://clash:7890
       - HTTPS_PROXY=http://clash:7890

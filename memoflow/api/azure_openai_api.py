@@ -61,6 +61,7 @@ class AzureOpenAIEmbedding(object):
         openai.api_key = azure_openai_key
         openai.api_base = azure_openai_endpoint
         openai.api_version = azure_api_version
+        openai.proxy = os.environ.get("OPENAI_PROXY", None)
         # engine  Defaults to "text-embedding-ada-002".
         # engine should be set to the deployment name you chose when you deployed
         self.engine = azure_api_model
