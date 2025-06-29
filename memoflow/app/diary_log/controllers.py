@@ -5,6 +5,7 @@ import base64
 import logging
 import json
 import datetime
+import time
 # from datetime import datetime
 # from datetime import timedelta
 from webob.exc import HTTPUnauthorized
@@ -345,17 +346,17 @@ class DiaryLog(wsgi.Application):
             )
 
         # save que string to vector db
-        que_string: List[str] = self.diary_log_api.get_que_string_from_content(
+        que_strings: List[str] = self.diary_log_api.get_que_string_from_content(
             processed_block_content)
-        if que_string:
+        if que_strings:
             self.asyn_task_api.asyn_add_texts_to_vector_db_coll(
-                texts=que_string,
+                texts=que_strings,
                 metadatas=[{
                     "user_id": user_id,
                     "id":record_id,
                     "tags":
                     ','.join(tags)
-                }])
+                }]*len(que_strings),)
 
         return json.dumps(
             {"record_id": record_id, "content": processed_block_content})
@@ -459,7 +460,7 @@ class DiaryLog(wsgi.Application):
 
         # 异步更新 `que_string` 到向量数据库
         self.asyn_update_que_string_to_vector_db_coll(
-            user_id, old_que_string, que_string, tags)
+            user_id, diary_log["record_id"], old_que_strings, que_strings, tags)
 
         # 向远程仓库发送更新后的 sync_file
         self.asyn_push_user_current_sync_file_to_repo(
@@ -1216,29 +1217,53 @@ class DiaryLog(wsgi.Application):
                 updated_content)
 
     def asyn_update_que_string_to_vector_db_coll(
-            self, user_id, old_que_string, que_string, tags):
+            self, user_id, record_id, old_que_strings, que_strings, tags):
 
-        update_flag = que_string != old_que_string
+        if not que_strings and not old_que_strings:
+            LOG.info("que_strings is empty, no need to update vector db")
+            return
 
-        metadatas = [{"user_id": user_id, "tags": ','.join(tags)}]
-        if update_flag and old_que_string:
-            search_result = self.vector_db_api.similarity_search(
-                    query=old_que_string, top_k=1)
-            # document = search_result["document"][0]
-            distance = search_result["distance"][0]
-            if distance >= 0.1:
-                update_flag = False
-            # threshold = 0
-            origin_id= search_result["id"][0]
+        if not que_strings and old_que_strings:
+            LOG.info("que_strings is empty, but old_que_strings is not empty, deleting from vector db")
+            self.vector_db_api.delete_items_by_metadata_filters(where={"id": record_id, "user_id": user_id})
+            return
 
-        if update_flag and que_string and old_que_string:
-            self.asyn_task_api.asyn_update_texts_to_vector_db_coll(
-                ids=[origin_id],
-                texts=[que_string],
-                metadatas= metadatas)
-        elif que_string and old_que_string is None:
+        vector_que_items = self.vector_db_api.get_items_by_metadata_filters(where={"id": record_id})
+        existing_strings = vector_que_items.get('documents', [])
+        existing_ids = vector_que_items.get('ids', [])
+
+        if set(que_strings) == set(existing_strings):
+            LOG.info("que_strings unchanged, no need to update vector db")
+            return
+
+        to_delete_ids = set(existing_ids)
+        to_add_set = set()
+
+        # 构建 string -> list[id] 映射
+        string_to_ids = {}
+        for s, id_ in zip(existing_strings, existing_ids):
+            string_to_ids.setdefault(s, []).append(id_)
+
+        for s in que_strings:
+            if s not in string_to_ids:
+                to_add_set.add(s)
+            else:
+                for id_ in string_to_ids[s]:
+                    to_delete_ids.discard(id_)
+
+        to_add_strings = list(to_add_set)
+
+        if to_add_strings:
+            LOG.info(f"Adding new que_strings: {to_add_strings}")
             self.asyn_task_api.asyn_add_texts_to_vector_db_coll(
-                texts=[que_string],
-                metadatas=metadatas)
-        elif que_string is None and old_que_string:
-            self.vector_db_api.delete_items_by_ids(ids=[origin_id])
+                texts=to_add_strings,
+                metadatas=[{
+                    "user_id": user_id,
+                    "id": record_id,
+                    "tags": ','.join(tags)
+                }] * len(to_add_strings)
+            )
+
+        if to_delete_ids:
+            LOG.info(f"Deleting IDs: {sorted(to_delete_ids)}")
+            self.vector_db_api.delete_items_by_ids(ids=list(to_delete_ids))

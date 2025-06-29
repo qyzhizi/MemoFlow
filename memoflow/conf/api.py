@@ -21,6 +21,10 @@ AZURE_API_VERSION = env_vars.get("AZURE_API_VERSION", None)
 AZURE_API_DEPLOYMENT = env_vars.get("AZURE_API_DEPLOYMENT", None)
 AZURE_API_MODEL = env_vars.get("AZURE_API_MODEL", None)
 
+OPENAI_API_KEY = env_vars.get("OPENAI_API_KEY", None)
+OPENAI_ENDPOINT = env_vars.get("OPENAI_ENDPOINT", None)
+OPENAI_EMBEDDING_MODEL = env_vars.get("OPENAI_EMBEDDING_MODEL", None)
+
 PINECONE_API_KEY = env_vars.get("PINECONE_API_KEY", None)
 
 
@@ -69,6 +73,15 @@ CONF_OPTS = [
     cfg.StrOpt('AZURE_API_DEPLOYMENT',
                 default=AZURE_API_DEPLOYMENT,
                 help='azure api deployment'),
+    cfg.StrOpt('OPENAI_API_KEY',
+                default=OPENAI_API_KEY,
+                help='openai api key'),
+    cfg.StrOpt('OPENAI_ENDPOINT',
+                default=OPENAI_ENDPOINT,
+                help='openai endpoint'),
+    cfg.StrOpt('OPENAI_EMBEDDING_MODEL',
+                default=OPENAI_EMBEDDING_MODEL,
+                help='openai embedding model'),
 
     cfg.StrOpt('PINECONE_API_KEY',
                 default=PINECONE_API_KEY,

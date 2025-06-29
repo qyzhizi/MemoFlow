@@ -10,7 +10,8 @@ from langchain.vectorstores import Chroma
 import uuid
 
 from memoflow.conf import CONF
-from memoflow.api.azure_openai_api import AzureOpenAIEmbedding
+# from memoflow.api.azure_openai_api import AzureOpenAIEmbedding
+from memoflow.api.openai_api import OpenAIEmbedding
 
 LOG = logging.getLogger(__name__)
 DEFAULT_K = 4  # Number of Documents to return.
@@ -29,14 +30,14 @@ from typing import (
 
 COLLECTION_NAME = CONF.diary_log["COLLECTION_NAME"]
 PERSIST_DIRECTORY = CONF.diary_log['CHROMA_PERSIST_DIRECTORY']
-azure_openai_embedding = AzureOpenAIEmbedding()
+# azure_openai_embedding = AzureOpenAIEmbedding()
+openai_embedding = OpenAIEmbedding()
 
 class ChromeDBCollectionHttpDriver(object):
     # TODO  need pass collection name and host name
     def __init__(self) -> None:
         self.persist_directory = PERSIST_DIRECTORY
-        # self.azure_openai_embedding = azure_openai_embedding
-        self._embedding_function = azure_openai_embedding
+        self._embedding_function = openai_embedding
 
         # self.vector_db = Chroma(
         #         collection_name=COLLECTION_NAME,

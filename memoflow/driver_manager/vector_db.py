@@ -87,7 +87,17 @@ class VectorDBCollectionManager(manager.Manager):
                          include=["metadatas", "documents", "embeddings"]):
         # return self.driver.vector_db.get(ids=ids, include=include)
         return self.driver.get(ids=ids, include=include)
-
+    
+    def get_items_by_metadata_filters(
+            self, 
+            where: dict={},
+            where_document: dict={}):
+        items = self.driver.get(
+            where=where,
+            where_document=where_document,
+            include=['metadatas', 'documents']
+            )
+        return items
 
 
 class CeleryVectorDBCollManager(VectorDBCollectionManager):
