@@ -30,9 +30,6 @@ body {
 /* .flex {
     display: flex;
 } */
-.w-full {
-    width: 100%;
-}
 .w-min-zero{
     min-width: 0;
 }

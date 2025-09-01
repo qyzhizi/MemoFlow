@@ -11,6 +11,7 @@ import {
     showNotification,
     mulTextMatchPattern
 } from '/v1/diary-log/static/utils.js';
+import {createEditor} from '/v1/diary-log/static/cm6Editor/cm6editor.js';
 
 if (function() { return !this; }()) {
     console.log("严格模式下运行");
@@ -18,25 +19,39 @@ if (function() { return !this; }()) {
     console.log("非严格模式下运行");
 }
 
+// interface editor {
+//   dom: Element,
+//   toolbar: Toolbar,
+//   editor: EditorView,
+//   getValue: () => string,
+//   setValue: (text: string) => void,
+//   clear: () => void,
+// }
+
+const EDITOR = "editor-container"
+var editor = null;
 
 $(function() {
     // window.addEventListener('load', adjustLayout);
     // window.addEventListener('beforeunload', adjustLayout);
     window.onload = adjustLayout;
     window.onresize = adjustLayout;
+    editor = createEditor(EDITOR, "");
 
-    const log_textarea = document.getElementById('log');
+    const log_textarea = document.getElementById(EDITOR);
+    console.log(editor.getValue());
+
     const edit_textarea = document.getElementById('editLog');
     // 绑定 input 事件监听器，以便在输入时调整高度
     // log_textarea.addEventListener('input', autoResize);
-    log_textarea.addEventListener('input', function(event) {
-        autoResize('log');
-    });
+    // log_textarea.addEventListener('input', function(event) {
+    //     autoResize('log');
+    // });
     // edit_textarea.addEventListener('input', autoResize);
     edit_textarea.addEventListener('input', function(event) {
         autoResize('editLog');
     });
-    autoResize('log')
+    // autoResize('log')
     // autoResize('editLog')
 
     localStorage.setItem('page_size', null);
@@ -96,9 +111,9 @@ $(function() {
     })
 
 
-    var txtInput = document.getElementById('log');
-    txtInput.addEventListener('keydown', alt_q);
-    txtInput.addEventListener('keydown', tab_to_space);
+    // var txtInput = document.getElementById('log');
+    // txtInput.addEventListener('keydown', alt_q);
+    // txtInput.addEventListener('keydown', tab_to_space);
 
     var editTxtInput = document.getElementById('editLog');
     editTxtInput.addEventListener('keydown', alt_q);
@@ -1735,11 +1750,16 @@ function addLog() {
     const now = new Date();
     const dateStr = now.toLocaleDateString();
     const timeStr = now.toLocaleTimeString();
-    var log = `## ${dateStr} ${timeStr}:\n` + $('#log').val();
-    if ($('#log').val() === '') {
+    // if ($('#log').val() === '') {
+    //     console.log("log is none");
+    //     return; // 退出函数
+    // }
+    // 
+    if (editor.getValue().trim() === '') {
         console.log("log is none");
         return; // 退出函数
     }
+    var log = `## ${dateStr} ${timeStr}:\n` + editor.getValue().trim();
     
     $.ajax({
         url: '/v1/diary-log/addlog',
@@ -1751,8 +1771,10 @@ function addLog() {
             addLogEntry(response.content, response.record_id)
             
             // 清空 输入框
-            $('#log').val('');
-            autoResize('log')
+            // $('#log').val('');
+            editor.clear()
+
+            // autoResize('log')
             // console.log(response);
         },
         error: xhr_process_error

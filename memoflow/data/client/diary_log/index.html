@@ -19,6 +19,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro">
 
+    <!-- cm6 editor-->
+    <link rel="stylesheet" href="/v1/diary-log/static/cm6Editor/chunmde.min.css">
+    <!-- <script src="/v1/diary-log/static/cm6Editor/chunmde.bundle.min.js"></script> -->
+
     <link rel="stylesheet" href="/v1/diary-log/static/root.css">
     <link rel="stylesheet" href="/v1/diary-log/static/data-joy-color-scheme-dark.css">
     <link rel="stylesheet" href="/v1/diary-log/static/avatar.css">
@@ -63,7 +67,8 @@
                     </form> -->
                     <div class="mb-2 relative w-full flex flex-col justify-start items-start bg-white dark:bg-zinc-800 px-1 pt-2 rounded-lg border border-gray-200 dark:border-zinc-700" tabindex="0">
                         <div class="flex flex-col justify-start items-start relative w-full h-auto bg-inherit dark:text-gray-300">
-                            <textarea id="log" name="log" class="w-full h-full max-h-[300px] my-1 text-base resize-none overflow-x-hidden overflow-y-auto bg-transparent outline-none whitespace-pre-wrap word-break" rows="1" placeholder="any things ..." style="height: 0px;"></textarea>
+                            <div id="editor-container" class="w-full"> </div>
+                            <!-- <textarea id="log" name="log" class="w-full h-full max-h-[300px] my-1 text-base resize-none overflow-x-hidden overflow-y-auto bg-transparent outline-none whitespace-pre-wrap word-break" rows="1" placeholder="any things ..." style="height: 0px;"></textarea> -->
                         </div>
                         <hr class="hr_2 w-full">
                         <div class="w-full flex flex-row justify-end items-center py-1 dark:border-t-zinc-500">
