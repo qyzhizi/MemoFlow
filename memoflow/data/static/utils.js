@@ -103,7 +103,7 @@ async function getUserNameAndAvatar(url) {
             });
         } else {
             $newImg = $('<img>').attr({
-                src: "https://via.placeholder.com/50",
+                src: "https://placehold.co/50x50",
                 alt: "Avatar"
             });
         }
