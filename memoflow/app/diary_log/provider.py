@@ -389,22 +389,24 @@ class Manager(manager.Manager):
     
     def replace_outside_code_blocks(self, text):
         code_blocks = self.find_code_blocks(text)
-        # 找到所有 # 的位置
-        # hash_positions = [m.start() for m in re.finditer(
-        #     r'(\t{0,}-{0,}[\x20]{1,})(#{1,}[\x20]{1,})', text)]
-        hash_positions = [(m.start(), m.end())for m in re.finditer(
-            r'#{1,}[\x20]{1,}', text)]
-        if hash_positions and hash_positions[0][0]==0:
+
+        # 只匹配“行首”的 # 后跟一个或多个空格
+        hash_positions = [(m.start(), m.end()) for m in re.finditer(
+            r'(?m)^#{1,}\s+', text
+        )]
+
+        # 如果第一个标题在开头，保留（原逻辑是跳过第一个，但这里通常不需要）
+        if hash_positions and hash_positions[0][0] == 0:
             hash_positions = hash_positions[1:]
 
-        # 初始化新文本
         new_text = list(text)
         for pos_start, pos_end in hash_positions:
-            # 检查 # 是否在任何一个代码块内
+            # 检查 # 是否在代码块内
             if not any(start <= pos_start < end for start, end in code_blocks):
-                # 如果不在代码块内，替换为 @
-                new_text[pos_start:pos_end] = '@'*(pos_end - pos_start - 1) + " "
-        # 返回新文本
+                # 只替换 # 部分，不动后面的空格
+                count_hash = text[pos_start:pos_end].rstrip().count('#')
+                new_text[pos_start:pos_start + count_hash] = '@' * count_hash
+
         return ''.join(new_text)
 
     def process_content(self, content):
