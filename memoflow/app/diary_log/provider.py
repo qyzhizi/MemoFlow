@@ -321,7 +321,8 @@ class Manager(manager.Manager):
             items = ['- ' , items[0]] + items[1:]
 
         child_block_list = []
-        #子块(block)与"\t"的个数是成对的, 偶数个
+        # items 是被 pattern 分割的，
+        # pattern与后面的字符串的个数是成对的, items 是偶数个
         for i in range(0, len(items), 2):
             if i+1 < len(items):
                 t_list = items[i].split("-")
