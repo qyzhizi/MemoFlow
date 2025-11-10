@@ -19,14 +19,6 @@ if (function() { return !this; }()) {
     console.log("非严格模式下运行");
 }
 
-// interface editor {
-//   dom: Element,
-//   toolbar: Toolbar,
-//   editor: EditorView,
-//   getValue: () => string,
-//   setValue: (text: string) => void,
-//   clear: () => void,
-// }
 
 const EDITOR = "editor-container"
 var editor = null;
@@ -42,17 +34,9 @@ $(function() {
     console.log(editor.getValue());
 
     const edit_textarea = document.getElementById('editLog');
-    // 绑定 input 事件监听器，以便在输入时调整高度
-    // log_textarea.addEventListener('input', autoResize);
-    // log_textarea.addEventListener('input', function(event) {
-    //     autoResize('log');
-    // });
-    // edit_textarea.addEventListener('input', autoResize);
     edit_textarea.addEventListener('input', function(event) {
         autoResize('editLog');
     });
-    // autoResize('log')
-    // autoResize('editLog')
 
     localStorage.setItem('page_size', null);
     localStorage.setItem('page_number', null);
@@ -64,17 +48,12 @@ $(function() {
     .then(html => {
         addDivInnerHTMLToBodyContainer(
             {doc_data: html, container_id: 'nav-container-root' })
-        
-        // // 添加新的类名
-        // var userInfoDiv = document.getElementById('nav-container-root').querySelector('.user-info')
-        // userInfoDiv.classList.add('cursor-pointer');
 
         navLoadAvatarAndSetUserName('nav-container-root')
     })
     .catch(error => {
         console.error(error); // 错误处理
     });
-
 
 
     $('#submit').on('click', function(event) {
@@ -109,11 +88,6 @@ $(function() {
         page_number = (parseInt(page_number) + 1).toString()
         getLogs(page_size=page_size, page_number=page_number)
     })
-
-
-    // var txtInput = document.getElementById('log');
-    // txtInput.addEventListener('keydown', alt_q);
-    // txtInput.addEventListener('keydown', tab_to_space);
 
     var editTxtInput = document.getElementById('editLog');
     editTxtInput.addEventListener('keydown', alt_q);
@@ -310,7 +284,6 @@ function autoResize(textarea_id) {
 }
 
 
-
 function addLogEntry(logText, record_id, reverse=true) {
     var log_entry = $('<div class="log_entry"></div>'); // 添加一个类以便样式控制
     // 将 log_entry 元素的内容添加到 log_entry 中
@@ -409,20 +382,6 @@ function addLogEntry(logText, record_id, reverse=true) {
         dropdownMenu.hide();
     });
 
-    // // 在文档的其他位置点击时隐藏下拉菜单
-    // logEntryContainer.click(function() {
-    //     dropdownMenu.hide();
-    // });
-
-    // 添加复制选项点击事件处理程序
-    // copyOption.click(function() {
-    //     // 复制日志文本到剪贴板
-    //     // copyToClipboard(removeLogseqMatches(pre.text()));
-    //     copyToClipboard(removeLogseqMatches(
-    //         log_entry.data('logText')));
-    //     // 隐藏下拉菜单
-    //     dropdownMenu.hide()
-    // });
     // 获取 copyOption 元素对应的 DOM 元素
     let copyOptionDOM = copyOption.get(0);
     let clipboard = new ClipboardJS(copyOptionDOM, {
@@ -463,22 +422,6 @@ function addLogEntry(logText, record_id, reverse=true) {
         }
     });
 
-    // latexView 选项点击事件处理程序
-    // latexView.click(function() {
-    //     // 渲染当前笔记中出现的公式
-    //     renderLatexInLog(log_entry);
-        
-    //     // renderLatexInLog 这里 重置了 html, 需要重新设置监听函数
-    //     // 获取替换后的代码块元素
-    //     var codeContainers = log_entry.find('.code-container');
-    //     // 为每个代码块元素添加点击事件监听器
-    //     codeContainers.each(function() {
-    //         var button = $(this).find('.copyIconSvgButton');
-    //         copyIconSvgButtonListener(button);
-    //     });
-    //     // 隐藏下拉菜单
-    //     dropdownMenu.hide();
-    // });
 
 
     // 将复制、编辑和删除选项添加到下拉菜单中
@@ -623,88 +566,69 @@ function processInputAndReturnString(process_input, pattern_logseq_child) {
 }
 
 
+/**
+ * 删除多行文本开头的指定数量的制表符（tab）。
+ * @param {string} text 
+ * @param {int} num 
+ * @returns {string}
+ */
+function trimTabsMultiline(text, num) {
+    const pattern_t = /^(\t+)(-\x20| {2})/gm;
+    return text.replace(pattern_t, (match, tabs, block) => {
+    const count = tabs.length;
+    if (count < num) return match; // 不够删
+    const newTabs = tabs.slice(num);
+    if(block === '  ') {
+        return newTabs + match.slice(tabs.length+block.length);
+    }
+    return newTabs + match.slice(tabs.length);
+    });
+}
+
+
 // Cancel Logseq format
 function removeLogseqMatches(inputString) {
-    var pattern_logseq_mian = /^[\x20]{0,}\t{0,}-[\x20]/gm
-    var pattern_logseq_child = /^[\x20]{0,}\t{0,}[\x20]{2}/gm;
-    var result1 = splitStringWithPattern(inputString, pattern_logseq_mian);
-    if ( result1 && result1.length === 0){
-        return inputString
-    }
-    inputString = processInputAndReturnString(result1, pattern_logseq_child)
-
-    // 匹配行首的 "  " "\t  " "\t\t  " "\t\t\t  " 等等, 替换为空串
-    // ^[\x20]{2} ：表示行首两个空格，匹配 `#ans` 之前的行
-    const pattern = /^[\x20]{0,}\t{1,}[\x20]{2}|^[\x20]{2}/gm;
-    const String1 = inputString.replace(pattern, '')
-
     // 使用正则表达式进行划分
     var regex = /^\t-[\x20]#ans/gm;
-    const pattern_t = /^\t- #/gm;
+    var queregex = /^\t(?:-[\x20]|[\x20]{2})#que/m;
+    const pattern_t_tag = /^\t- #/gm;
     var splittedParts = [];
     // 检查 regex 是否是带有全局标志的正则表达式
     if (!regex.global) {
     console.error("Error: #ans regex must have the global (g) flag.");
     return;
     }
-    var match = regex.exec(String1); // 使用 exec 方法进行匹配
+    var match = regex.exec(inputString); // 使用 exec 方法进行匹配
     if (match) {
         var index = match.index;
-        var firstPart = String1.substring(0, index); // 第一个部分是匹配之前的字符串
-        var secondPart = String1.substring(regex.lastIndex); // 第二个部分是匹配之后的字符串
+        var firstPart = inputString.substring(0, index); // 第一个部分是匹配之前的字符串
+        var secondPart = inputString.substring(regex.lastIndex); // 第二个部分是匹配之后的字符串
         splittedParts.push(firstPart, secondPart);
     } else {
-        splittedParts.push(String1); // 如果没有匹配到，直接将整个字符串加入列表
+        splittedParts.push(inputString); // 如果没有匹配到，直接将整个字符串加入列表
     }
     // 如果长度为 1，说明字符串中没有包含 #ans
     if (splittedParts.length === 1) {
-        const pattern1_0 = /^[\x20]{0,}\t-[\x20]/gm;
-        let result = splittedParts[0].replace(pattern_t, '#');
-        result = result.replace(pattern1_0, '- ');
+        let result = splittedParts[0].replace(pattern_t_tag, '#');
+        result = result.replace(queregex, '#que');
         console.log("输入字符串中没有包含 #ans");
+        result = trimTabsMultiline(result, 1)
         return result.substring(2);
     }
     // 如果长度等于 2，说明字符串中包含了 #ans
     if (splittedParts.length == 2) {
         console.log("输入字符串中包含了 #ans");
-        splittedParts[0] = splittedParts[0].replace(pattern_t, '#');
+        splittedParts[0] = splittedParts[0].replace(pattern_t_tag, '#');
+        splittedParts[0] = splittedParts[0].replace(queregex, '#que');
 
         var part1 = splittedParts[0];
         var part2 = splittedParts[1];
-        const pattern1_0 = /^[\x20]{0,}\t-[\x20]/gm;
-        part1 = part1.replace(pattern1_0, '- ');
-        const pattern2_0 = /^[\x20]{0,}\t-[\x20]/gm;
-        const pattern2_1 = /^[\x20]{0,}\t\t-[\x20]/gm;
-        const pattern2_2 = /^[\x20]{0,}\t\t\t-[\x20]/gm;
-        part2 = part2.replace(pattern2_0, '@blk ');
-        part2 = part2.replace(pattern2_1, '- ');
-        part2 = part2.replace(pattern2_2, '@blk- ');
+        part1 = trimTabsMultiline(part1, 1) 
+        part2 = trimTabsMultiline(part2, 2)
         var result = part1 +"#ans"+ part2;
         return result.substring(2);
     }
 }
-
-// 复制到剪贴板函数
-// function copyToClipboard(text) {
-//     // 创建一个新的 ClipboardItem 对象
-//     const clipboardItem = new ClipboardItem({ "text/plain": new Blob([text], { type: "text/plain" }) });
-  
-//     // 将文本添加到剪贴板
-//     navigator.clipboard.write([clipboardItem]).then(function() {
-//       console.log('文本已成功复制到剪贴板');
-//     }).catch(function(err) {
-//       console.error('复制失败:', err);
-//     });
-//   }
-
-// function copyToClipboard(text) {
-//     var tempInput = document.createElement("input");
-//     tempInput.value = text;
-//     document.body.appendChild(tempInput);
-//     tempInput.select();
-//     document.execCommand("copy");
-//     document.body.removeChild(tempInput);
-// }
 
 
 // let modalMousedownisListenerAttached = false;
@@ -750,7 +674,6 @@ modal.addEventListener('mouseup', function(event) {
     }
     isModalMouseDown = false;
 });  
-
 
 
 // 获取关闭按钮，并为其添加点击事件处理程序
@@ -966,19 +889,6 @@ function match_replace_help3(
     const lengthDifference = replacementLength - match.length; // 长度变化
     // 更新positions数组中的位置信息
 
-    // newPositions = newPositions.map(pos => {
-    //     if (offset < pos.start) {
-    //         // 如果当前替换发生在某个代码块之前，只需要移动该代码块的位置
-    //         return {
-    //             ...pos,
-    //             start: pos.start + lengthDifference,
-    //             end: pos.end + lengthDifference,
-    //         };
-    //     } else {
-    //         // 如果当前替换发生在某个代码块之后，不需要更新该代码块的位置
-    //         return pos;
-    //     }
-    // });
 
     for (let i = newPositions.length - 1; i >= 0; i--) {
         const pos = newPositions[i];
@@ -1015,19 +925,6 @@ function addCodePositions(changedPositions, targetPositions){
         // 更新positions数组中的位置信息
         let offset  = pos.start;
 
-        // targetPositions = targetPositions.map(targetPos => {
-        //     if (offset < targetPos.start) {
-        //         // 如果当前替换发生在某个代码块之前，只需要移动该代码块的位置
-        //         return {
-        //             ...targetPos,
-        //             start: targetPos.start + lengthDifference,
-        //             end: targetPos.end + lengthDifference,
-        //         };
-        //     } else {
-        //         // 如果当前替换发生在某个代码块之后，不需要更新该代码块的位置
-        //         return targetPos;
-        //     }
-        // });
 
         for (let i = targetPositions.length - 1; i >= 0; i--) {
             const pos = targetPositions[i];
@@ -1153,50 +1050,6 @@ function replaceURLsWithLinks(htmlString, positions) {
         positions: newPositions
     };    
 }
-
-
-// function replaceCodeWithPre(log_entry) {
-//     var copyIcon = $(<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy w-4 h-auto"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>)
-
-//     // 获取<log_entry>元素的文本内容
-//     var content = log_entry.html();
-    
-//     // 定义匹配三个反引号包围的代码段的正则表达式
-//     var codeRegex = /```([\s\S]*?)```/g;
-
-//     content = content.replace(codeRegex, function(match, code) {
-//         // 移除代码段开头的换行符
-//         code = code.replace(/^\n+/, '');
-//         code = code.trimEnd();
-    
-//         if (code.length === 0) {
-//             // 空代码段处理方式1：替换为空白
-//             return '<pre></pre>';
-//         }
-    
-//         // 使用<pre>标签包裹代码段
-//         return '<pre>' + code + '</pre>';
-//     });    
-
-//     // 设置<log_entry>元素的HTML内容为替换后的内容
-//     log_entry.html(content);
-// }
-
-// function copyIconSvgButtonListener(button) {
-//     // 为所有的.copyIconSvgButton按钮添加点击事件监听器
-//     button.click(function () {
-
-//         // 获取点击按钮所在的code-container元素
-//         var codeContainer = $(this).closest('.code-container');
-
-//         // 获取code-container中的pre元素的文本内容
-//         var code = codeContainer.find('pre').text();
-//         copyToClipboard(removeMinimumIndentation(code))
-//         showNotification('Success!', 700);
-
-//         // alert('代码已复制到剪贴板！');
-//     });
-// }
 
 
 function copyIconSvgButtonListener(button) {
@@ -1588,43 +1441,38 @@ function replaceTabWithSpace(htmlString) {
 
 
 function removeMinimumIndentation(text) {
-    // 将文本分割成行数组
+    const TAB_WIDTH = 2;
     const lines = text.split('\n');
 
-    // 初始化最小缩进量为一个较大的值
-    let minIndentation = Infinity;
+    // 计算每行缩进（空行跳过）
+    const indents = lines
+        .filter(line => line.trim() !== '')
+        .map(line => {
+            let count = 0;
+            for (const ch of line) {
+                if (ch === ' ') count += 1;
+                else if (ch === '\t') count += TAB_WIDTH;
+                else break;
+            }
+            return count;
+        });
 
-    // 遍历每一行，找到最小缩进量，但不处理空行
-    for (const line of lines) {
-        if (line.trim() === '') {
-            continue;
+    const minIndent = indents.length ? Math.min(...indents) : 0;
+
+    // 根据 minIndent 移除缩进
+    return lines.map(line => {
+        let remaining = minIndent;
+        let i = 0;
+
+        while (remaining > 0 && i < line.length) {
+            if (line[i] === ' ') remaining -= 1;
+            else if (line[i] === '\t') remaining -= TAB_WIDTH;
+            else break;
+            i++;
         }
 
-        let indentation = 0;
-        while (line[indentation] === ' ') {
-            indentation++;
-        }
-
-        if (indentation < minIndentation) {
-            minIndentation = indentation;
-        }
-    }
-
-    // 如果所有行都是空行或没有缩进，设置最小缩进为0
-    if (minIndentation === Infinity) {
-        minIndentation = 0;
-    }
-
-    // 去除每行的最小缩进量空格，并忽略完全是空格的行
-    const result = lines.map(line => {
-        if (line.trim() === '') {
-            return line;
-        } else {
-            return line.slice(minIndentation);
-        }
+        return line.slice(i);
     }).join('\n');
-
-    return result;
 }
 
   
@@ -1759,7 +1607,7 @@ function addLog() {
         console.log("log is none");
         return; // 退出函数
     }
-    var log = `## ${dateStr} ${timeStr}:\n` + editor.getValue().trim();
+    var log = `## ${dateStr} ${timeStr}:\n` + editor.getValue();
     
     $.ajax({
         url: '/v1/diary-log/addlog',

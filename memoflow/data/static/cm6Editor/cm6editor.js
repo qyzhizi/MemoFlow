@@ -30,6 +30,7 @@ export function createEditor(containerId = "editor-container", initialContent = 
     lineWrapping: true,
     indentWithTab: true,
     toolbar: true,
+    theme: "dark",
   })
   .use(imageUploadPlugin)
   .use(MarkdownPreviewPlugin)

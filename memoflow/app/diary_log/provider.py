@@ -284,8 +284,8 @@ class Manager(manager.Manager):
         \t- item2
         3405834056
         '''
-        items = re.split(r'(\t+-\s+)', block_string)
-        items:  ['## 2023-5-10\nssssssssssssssssssssss',
+        tab_block_pairs = re.split(r'(\t+-\s+)', block_string)
+        tab_block_pairs:  ['## 2023-5-10\nssssssssssssssssssssss',
         '\t- ', 'item1\n509348606-\n',
         '\t\t-    ', 'item1.1\n\t\t\t    45834056843\n',
         '\t\t\t- ', 'item1.2\n\t\t\t    405843068045\n',
@@ -306,61 +306,60 @@ class Manager(manager.Manager):
         """
         processed_result = []
 
-        pattern = r'(\t+-[\x20]|\t-@ans[\x20])'
-        items = re.split(pattern, block_string)
+        # pattern = r'(\t+-[\x20]|\t-@ans[\x20])'
+        pattern = r'(\t+-[\x20])'
+        tab_block_pairs = re.split(pattern, block_string)
 
         # 假设block_string以`- ## 2023-5-10`开头，
         # 开头是第一个block,但该block不带"\t", 额外做处理，变为0个"\t"
         # 之所以这样处理，是因为`- `很常见，不能直接使用上面那样的正则匹配
-        if items[0].startswith("- "):
-            # items[0] 分割成两部分：'- ' , items[0][2:]
-            items = ['- ' , items[0][2:]] + items[1:]
+        if tab_block_pairs[0].startswith("- "):
+            # tab_block_pairs[0] 分割成两部分：'- ' , tab_block_pairs[0][2:]
+            tab_block_pairs = ['- ' , tab_block_pairs[0][2:]] + tab_block_pairs[1:]
         else:
             # 额外添加'- '，把第一行默认做一个子块，
             # 比如：block_string 以`## 2023-5-10`开头
-            items = ['- ' , items[0]] + items[1:]
+            tab_block_pairs = ['- ' , tab_block_pairs[0]] + tab_block_pairs[1:]
 
         child_block_list = []
-        # items 是被 pattern 分割的，
-        # pattern与后面的字符串的个数是成对的, items 是偶数个
-        for i in range(0, len(items), 2):
-            if i+1 < len(items):
-                t_list = items[i].split("-")
-                if len(t_list) > 1 and t_list[1] == "@ans ":
-                    # norm ans child block
-                    t_num = (1, "@ans ")
-                else:
-                    t_num = len(t_list[0])
-                child_block_list.append((t_num, items[i+1]))
+        # tab_block_pairs 是被 pattern 分割的，
+        # pattern与后面的字符串的个数是成对的, tab_block_pairs 是偶数个
+        for i in range(0, len(tab_block_pairs), 2):
+            if i+1 < len(tab_block_pairs):
+                t_list = tab_block_pairs[i].split("-")
+                # if len(t_list) > 1 and t_list[1] == "@ans ":
+                #     # norm ans child block
+                #     t_num = (1, "@ans ")
+                # else:
+                t_num = len(t_list[0])
+                child_block_list.append((t_num, tab_block_pairs[i+1]))
 
         # 处理每个子块
         for i, (t_num, item) in enumerate(child_block_list):
-            if t_num == (1, "@ans "):
+            # 子块第一行，比较特殊，最多给一个"\t"，或者不给"\t"
+            # 因为已经把最上层的子块考虑进来了，例如：`- ## 2023-5-10`
+            # i == 0时， t_num一般是等于0的
+            if i == 0 and t_num > 1:
                 t_num = 1
-                child_block_list[i] = (t_num, item)
-                ans_normal_block = True
-            else:
-                ans_normal_block = False
+            # 当前子块如果比上个子块多2个、2个以上的"\t"，进行现在，最多只能多一个"\t"
+            if i-1 >= 0 and t_num >= child_block_list[i-1][0] +1:
+                t_num = child_block_list[i-1][0] +1
+            # if t_num == (1, "@ans "):
+            #     t_num = 1
+            #     child_block_list[i] = (t_num, item)
+            #     ans_normal_block = True
+            # else:
+            #     ans_normal_block = False
             # 去除子块最后一行末尾的空白字符(包括\t \n), logseq 格式
             item = item.rstrip()
             #得到每一行，相当于logseq的软回车的行
             lines = item.split('\n')
             # split('\n')操作会可能会多得到一个空字符串, 去除最后一个空字符串
-            if lines[-1].strip(" ") == "":
-                lines = lines[:-1]
-            # 去除子块最后一行末尾的空白字符串
-            # lines[-1] = lines[-1].rstrip()
+            # if lines[-1].strip(" ") == "":
+            #     lines = lines[:-1]
             for line_index, line in enumerate(lines):
-                # 子块第一行，比较特殊，最多给一个"\t"，或者不给"\t"
-                # 因为已经把最上层的子块考虑进来了，例如：`- ## 2023-5-10`
-                # i == 0时， t_num一般是等于0的
-                if i == 0 and t_num > 1:
-                    t_num = 1
-                # 当前子块如果比上个子块多2个、2个以上的"\t"，进行现在，最多只能多一个"\t"
-                if i-1 >= 0 and t_num >= child_block_list[i-1][0] +1:
-                    t_num = child_block_list[i-1][0] +1
                 # 判断是否为block开头标识：t_num*'\t'+ "- "
-                if line_index > 0 or ans_normal_block:
+                if line_index > 0 :
                     # 软回车标识
                     pre_str = t_num*'\t'+ "  "
                     # 匹配开头“\t\t  ”, 多个"\t", 两个空格
@@ -409,6 +408,120 @@ class Manager(manager.Manager):
                 new_text[pos_start:pos_start + count_hash] = '@' * count_hash
 
         return ''.join(new_text)
+    
+    
+    def remove_minimum_indentation(self, lines: List[str]) -> List[str]:
+        # 计算每行缩进深度，只考虑空格
+        min_indent = float('inf')
+        for line in lines:
+            if line.strip():  # 只计算非空行的缩进
+                indent = len(line) - len(line.lstrip(' '))  # 计算空格的数量
+                min_indent = min(min_indent, indent)
+    
+        # 如果没有非空行，则返回原始文本
+        if min_indent == float('inf'):
+            min_indent = 0
+
+        # 移除最小缩进并返回
+        result = [
+            line[min_indent:] if line.strip() else line  # 只对非空行处理
+            for line in lines
+        ]
+    
+        return result
+
+    # ans 之前的子块转换, 将开头的若干空格 + "- " 转换为 "\t- " 子块格式
+    def convert_indent_before_ans_block(self, line: str) -> str:
+        # 匹配：开头若干空格 + "- "    ^( *)-
+        m = re.match(r'^( *)- ', line)
+        if not m:
+            return line
+
+        spaces = len(m.group(1)) + 2 # 额外添加 2 个空格
+        tabs = '\t' * (spaces // 2)
+        rest = ' ' * (spaces % 2)    # 如果有多出来的 1 个空格，就保留它
+        return tabs + rest + line[spaces - 2:]
+    
+    # 匹配“行首”的 # 后跟一个或多个空格，返回 # 的数量, 否则返回0
+    # 用于处理 que 标签时，判断上一行是否为 tag 行
+    def match_tag_in_line(self, line: str) -> int:
+        # 只匹配“行首”的 # 后跟一个或多个空格
+        match = re.match(r'^(#|\t*- #)', line)
+        return len(match.group(1)) if match else 0
+
+
+    def normalize_and_check(self, line: str):
+        """
+        返回 (normalized_line, is_header)
+
+        规范化规则：
+        - tab 和 两空格 作为一个缩进单元
+        - header 行缩进统一为若干个 \t
+        - 非 header 行保持原样，不处理缩进
+        """
+        LINE_RE = re.compile(r'^(?P<indent>(?:\t| {2})*- )?(?P<body>.*)')
+
+        m = LINE_RE.match(line)
+        indent = m.group("indent")
+        body = m.group("body")
+
+        if indent:
+            # indent 是  (缩进 + "- ")
+            # 去掉 "- " 后仅剩缩进区域
+            pure_indent = indent[:-2]
+            indent_units = pure_indent.count("\t") + pure_indent.count("  ")
+            new_line = ("\t" * indent_units) + "- " + body
+            is_header = True
+        else:
+            # 非 header 行不做缩进规范化
+            new_line = body
+            is_header = False
+            indent_units = 0  # ← 补上这一行
+
+        return new_line, is_header, indent_units
+
+    def split_blocks_and_blank(self, lines: List[str]) -> List[List[str]]:
+        ANS_BLOCK_ADD = 2
+        blocks = []
+        current = []
+
+        for raw in lines:
+            # 空白行：结块 + 插入独立空白块
+            if raw.strip() == "":
+                if current:
+                    blocks.append(current)
+                    current = []
+                blocks.append(["\t"*ANS_BLOCK_ADD + "- "] if ANS_BLOCK_ADD else [""])
+                continue
+
+            line, is_header, indent_units = self.normalize_and_check(raw)
+
+            if is_header:
+                # 遇到 header → 断开旧块，开始新块
+                if current:
+                    blocks.append(current)
+                current = [line]
+                if indent_units < 2 :
+                    current[0]  = "\t" * ANS_BLOCK_ADD + current[0]
+            else:
+                # 普通行
+                if current:
+                    current.append(line)
+                else:
+                    if ANS_BLOCK_ADD == 0:
+                        ANS_BLOCK_ADD = 2
+                    current = ["\t"*ANS_BLOCK_ADD +"- " + line] if ANS_BLOCK_ADD else [line] 
+
+        if current:
+            blocks.append(current)
+
+        return blocks
+
+    def flatten(self, blocks):
+        result = []
+        for group in blocks:
+            result.extend(group)
+        return result
 
     def process_content(self, content):
         """
@@ -442,28 +555,11 @@ class Manager(manager.Manager):
         ```        
         """
         title_string = "##"
-        tag_string = "#"
         block_pre_string = ["- ", "\t- "]
-        normal_parse_list = [
-            ('- ', '\t- ')
-        ]
-        # 替换规则, 类似的字符串上下顺序有要求，优先匹配的放上面
-        list_parse_pre = [
-            ('- ', '\t\t- '),
-            ('@blk ', '\t- '),
-            ('@blk- ', '\t\t\t- '),
-            ('@blk-', '\t\t\t- '),
-            ('@blk', '\t- '),
-            ('@ans ', '\t-@ans '),
-            ('@ans', '\t-@ans '),
-        ]
         que_flag = False
         ans_flag = False
-        que_condition_flag = 0
-        ans_condition_flag = 0
         que_strings = ["#que", "\t- #que", "- #que"]
         ans_strings = ["#ans", "\t- #ans", "- #ans"]
-        # normal_blk_strings = ["@blk ", "@blk"]
 
         todo_key = ["--todo ", "--TODO ",
                     "--done ", "--DONE "]
@@ -476,70 +572,60 @@ class Manager(manager.Manager):
         content = self.replace_outside_code_blocks(content)
         content_list = content.split('\n')
         for i, content in enumerate(content_list):
-            if i == 0 and content.strip()[:len(title_string)] == title_string:
+            if not content.strip():
+                continue
+            if i == 0 and content.lstrip()[:len(title_string)] == title_string:
                 # 第一个时间戳标题需要设置为logseq最上层的子块，所以不带"\t"
                 content_list[i] = block_pre_string[0] + content_list[i]
+                continue
 
-            # que_strings = ["#que ", "\t- #que", "- #que"]
             if not que_flag:
-                content_strip_space = content.strip(' ')
-                # match_list =[]
-                for item in que_strings:
-                    # matched = int(content_strip_space[:len(item)] == item)
-                    # match_list.append(matched)
-                    if content_strip_space[:len(item)] == item:
-                        content = que_strings[0] + content[len(item):]
-                        content_list[i] = content
-                        que_condition_flag = True
-                        break
-
-            if not que_flag and content and que_condition_flag:
-                que_flag = True
-                up_line = i-1
-                # 将上一行（带标签）当做子块
-                up_line_list = content_list[up_line].strip()
-                if up_line != 0 and content_list[up_line].startswith(block_pre_string[1]):
-                    continue
-                # 当遇到 ”- # tag1“
-                if up_line != 0 and content_list[up_line].startswith(block_pre_string[0]):
-                    content_list[up_line] = "\t" + content_list[up_line]
-                    continue
-                if up_line != 0 and up_line_list and up_line_list[0] == tag_string:
-                    #给问题的上一行（标题）添加 前缀 `block_pre_string[1]`
-                    content_list[up_line] = block_pre_string[1] + content_list[up_line]
-                else:
+                # 找出第一个匹配的 que_strings
+                # que_strings = ["#que ", "\t- #que", "- #que"]
+                que_matched = next((item for item in que_strings if content.lstrip(' ').startswith(item)), None)
+                # 处理 que 与 tag 的关系，如果 tag 存在，则把 tag 作为 que 的上一级块
+                if que_matched:
+                    que_flag = True
+                    # fist meet, normalize que sytle
+                    content_list[i] = que_strings[0] + content.lstrip(' ')[len(que_matched):]
+                    # 将上一行（带标签）当做块
+                    up_line = i-1
+                    # 当 up_line 匹配 r'^(#|\t*- #)' 时，视为 tag block，
+                    # 将上一行匹配的内容 r'^(#|\t*- #)' 替换前缀 "\t- #"，否则不处理 
+                    if up_line > 0 and (prefix_num := self.match_tag_in_line(content_list[up_line].lstrip(' '))):
+                        content_list[up_line] = f"\t- #{content_list[up_line].lstrip(' ')[prefix_num:]}"
+                        continue
+                    # 给 que 本身添加 前缀 `block_pre_string[1]`
                     content_list[i] = block_pre_string[1] + content_list[i]
+                    continue
 
             # 这一行将视为特殊标签，并作为子块
             # ans_strings = ["#ans", "\t- #ans", "- #ans"]
             if not ans_flag:
-                content_strip_space = content.strip(' ')
-                for item in ans_strings:
-                    if content_strip_space[:len(item)] == item:
-                        content = ans_strings[1] + content[len(item):]
-                        content_list[i] = content
-                        ans_flag = True
-                        break
-                for old, new in normal_parse_list:
-                    if content.startswith(old):
-                        content = new + content[len(old):]
-                        content_list[i] = content
-                        break
+                ans_matched = next((item for item in ans_strings if content.lstrip(' ').startswith(item)), None)
+                if ans_matched:
+                    content = ans_strings[1] + content.lstrip(' ')[len(ans_matched):]
+                    content_list[i] = content
+                    ans_flag = True
+                    # 对 i+1 之后的行先做缩进处理, 先去除最小缩进
+                    # tail = self.remove_minimum_indentation(content_list[i+1:])
+                    # 更具空行拆分为多个块
+                    # splited_tail_block = self.split_and_keep_blank(tail)
+                    # 每个块的第一行，加上前缀，"\t- "
+                    # 拼回整体, 直接就地替换
+                    content_list[i+1:] = self.flatten(
+                        self.split_blocks_and_blank(content_list[i+1:]))
+                    break
+                # 普通子块转换, ans 之前的子块
+                content = self.convert_indent_before_ans_block(content)
+                content_list[i] = content
 
-            # 解析`-todo ` 变为子块
-            if content and (content.strip()[:len(todo_key[0])] in todo_map
+            # 解析`--todo ` 变为子块
+            if not ans_flag and (content.strip()[:len(todo_key[0])] in todo_map
                             or content.strip() in todo_map):
-                new_content = todo_map[content.strip()[:len(todo_key[0])]] + content[
-                    len(todo_key[0]):]
+                new_content = todo_map[content.strip()[:len(todo_key[0])]] + content[len(todo_key[0]):]
                 content_list[i] = new_content
 
-            # 解析`- ` 变为子块, ans_flag = True, ensure right place. "\t- #ans" will not match this condition
-            if ans_flag and content:
-                for old, new in  list_parse_pre:
-                    if content.startswith(old):
-                        content = new + content[len(old):]
-                        content_list[i] = content
-                        break
 
         # 重新组成串,并去除前后的空格与换行符等空白字符
         return "\n".join(content_list).strip()
