@@ -1,4 +1,5 @@
-import "/v1/diary-log/static/cm6Editor/chunmde.bundle.min.js";
+import "https://cdn.jsdelivr.net/gh/qyzhizi/chun-mde-dist@v0.1.0/dist/chunmde.bundle.min.js";
+
 
 const { 
   createChunEditor, 
