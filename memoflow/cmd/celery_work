@@ -37,6 +37,10 @@ def start_beat():
     beat.run()
 
 if __name__ == "__main__":
+    # === 确保日志目录存在 ===
+    log_file = cf_defaults.get("celery_log_file")
+    log_dir = os.path.dirname(log_file)
+    os.makedirs(log_dir, exist_ok=True)
     worker_process = Process(target=start_worker)
     beat_process = Process(target=start_beat)
     worker_process.start()
