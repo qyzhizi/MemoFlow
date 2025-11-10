@@ -304,7 +304,6 @@ class DiaryLog(wsgi.Application):
                 # file_path = CURRENT_SYNC_FILE
                 commit_message = "commit by memoflow"
                 branch_name = "main"
-                # token = CONF.diary_log['GITHUB_TOKEN']
                 token = github_access_info['access_token']
 
                 # repo = CONF.diary_log['GITHUB_REPO']
@@ -511,7 +510,6 @@ class DiaryLog(wsgi.Application):
             file_path = sync_file
             commit_message = "commit by memoflow"
             branch_name = "main"
-            # token = CONF.diary_log['GITHUB_TOKEN']
             token = github_access_info['access_token']
             repo = github_access_info['github_repo_name']
             # repo = CONF.diary_log['GITHUB_REPO']
@@ -587,32 +585,6 @@ class DiaryLog(wsgi.Application):
             data_dict={'content':diary_log["content"]},
             data_base_path=CLIPBOARD_DATA_BASE_PATH)
         return json.dumps(diary_log)  # data 是否可行？
-
-    # @token_required
-    # def get_contents_from_github(self, req):
-    #     user_id = req.environ['user_id']
-    #     user_settings = self.diary_db_api.get_user_settings(user_id)
-    #     if user_settings.get('SEND_TO_GITHUB', None) != True:
-    #         return json.dumps({"error": "CONF SEND_TO_GITHUB != True"})
-    #     if len(sync_file_paths) != len(sync_table_names):
-    #         raise Exception("sync_file_paths and sync_table_names length not equal")
-    #     github_access_info = self.get_access_token_by_user_id(
-    #             user_id=user_id)
-    #     # token = CONF.diary_log['GITHUB_TOKEN']
-    #     token = github_access_info['access_token']
-    #     repo = github_access_info['github_repo_name']
-    #     # token = CONF.diary_log['GITHUB_TOKEN']
-    #     # repo = CONF.diary_log['GITHUB_REPO']
-    #     branch_name = "main"
-    #     contents = self.diary_log_api.get_contents_from_github(
-    #         token, repo, sync_file_paths, branch_name)
-    #     if len(contents) != len(sync_file_paths):
-    #         raise Exception("contents length and len(sync_file_paths) not equal")
-    #     result = []
-    #     for content in contents:
-    #         result.extend(content)
-    #     # return contents
-    #     return json.dumps({"contents": result})
 
     @token_required
     def sync_contents_from_repo_to_db(self, req):

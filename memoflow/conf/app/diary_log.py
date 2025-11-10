@@ -11,7 +11,6 @@ DATABASE_ID = env_vars.get("DATABASE_ID", None)
 NOTION_API_KEY = env_vars.get("NOTION_API_KEY", None)
 
 # github config
-GITHUB_TOKEN = env_vars.get("GITHUB_TOKEN", None)
 GITHUB_REPO = env_vars.get("GITHUB_REPO", None)
 # github app config
 CLIENT_SECRET = env_vars.get("CLIENT_SECRET", None)
@@ -109,9 +108,6 @@ CONF_OPTS = [
     cfg.StrOpt('NOTION_API_KEY', default=NOTION_API_KEY,
                help='notion api key'),
     # github config
-    cfg.StrOpt('GITHUB_TOKEN',
-               default=GITHUB_TOKEN,
-               help='github access token'),
     cfg.StrOpt("GITHUB_REPO", default=GITHUB_REPO, help='github repo'),
     # github app config
     cfg.StrOpt('CLIENT_SECRET',

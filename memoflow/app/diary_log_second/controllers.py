@@ -34,21 +34,6 @@ class DiaryLog(wsgi.Application):
         # 发送到浮墨笔记
         # self.diary_log_second_api.send_log_flomo(diary_log)
 
-        # 保存到github
-        # added_content = diary_log['content']
-        # file_path = "pages/github_cards.md"
-        # commit_message = "commit by memoflow"
-        # branch_name = "main"
-        # token = CONF.diary_log['GITHUB_TOKEN']
-        # repo = CONF.diary_log['GITHUB_REPO']
-
-        # self.diary_log_api.celery_update_file_to_github(token,
-        #                                                 repo,
-        #                                                 file_path,
-        #                                                 added_content,
-        #                                                 commit_message,
-        #                                                 branch_name)
-        
         # 向坚果云发送异步任务，更新文件
         # second 的坚果云账号
         second_jianguoyun_count = CONF.api_conf.second_jianguoyun_count
