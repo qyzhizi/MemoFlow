@@ -307,19 +307,15 @@ class Manager(manager.Manager):
         processed_result = []
 
         # pattern = r'(\t+-[\x20]|\t-@ans[\x20])'
-        pattern = r'(\t+-[\x20])'
+        pattern = r'(\t*-[\x20])'
         tab_block_pairs = re.split(pattern, block_string)
+        if tab_block_pairs[0] == '':
+            tab_block_pairs = tab_block_pairs[1:]
 
-        # 假设block_string以`- ## 2023-5-10`开头，
-        # 开头是第一个block,但该block不带"\t", 额外做处理，变为0个"\t"
-        # 之所以这样处理，是因为`- `很常见，不能直接使用上面那样的正则匹配
-        if tab_block_pairs[0].startswith("- "):
-            # tab_block_pairs[0] 分割成两部分：'- ' , tab_block_pairs[0][2:]
-            tab_block_pairs = ['- ' , tab_block_pairs[0][2:]] + tab_block_pairs[1:]
-        else:
+        if not tab_block_pairs[0].startswith("- "):
             # 额外添加'- '，把第一行默认做一个子块，
             # 比如：block_string 以`## 2023-5-10`开头
-            tab_block_pairs = ['- ' , tab_block_pairs[0]] + tab_block_pairs[1:]
+            tab_block_pairs = ['- ' + tab_block_pairs[0]] + tab_block_pairs[1:]
 
         child_block_list = []
         # tab_block_pairs 是被 pattern 分割的，
@@ -327,10 +323,6 @@ class Manager(manager.Manager):
         for i in range(0, len(tab_block_pairs), 2):
             if i+1 < len(tab_block_pairs):
                 t_list = tab_block_pairs[i].split("-")
-                # if len(t_list) > 1 and t_list[1] == "@ans ":
-                #     # norm ans child block
-                #     t_num = (1, "@ans ")
-                # else:
                 t_num = len(t_list[0])
                 child_block_list.append((t_num, tab_block_pairs[i+1]))
 
@@ -344,19 +336,10 @@ class Manager(manager.Manager):
             # 当前子块如果比上个子块多2个、2个以上的"\t"，进行现在，最多只能多一个"\t"
             if i-1 >= 0 and t_num >= child_block_list[i-1][0] +1:
                 t_num = child_block_list[i-1][0] +1
-            # if t_num == (1, "@ans "):
-            #     t_num = 1
-            #     child_block_list[i] = (t_num, item)
-            #     ans_normal_block = True
-            # else:
-            #     ans_normal_block = False
             # 去除子块最后一行末尾的空白字符(包括\t \n), logseq 格式
             item = item.rstrip()
             #得到每一行，相当于logseq的软回车的行
             lines = item.split('\n')
-            # split('\n')操作会可能会多得到一个空字符串, 去除最后一个空字符串
-            # if lines[-1].strip(" ") == "":
-            #     lines = lines[:-1]
             for line_index, line in enumerate(lines):
                 # 判断是否为block开头标识：t_num*'\t'+ "- "
                 if line_index > 0 :
@@ -449,22 +432,18 @@ class Manager(manager.Manager):
         match = re.match(r'^(#|\t*- #)', line)
         return len(match.group(1)) if match else 0
 
-
     def normalize_and_check(self, line: str):
         """
-        返回 (normalized_line, is_header)
-
+        返回 (normalized_line, is_header, indent_units)
         规范化规则：
         - tab 和 两空格 作为一个缩进单元
         - header 行缩进统一为若干个 \t
         - 非 header 行保持原样，不处理缩进
         """
         LINE_RE = re.compile(r'^(?P<indent>(?:\t| {2})*- )?(?P<body>.*)')
-
         m = LINE_RE.match(line)
         indent = m.group("indent")
         body = m.group("body")
-
         if indent:
             # indent 是  (缩进 + "- ")
             # 去掉 "- " 后仅剩缩进区域
@@ -476,16 +455,62 @@ class Manager(manager.Manager):
             # 非 header 行不做缩进规范化
             new_line = body
             is_header = False
-            indent_units = 0  # ← 补上这一行
-
+            indent_units = 0
         return new_line, is_header, indent_units
 
     def split_blocks_and_blank(self, lines: List[str]) -> List[List[str]]:
         ANS_BLOCK_ADD = 2
+        # 改进的正则：捕获缩进部分（\t*）、可选的header前缀（"- " 或 "  "）
+        CODE_BLOCK_RE = re.compile(r'^(?P<indent>\t*)(?P<prefix>-\x20|[\x20]{0,2})```')
+    
         blocks = []
         current = []
-
+        in_code_block = False
+        code_block = []
+    
         for raw in lines:
+            # 检查代码块边界
+            match = CODE_BLOCK_RE.match(raw)
+            if match:
+                if not in_code_block:
+                    # 开始代码块
+                    in_code_block = True
+                    # 如果当前有未完成的块，先结块
+                    if current:
+                        blocks.append(current)
+                        current = []
+                
+                    # 获取匹配的缩进和前缀
+                    indent = match.group('indent')
+                    prefix = match.group('prefix')
+                
+                    # 判断是否有 header 前缀 "- "
+                    has_header_prefix = (prefix == '- ')
+                    indent_count = len(indent)
+                
+                    if not has_header_prefix:
+                        # 没有 header 前缀，添加 "\t\t- "
+                        code_block = ["\t\t- " + raw]
+                    elif indent_count < 2:
+                        # 有 header 前缀但缩进不足2个，补齐到2个
+                        needed_tabs = 2 - indent_count
+                        code_block = [("\t" * needed_tabs) + raw]
+                    else:
+                        # 缩进已经足够，保持原样
+                        code_block = [raw]
+                else:
+                    # 结束代码块
+                    code_block.append(raw)
+                    blocks.append(code_block)
+                    code_block = []
+                    in_code_block = False
+                continue
+        
+            # 在代码块内部
+            if in_code_block:
+                code_block.append(raw)
+                continue
+        
             # 空白行：结块 + 插入独立空白块
             if raw.strip() == "":
                 if current:
@@ -493,16 +518,15 @@ class Manager(manager.Manager):
                     current = []
                 blocks.append(["\t"*ANS_BLOCK_ADD + "- "] if ANS_BLOCK_ADD else [""])
                 continue
-
+        
             line, is_header, indent_units = self.normalize_and_check(raw)
-
             if is_header:
                 # 遇到 header → 断开旧块，开始新块
                 if current:
                     blocks.append(current)
                 current = [line]
-                if indent_units < 2 :
-                    current[0]  = "\t" * ANS_BLOCK_ADD + current[0]
+                if indent_units < 2:
+                    current[0] = "\t" * ANS_BLOCK_ADD + current[0]
             else:
                 # 普通行
                 if current:
@@ -510,13 +534,16 @@ class Manager(manager.Manager):
                 else:
                     if ANS_BLOCK_ADD == 0:
                         ANS_BLOCK_ADD = 2
-                    current = ["\t"*ANS_BLOCK_ADD +"- " + line] if ANS_BLOCK_ADD else [line] 
-
+                    current = ["\t"*ANS_BLOCK_ADD + "- " + line] if ANS_BLOCK_ADD else [line]
+    
+        # 处理未结束的代码块（如果有）
+        if in_code_block and code_block:
+            blocks.append(code_block)
+    
         if current:
             blocks.append(current)
-
+    
         return blocks
-
     def flatten(self, blocks):
         result = []
         for group in blocks:
