@@ -306,9 +306,8 @@ class Manager(manager.Manager):
         """
         processed_result = []
 
-        # pattern = r'(\t+-[\x20]|\t-@ans[\x20])'
-        pattern = r'(\t*-[\x20])'
-        tab_block_pairs = re.split(pattern, block_string)
+        pattern = r'((?:^\t*)-\x20)'
+        tab_block_pairs = re.split(pattern, block_string, flags=re.MULTILINE)
         if tab_block_pairs[0] == '':
             tab_block_pairs = tab_block_pairs[1:]
 
@@ -413,18 +412,6 @@ class Manager(manager.Manager):
     
         return result
 
-    # ans 之前的子块转换, 将开头的若干空格 + "- " 转换为 "\t- " 子块格式
-    def convert_indent_before_ans_block(self, line: str) -> str:
-        # 匹配：开头若干空格 + "- "    ^( *)-
-        m = re.match(r'^( *)- ', line)
-        if not m:
-            return line
-
-        spaces = len(m.group(1)) + 2 # 额外添加 2 个空格
-        tabs = '\t' * (spaces // 2)
-        rest = ' ' * (spaces % 2)    # 如果有多出来的 1 个空格，就保留它
-        return tabs + rest + line[spaces - 2:]
-    
     # 匹配“行首”的 # 后跟一个或多个空格，返回 # 的数量, 否则返回0
     # 用于处理 que 标签时，判断上一行是否为 tag 行
     def match_tag_in_line(self, line: str) -> int:
@@ -458,8 +445,7 @@ class Manager(manager.Manager):
             indent_units = 0
         return new_line, is_header, indent_units
 
-    def split_blocks_and_blank(self, lines: List[str]) -> List[List[str]]:
-        ANS_BLOCK_ADD = 2
+    def split_blocks_and_blank(self, lines: List[str], add_block_num) -> List[List[str]]:
         # 改进的正则：捕获缩进部分（\t*）、可选的header前缀（"- " 或 "  "）
         CODE_BLOCK_RE = re.compile(r'^(?P<indent>\t*)(?P<prefix>-\x20|[\x20]{0,2})```')
     
@@ -489,11 +475,11 @@ class Manager(manager.Manager):
                     indent_count = len(indent)
                 
                     if not has_header_prefix:
-                        # 没有 header 前缀，添加 "\t\t- "
-                        code_block = ["\t\t- " + raw]
-                    elif indent_count < 2:
-                        # 有 header 前缀但缩进不足2个，补齐到2个
-                        needed_tabs = 2 - indent_count
+                        # 没有 header 前缀，添加 '\t'*add_block_num + "- "
+                        code_block = ['\t'*add_block_num + "- " + raw]
+                    elif indent_count < add_block_num:
+                        # 有 header 前缀但缩进不足 add_block_num 个，补齐到 add_block_num 个
+                        needed_tabs = add_block_num - indent_count
                         code_block = [("\t" * needed_tabs) + raw]
                     else:
                         # 缩进已经足够，保持原样
@@ -516,7 +502,7 @@ class Manager(manager.Manager):
                 if current:
                     blocks.append(current)
                     current = []
-                blocks.append(["\t"*ANS_BLOCK_ADD + "- "] if ANS_BLOCK_ADD else [""])
+                # blocks.append(["\t"*add_block_num + "- "] if add_block_num else [""])
                 continue
         
             line, is_header, indent_units = self.normalize_and_check(raw)
@@ -525,16 +511,16 @@ class Manager(manager.Manager):
                 if current:
                     blocks.append(current)
                 current = [line]
-                if indent_units < 2:
-                    current[0] = "\t" * ANS_BLOCK_ADD + current[0]
+                if indent_units < add_block_num:
+                    current[0] = "\t" * add_block_num + current[0]
             else:
                 # 普通行
                 if current:
                     current.append(line)
                 else:
-                    if ANS_BLOCK_ADD == 0:
-                        ANS_BLOCK_ADD = 2
-                    current = ["\t"*ANS_BLOCK_ADD + "- " + line] if ANS_BLOCK_ADD else [line]
+                    if add_block_num == 0:
+                        add_block_num = add_block_num
+                    current = ["\t"*add_block_num + "- " + line] if add_block_num else [line]
     
         # 处理未结束的代码块（如果有）
         if in_code_block and code_block:
@@ -543,7 +529,8 @@ class Manager(manager.Manager):
         if current:
             blocks.append(current)
     
-        return blocks
+        return self.flatten(blocks)
+
     def flatten(self, blocks):
         result = []
         for group in blocks:
@@ -597,7 +584,8 @@ class Manager(manager.Manager):
                     todo_key[3]:todo_value[1]}
         content = self.replace_error_tag_str(content)
         content = self.replace_outside_code_blocks(content)
-        content_list = content.split('\n')
+        content_list = content.rstrip().split('\n')
+        ans_line_num = None
         for i, content in enumerate(content_list):
             if not content.strip():
                 continue
@@ -634,18 +622,15 @@ class Manager(manager.Manager):
                     content = ans_strings[1] + content.lstrip(' ')[len(ans_matched):]
                     content_list[i] = content
                     ans_flag = True
-                    # 对 i+1 之后的行先做缩进处理, 先去除最小缩进
-                    # tail = self.remove_minimum_indentation(content_list[i+1:])
-                    # 更具空行拆分为多个块
-                    # splited_tail_block = self.split_and_keep_blank(tail)
                     # 每个块的第一行，加上前缀，"\t- "
                     # 拼回整体, 直接就地替换
-                    content_list[i+1:] = self.flatten(
-                        self.split_blocks_and_blank(content_list[i+1:]))
+                    content_list[i+1:] = self.split_blocks_and_blank(
+                        content_list[i+1:], 2)
+                    ans_line_num = i
                     break
-                # 普通子块转换, ans 之前的子块
-                content = self.convert_indent_before_ans_block(content)
-                content_list[i] = content
+                # ans 未出现前，处理 ans 之前的子块缩进
+                # content_list[:i] = self.split_blocks_and_blank(content_list[:], 1)
+
 
             # 解析`--todo ` 变为子块
             if not ans_flag and (content.strip()[:len(todo_key[0])] in todo_map
@@ -653,7 +638,10 @@ class Manager(manager.Manager):
                 new_content = todo_map[content.strip()[:len(todo_key[0])]] + content[len(todo_key[0]):]
                 content_list[i] = new_content
 
-
+        if ans_line_num is None or ans_line_num > 0:
+            if ans_line_num is None:
+                ans_line_num = len(content_list)
+            content_list[:ans_line_num] = self.split_blocks_and_blank(content_list[:ans_line_num], 1)
         # 重新组成串,并去除前后的空格与换行符等空白字符
         return "\n".join(content_list).strip()
 
@@ -831,42 +819,20 @@ class Manager(manager.Manager):
     def sync_contents_to_db(self, contents, table_name, data_base_path):
         self.driver.sync_contents_to_db(contents, table_name, data_base_path)
 
-
-    # s is input text
-    def normalize_text(self, s):
-        BLOCK_SEPARATOR = r'\t+-\s'
-        s = re.sub(BLOCK_SEPARATOR, "", s).strip()
-        s = re.sub(r'@blk',  ' ', s).strip()
-        s = re.sub(r'\s+',  ' ', s).strip()
-        # s = re.sub(r". ,","",s)
-        # remove all instances of multiple spaces
-        s = s.replace("\n", "")
-        s = s.replace("..",".")
-        s = s.replace(". .",".")
-        s = s.strip()
-
-        return s
-
     def get_que_string_from_content(self, content: str) -> List[str]:
         """get que  content
-
         Args:
             content (string): diary content
-
         Returns:
             List[str]
         """
-        # "#s?que" 匹配 "#que" "#sque"
-        separators = ["#s?que", "#ans"]
-        result = []
-        # 匹配标签，找到所有的标签
-        if re.search(separators[0], content):
-            content_split_0_list = re.split(f"({separators[0]})", content)
-            for i in range(2, len(content_split_0_list), 2):
-                content_split_1_list = re.split(f"({separators[1]})",
-                                                    content_split_0_list[i])
-                result.append(self.normalize_text(content_split_1_list[0]))
-        return result
+        # 匹配 que 内容的正则表达式, \Z 表示字符串的结尾 ?= 代表前瞻
+        pattern = re.compile(r'^\t*(?:-|\x20)\x20#s?que\s+(.*?)(?=\t+-\x20|\Z)', re.MULTILINE | re.DOTALL)
+        res = []
+        for item in pattern.findall(content):
+            # remove extra indentations
+            res.append(re.sub(r'\n\t*\x20*', '\n', item))
+        return res
 
     def get_all_que_from_contents(self, contents: List[str]) -> List[str]:
         """get all que string from contents

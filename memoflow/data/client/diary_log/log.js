@@ -573,15 +573,15 @@ function processInputAndReturnString(process_input, pattern_logseq_child) {
  * @returns {string}
  */
 function trimTabsMultiline(text, num) {
-    const pattern_t = /^(\t+)(-\x20| {2})/gm;
+    const pattern_t = /^(\t*)(-\x20| {2})/gm;
     return text.replace(pattern_t, (match, tabs, block) => {
-    const count = tabs.length;
-    if (count < num) return match; // 不够删
+    const count = tabs.length + 1;
+    if (count < num) {return match;} // 不够删
     const newTabs = tabs.slice(num);
-    if(block === '  ') {
-        return newTabs + match.slice(tabs.length+block.length);
+    if(block === '- ') {
+        return newTabs + block;
     }
-    return newTabs + match.slice(tabs.length);
+    return newTabs 
     });
 }
 

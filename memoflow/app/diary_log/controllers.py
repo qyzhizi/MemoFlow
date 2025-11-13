@@ -451,12 +451,8 @@ class DiaryLog(wsgi.Application):
 
         que_strings: str = self.diary_log_api.get_que_string_from_content(
             processed_block_content)
-        que_string = que_strings[0] if que_strings else None
-
         old_que_strings: str = self.diary_log_api.get_que_string_from_content(
             old_diary_content[0])
-        old_que_string = old_que_strings[0] if old_que_strings else None
-
         # 异步更新 `que_string` 到向量数据库
         self.asyn_update_que_string_to_vector_db_coll(
             user_id, diary_log["record_id"], old_que_strings, que_strings, tags)
