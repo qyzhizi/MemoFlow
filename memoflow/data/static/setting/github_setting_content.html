@@ -1,16 +1,8 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Settings</title>
     <meta charset="UTF-8">
-    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
-
-
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro"> -->
-
 </head>
 
 <body>
@@ -23,7 +15,6 @@
         <span class="text-sm mr-1 text-gray-500">
             Basic
         </span>
-        <!-- <hr class="setting_hr_2"> -->
         <div class="setting-title">
             <div class="flex flex-row items-center">
                 <div class="w-auto flex items-center">
@@ -32,7 +23,6 @@
                     </span>
                 </div>
             </div>
-            <!-- <button class="css-button" bype="button">保存</button> -->
         </div>
         <div class="flex flex-row items-center justify-content-space_evenly">
             <a class="github-authorization" id="github-bind" href="/v1/diary-log/github-authenticate" >
@@ -43,8 +33,6 @@
             </a>
 
         </div>
-            
-        <!-- <hr class="setting_hr"> -->
 
         <div class="setting-title">
             <div class="flex flex-row items-center">
@@ -54,54 +42,16 @@
                     </span>
                 </div>
             </div>
-            <!-- <button class="css-button" bype="button">保存</button> -->
         </div>
         <div class="css-setting-content w-full">
-            <!-- <input placeholder="e.g.: Username/RepoName" class="css-setting-input" value> -->
             <input id="gitRepPathInput" placeholder="e.g.: Username/RepoName" class="css-setting-input" value>
         </div>
 
-        <!-- <div class="setting-title">
-            <div class="flex flex-row items-center">
-                <div class="w-auto flex items-center">
-                    <span class="text-sm mr-1">
-                        (3) Git Current Sync File Name
-                    </span>
-                </div>
-            </div>
-        </div>
-        <div class="css-setting-content w-full">
-            <input id="gitCurrentSyncFileNameInput" placeholder="e.g.: /path/1.md" class="css-setting-input" value>
-        </div>
-
-        <div class="setting-title">
-            <div class="flex flex-row items-center">
-                <div class="w-auto flex items-center">
-                    <span class="text-sm mr-1">
-                        (4) Git Other Sync File Name
-                    </span>
-                </div>
-            </div>
-        </div>
-        <div class="css-setting-content w-full">
-            <input id="gitOtherSyncFileNameInput"
-            placeholder="comma-separated paths, e.g.: /path/2.md, /path/3.md" class="css-setting-input" value>
-        </div> -->
         <hr class="setting_hr_2">
         <div class="setting-title">
             <button id="github-save-changes-and-test-connection" class="css-button" 
             type="button">Save Changes and Test Connection</button>
         </div>
-
-        <!-- <hr class="setting_hr_2">
-        <span class="text-sm mr-1 text-gray-500">
-            Action
-        </span>
-        <div class="setting-title">
-            <button id="pull_from_github" class="css-button">Pull Current Sync File To Database</button>
-        </div> -->
-        
-
     </div>
 </body>
 </html>

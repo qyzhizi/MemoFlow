@@ -1,4 +1,4 @@
-import "https://cdn.jsdelivr.net/gh/qyzhizi/chun-mde-dist@v0.1.0/dist/chunmde.bundle.min.js";
+import "https://cdn.jsdelivr.net/gh/qyzhizi/chun-mde-dist@v0.1.1/dist/chunmde.bundle.min.js";
 
 
 const { 

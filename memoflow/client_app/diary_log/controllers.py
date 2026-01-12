@@ -130,8 +130,10 @@ class DiaryLog(wsgi.Application):
         response = Response()
         # Set Cache-Control header to cache the resource for 1 hour
         # response.cache_control = 'public, max-age=3600'        
+        # 设置不缓存, 强制每次都验证, 与 if_modified_since 配合使用
         response.headers["Cache-Control"] = "no-cache"
         if req.if_modified_since and req.if_modified_since >= last_modified:
+            # 资源未修改，返回304状态码，if-modified-since 是求头中的时间，last_modified是文件最后修改时间
             response.status = '304 Not Modified'
         else:
             content_type = 'text/plain'
