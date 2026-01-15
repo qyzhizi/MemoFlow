@@ -2,7 +2,7 @@ import os
 import logging
 import sqlite3
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from memoflow.conf import CONF
 from memoflow.utils.common import is_nested_list
@@ -796,7 +796,7 @@ class DBSqliteDriver(object):
         time_values = []
         if no_create_time or no_update_time:
             # Calculate the initial time
-            current_time = datetime.now().replace(microsecond=0)-\
+            current_time = datetime.now(timezone.utc).replace(microsecond=0)-\
                  timedelta(seconds=len(records)) 
             time_values = [(current_time + timedelta(seconds=i),
                             current_time + timedelta(seconds=i)) 

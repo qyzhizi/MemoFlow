@@ -4,10 +4,8 @@
 import base64
 import logging
 import json
-import datetime
+from datetime import datetime, timedelta, timezone
 import time
-# from datetime import datetime
-# from datetime import timedelta
 from webob.exc import HTTPUnauthorized
 from webob.exc import HTTPFound
 from webob import Response
@@ -132,23 +130,30 @@ class DiaryLog(wsgi.Application):
         if username and password and (username == user_name_db and
             hashed_password == password_db):
             # 获取当前时间
-            current_time = datetime.datetime.now()
-            # 计算过期时间为当前时间后的24*7小时
-            expires = current_time + datetime.timedelta(hours=24*7)
+            current_time = datetime.now(timezone.utc)
+            # 统一设置有效期为 7 天
+            EXPIRATION_DELTA = 7 * 24 * 60 * 60  # 秒
+            expires = current_time + timedelta(seconds=EXPIRATION_DELTA)
             token = self.diary_log_api.generate_token(user_info['id'], expires)
 
             # 创建响应对象
             response = Response(json.dumps({"token": token}))
             # 设置名为 "user_id" 的 Cookie，值为用户ID
 
-            response.set_cookie('MemoFlowAuth', 'Bearer ' + token, expires=expires, httponly=True)
+            # Cookie 过期时间，可以和 EXPIRATION_DELTA 保持一致，或者稍微多加几秒作为缓冲。
+            response.set_cookie(
+                'MemoFlowAuth',
+                'Bearer ' + token,
+                max_age=EXPIRATION_DELTA+5,  # 秒
+                httponly=True,
+                samesite='Lax',
+                # secure=True,   # 如果是 HTTPS
+            )
 
             return response
         else:
             raise VisibleException(
                 f"User: {username} not exist or Password not correct!")
-
-        return response
     
     def logout(self, req):
         ''' 清除用户身份验证信息并注销会话 '''
@@ -802,10 +807,16 @@ class DiaryLog(wsgi.Application):
         self.diary_db_api.user_add_or_update_github_access_data_to_db(
             user_id, github_tokens_info)
 
-        access_token_expires_at = github_tokens_info\
-            ['access_token_expires_at'].strftime("%Y-%m-%d %H:%M:%S")
-        refresh_token_expires_at = github_tokens_info\
-        ['refresh_token_expires_at'].strftime("%Y-%m-%d %H:%M:%S")
+        access_token_expires_at = (
+            github_tokens_info['access_token_expires_at']
+            .astimezone(timezone.utc)
+            .isoformat()
+        )
+        refresh_token_expires_at = (
+            github_tokens_info['refresh_token_expires_at']
+            .astimezone(timezone.utc)
+            .isoformat()
+        )
 
         return Response(json.dumps({
             "success:": 1,
@@ -1068,9 +1079,11 @@ class DiaryLog(wsgi.Application):
         refresh_token = github_access_info.get('refresh_token', None)
         access_token_expires_at = github_access_info.get(
             'access_token_expires_at', None)
-        access_token_expires_at = datetime.datetime.strptime\
-            (access_token_expires_at, '%Y-%m-%d %H:%M:%S.%f') \
-                if access_token_expires_at else None
+        access_token_expires_at = (
+            datetime.fromisoformat(access_token_expires_at)
+            if access_token_expires_at
+            else None
+        )
         
         if not refresh_token or not access_token_expires_at:
             LOG.error( "github refresh token don't exit, "
@@ -1079,15 +1092,17 @@ class DiaryLog(wsgi.Application):
                     "please bing github again")
 
         # 获取当前时间
-        current_datetime = datetime.datetime.now()
+        current_datetime = datetime.now(timezone.utc)
         # if access_token hans expired
         if current_datetime >= access_token_expires_at:
             LOG.warn("access_token has expired")
             refresh_token_expires_at = github_access_info[
                 'refresh_token_expires_at']
-            refresh_token_expires_at = datetime.datetime.strptime\
-                    (refresh_token_expires_at,
-                    '%Y-%m-%d %H:%M:%S.%f')
+            refresh_token_expires_at = (
+                datetime.fromisoformat(refresh_token_expires_at)
+                if refresh_token_expires_at
+                else None
+            )
             # if refresh token alse has expired
             if current_datetime > refresh_token_expires_at:
                 LOG.error( "github refresh token has expired, \

@@ -1,6 +1,6 @@
 import logging
 import jwt
-import datetime
+from datetime import datetime, timezone
 import secrets
 import json
 from functools import wraps
@@ -16,7 +16,7 @@ class TokenManager:
     @classmethod
     def generate_token(cls, user_id, expiration_time=None):
         if not expiration_time:
-            expiration_time = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+            expiration_time = datetime.now(timezone.utc) + datetime.timedelta(hours=24)
         token = jwt.encode({"user_id": user_id, "exp": expiration_time}, cls.secret_key, algorithm="HS256")
         return token
     
@@ -24,7 +24,7 @@ class TokenManager:
     def invalidate_token(cls, token):
         # 将 token 的过期时间设置为当前时间，使其立即失效
         invalid_token = jwt.decode(token, cls.secret_key, algorithms=["HS256"])
-        invalid_token['exp'] = datetime.utcnow()
+        invalid_token['exp'] = datetime.now(timezone.utc)
         return jwt.encode(invalid_token, cls.secret_key, algorithm="HS256")
 
     @classmethod

@@ -106,7 +106,7 @@ $('#github-save-changes-and-test-connection').click(function() {
                 getGithubConfig();
             }
             else if (jsonResponse.config_input_flag === 0){
-                alert("input `Git Rep Path` is empty")
+                alert("input `Git Repo Path` is empty")
             }
             else{alert("Failed, please check your configuration")}
 

@@ -6,7 +6,7 @@
 import sys
 # sys.path.insert(0,"")
 
-from datetime import datetime
+from datetime import datetime, timezone
 import sqlite3
 
 from memoflow.conf import CONF
@@ -18,7 +18,7 @@ conn = sqlite3.connect(path)
 c = conn.cursor()
 
 
-now = datetime.now()
+now = datetime.now(timezone.utc)
 formatted_date = now.strftime("%Y%m%d%H%M%S%f")[:-5]
 
 # 表名

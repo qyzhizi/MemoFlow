@@ -3,8 +3,7 @@
 import asyncio
 import logging
 import json
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 import requests
 import uuid
 from webob import Request
@@ -137,27 +136,28 @@ class Manager(manager.Manager):
             raise Exception("Network Error, Can't get accesstoken by refresh token, try again later!")
 
     def process_github_tokens_info_to_db_format(self, github_tokens_info):
-        access_token = github_tokens_info.get('access_token', None)
-        github_access_token_expires_in = github_tokens_info.get('expires_in', None)
-        refresh_token = github_tokens_info.get('refresh_token', None)
-        github_refresh_token_expires_in = github_tokens_info.get('refresh_token_expires_in', None)
+        access_token = github_tokens_info.get('access_token')
+        github_access_token_expires_in = github_tokens_info.get('expires_in')
+        refresh_token = github_tokens_info.get('refresh_token')
+        github_refresh_token_expires_in = github_tokens_info.get('refresh_token_expires_in')
 
-        # 获取当前时间
-        current_time = datetime.now()
+        # 获取当前 UTC 时间（时区感知）
+        current_time = datetime.now(timezone.utc)
 
-        # 增加 github_access_token_expires_in 秒（8小时），然后减去120秒
-        access_token_expires_at = current_time + timedelta\
-            (seconds=(github_access_token_expires_in - 120))
-        refresh_token_expires_at = current_time + timedelta\
-            (seconds=(github_refresh_token_expires_in - 120))
+        # 计算过期时间（提前 120 秒）
+        access_token_expires_at = current_time + timedelta(
+            seconds=github_access_token_expires_in - 120
+        )
+        refresh_token_expires_at = current_time + timedelta(
+            seconds=github_refresh_token_expires_in - 120
+        )
 
-        github_tokens_info = {
+        return {
             'access_token': access_token,
             'access_token_expires_at': access_token_expires_at,
             'refresh_token': refresh_token,
             'refresh_token_expires_at': refresh_token_expires_at,
         }
-        return github_tokens_info
 
     def test_github_access(
             self,
@@ -1095,7 +1095,7 @@ class DiaryDBManager(manager.Manager):
         """
         table_name = self.driver.get_table_name_by_user_id(user_id)
         tags_string = ','.join(tags)
-        update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        update_time = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
         update_data_dict = {'content': content,
                             'tags': tags_string,
                             'update_time': update_time,
