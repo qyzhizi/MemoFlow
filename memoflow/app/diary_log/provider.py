@@ -53,7 +53,6 @@ class Manager(manager.Manager):
         return TokenManager.verify_token(token)
 
     def get_access_token(self, code):
-
         CLIENT_SECRET = CONF.diary_log['CLIENT_SECRET']
         CLIENT_ID = CONF.diary_log['CLIENT_ID']
         # 回调 URL，需与 GitHub App 中设置的一致
@@ -90,6 +89,29 @@ class Manager(manager.Manager):
             return data
         else:
             return None
+
+    # def get_access_token(self, code):
+    #     token_url = 'https://github.com/login/oauth/access_token'
+    #     payload = {
+    #             'client_id': CONF.diary_log['CLIENT_ID'],
+    #             'client_secret': CONF.diary_log['CLIENT_SECRET'],
+    #             'code': code,
+    #     }
+    #     headers = {'Accept': 'application/json'}
+    #     try:
+    #         resp = requests.post(token_url, data=payload,
+    #                                 headers=headers, timeout=10)
+    #     except requests.RequestException as e:
+    #         LOG.error("get github token failed: %s" % e)
+    #         return None
+
+    #     if resp.status_code == 200:
+    #         res_json =  resp.json()
+    #         LOG.info("get_access_token res_json: %s" % res_json)
+    #         return res_json
+
+    #     LOG.error("github token response: %s %s" % (resp.status_code, resp.text))
+    #     return None
 
     def get_github_access_token_by_refresh_token(self, refresh_token):
         # 参考：
