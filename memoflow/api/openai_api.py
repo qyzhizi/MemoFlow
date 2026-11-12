@@ -1,7 +1,12 @@
 import logging
 import openai
 from memoflow.conf import CONF
-from tenacity import retry, stop_after_attempt, wait_random_exponential
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_random_exponential,
+    retry_if_not_exception_type
+)
 from typing import (
     Any,
     Callable,
@@ -81,17 +86,86 @@ class OpenAIEmbedding(object):
             raise  # Re-raise the exception to trigger the retry mechanism
         return sorted(response.data, key=lambda x: x["index"])
     
-    @retry(wait=wait_random_exponential(min=0.5, max=20), stop=stop_after_attempt(6))
-    async def async_get_chunk_embeddings(self, chunk_text: List[str]) -> List[List[float]]:
-        LOG.info("start embedding async request")
-        try:
-            response = await openai.Embedding.acreate(input=chunk_text, model=self.openai_api_model)
-        except Exception as e:
-            LOG.error(f"fail embedding chunk_text: {chunk_text}")
-            LOG.error(f"Error occurred: {e}")
-            raise  # Re-raise the exception to trigger the retry mechanism
+    @retry(
+        wait=wait_random_exponential(min=0.5, max=20),
+        stop=stop_after_attempt(6),
+        retry=retry_if_not_exception_type(ValueError)
+    )
+    async def async_get_chunk_embeddings(
+        self,
+        chunk_text: List[str]
+    ) -> List[Dict[str, Any]]:
 
-        return sorted(response['data'], key=lambda x: x["index"])
+        LOG.info(
+            f"start embedding async request, batch size: {len(chunk_text)}"
+        )
+
+        try:
+            response = await openai.Embedding.acreate(
+                input=chunk_text,
+                model=self.openai_api_model
+            )
+
+            return sorted(
+                response['data'],
+                key=lambda x: x["index"]
+            )
+
+        except Exception as e:
+
+            error_message = str(e).lower()
+
+            # 判断是否属于上下文长度超限错误
+            is_context_error = (
+                "max context reached" in error_message
+                or "context length" in error_message
+                or "8007" in error_message
+            )
+
+            if is_context_error:
+
+                # 如果只剩一个文本，无法继续按批次拆分
+                if len(chunk_text) <= 1:
+                    LOG.error(
+                        "Single text exceeds model context limit. "
+                        f"Text length: {len(chunk_text[0])} characters"
+                    )
+                    raise ValueError(
+                        "Single text exceeds embedding model context limit. "
+                        "Please split this text into smaller chunks."
+                    ) from e
+
+                # 将当前批次一分为二
+                mid = len(chunk_text) // 2
+
+                first_batch = chunk_text[:mid]
+                second_batch = chunk_text[mid:]
+
+                LOG.warning(
+                    "Embedding context limit exceeded. "
+                    f"Split batch {len(chunk_text)} into "
+                    f"{len(first_batch)} + {len(second_batch)}"
+                )
+
+                # 递归处理两个子批次
+                first_result = await self.async_get_chunk_embeddings(
+                    first_batch
+                )
+
+                second_result = await self.async_get_chunk_embeddings(
+                    second_batch
+                )
+
+                # 合并结果，保持原始顺序
+                return first_result + second_result
+
+            # 其他错误交给 tenacity 处理
+            LOG.error(
+                f"Embedding request failed, batch size: {len(chunk_text)}"
+            )
+            LOG.error(f"Error occurred: {e}")
+
+            raise
 
     def get_embeddings_use_async_loop(self, list_of_text: List[str], batch_size: int) -> List[List[float]]:
         # replace newlines, which can negatively affect performance.
